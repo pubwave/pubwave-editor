@@ -1,0 +1,42 @@
+# Source files (not needed in published package)
+src/
+tests/
+examples/
+
+# Config files
+.github/
+.specify/
+specs/
+.vscode/
+eslint.config.js
+tsconfig.json
+tsconfig.build.json
+vite.config.ts
+vitest.config.ts
+playwright.config.ts
+.prettierrc*
+.prettierignore
+
+# Build artifacts
+*.tsbuildinfo
+.cache/
+
+# Development
+node_modules/
+*.log
+.env
+.env.*
+
+# Test outputs
+coverage/
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# OS & IDE
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*.swo

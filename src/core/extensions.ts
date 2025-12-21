@@ -1,0 +1,139 @@
+/**
+ * Extensions Registry
+ *
+ * Composes and exports the Tiptap extensions used by the editor.
+ * This provides a centralized place for extension configuration.
+ */
+
+import { Extension } from '@tiptap/core';
+import Placeholder from '@tiptap/extension-placeholder';
+import History from '@tiptap/extension-history';
+import Dropcursor from '@tiptap/extension-dropcursor';
+import Gapcursor from '@tiptap/extension-gapcursor';
+
+import type { BlockType, MarkType } from '../types/editor';
+import {
+  createBlockExtensions,
+  type BlockExtensionsConfig,
+} from './extensions/blocks';
+import {
+  createMarkExtensions,
+  type MarkExtensionsConfig,
+} from './extensions/marks';
+import {
+  createSlashCommandsExtension,
+  defaultSlashCommands,
+  type SlashCommand,
+} from '../ui/SlashMenu';
+
+/**
+ * Supported block types
+ */
+export const SUPPORTED_BLOCKS: readonly BlockType[] = [
+  'paragraph',
+  'heading',
+  'bulletList',
+  'orderedList',
+  'taskList',
+  'blockquote',
+  'codeBlock',
+  'horizontalRule',
+] as const;
+
+/**
+ * Supported mark types
+ */
+export const SUPPORTED_MARKS: readonly MarkType[] = [
+  'bold',
+  'italic',
+  'underline',
+  'strike',
+  'code',
+  'link',
+] as const;
+
+/**
+ * Configuration for creating the extension set
+ */
+export interface ExtensionConfig
+  extends BlockExtensionsConfig,
+    MarkExtensionsConfig {
+  /**
+   * Placeholder text for empty editor
+   */
+  placeholder?: string;
+
+  /**
+   * Undo/redo history depth
+   * @default 100
+   */
+  historyDepth?: number;
+
+  /**
+   * Enable slash commands menu
+   * @default true
+   */
+  enableSlashCommands?: boolean;
+
+  /**
+   * Custom slash commands (merged with defaults)
+   */
+  slashCommands?: SlashCommand[];
+}
+
+/**
+ * Create the core extension set for the editor
+ *
+ * This composes all block, mark, and feature extensions into a single array.
+ */
+export function createExtensions(config: ExtensionConfig = {}): Extension[] {
+  const {
+    placeholder = 'Type "/" for commands...',
+    historyDepth = 100,
+    headingLevels,
+    linkOpenInNewTab,
+    linkOpenOnClick,
+    enableSlashCommands = true,
+    slashCommands,
+  } = config;
+
+  const extensions: Extension[] = [
+    // Block extensions (document structure + block types)
+    ...createBlockExtensions({ headingLevels }),
+
+    // Mark extensions (inline formatting)
+    ...createMarkExtensions({ linkOpenInNewTab, linkOpenOnClick }),
+
+    // Editor features
+    Placeholder.configure({
+      placeholder,
+      emptyEditorClass: 'pubwave-editor--empty',
+      emptyNodeClass: 'pubwave-editor__node--empty',
+    }),
+    History.configure({
+      depth: historyDepth,
+    }),
+    Dropcursor.configure({
+      color: 'var(--pubwave-dropcursor-color, #3b82f6)',
+      width: 2,
+    }),
+    Gapcursor,
+  ];
+
+  // Slash commands (optional)
+  if (enableSlashCommands) {
+    const commands = slashCommands
+      ? [...defaultSlashCommands, ...slashCommands]
+      : defaultSlashCommands;
+    extensions.push(createSlashCommandsExtension(commands));
+  }
+
+  return extensions as Extension[];
+}
+
+/**
+ * Get the default extensions with standard configuration
+ */
+export function getDefaultExtensions(): Extension[] {
+  return createExtensions();
+}
