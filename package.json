@@ -29,6 +29,7 @@
   ],
   "scripts": {
     "dev": "vite",
+    "dev:lib": "vite --mode lib",
     "build": "tsc -b && vite build",
     "build:lib": "vite build --mode lib",
     "lint": "eslint .",
