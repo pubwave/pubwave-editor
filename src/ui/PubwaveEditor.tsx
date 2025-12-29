@@ -238,7 +238,7 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
         data-testid={testId}
         role="application"
         aria-label={ariaLabels.editor}
-        style={{ position: 'relative' }}
+        style={{ position: 'relative', overflow: 'visible' }}
       >
         <EditorContent editor={editor} />
         {/* Bubble toolbar - appears only on non-empty text selection (US2) */}

@@ -135,21 +135,33 @@ export function moveBlock(
   const { tr, doc } = state;
 
   // Find the block at the source position
+  // fromPos might be a position inside the block, so findBlockAtPos should find the containing block
   const sourceBlock = findBlockAtPos(doc, fromPos);
   if (!sourceBlock) {
     return false;
   }
 
+  // Find the target block
+  // toPos should be the position of the target block
+  const targetBlock = findBlockAtPos(doc, toPos);
+  if (!targetBlock) {
+    return false;
+  }
+
   // Calculate the actual insertion position
-  let insertPos = toPos;
+  let insertPos = targetBlock.pos;
   if (position === 'after') {
-    const targetBlock = findBlockAtPos(doc, toPos);
-    if (targetBlock) {
-      insertPos = targetBlock.pos + targetBlock.node.nodeSize;
-    }
+    insertPos = targetBlock.pos + targetBlock.node.nodeSize;
   }
 
   // If moving to the same position, do nothing
+  // Check if source and target are the same block
+  if (sourceBlock.pos === targetBlock.pos) {
+    return false;
+  }
+  
+  // Check if we're trying to insert at the exact same position (before or after source)
+  // This handles the case where we're moving a block to immediately before/after itself
   if (
     insertPos === sourceBlock.pos ||
     insertPos === sourceBlock.pos + sourceBlock.node.nodeSize
@@ -157,23 +169,42 @@ export function moveBlock(
     return false;
   }
 
-  // Adjust insert position if source is before target
+  // Store source node and positions
+  const sourceNode = sourceBlock.node;
+  const sourceStart = sourceBlock.pos;
+  const sourceEnd = sourceBlock.pos + sourceNode.nodeSize;
+
+  // Create a slice of the source block
+  const slice = doc.slice(sourceStart, sourceEnd);
+
+  // Calculate adjusted insert position considering deletion
+  // We need to adjust the insert position based on where the source is relative to the target
   let adjustedInsertPos = insertPos;
-  if (sourceBlock.pos < insertPos) {
-    adjustedInsertPos -= sourceBlock.node.nodeSize;
+  
+  if (sourceStart < insertPos) {
+    // Source is before target: after deletion, insert position decreases by source size
+    adjustedInsertPos = insertPos - sourceNode.nodeSize;
   }
-
-  // Create the transaction
-  const slice = doc.slice(
-    sourceBlock.pos,
-    sourceBlock.pos + sourceBlock.node.nodeSize
-  );
-
-  // Delete the source block
-  tr.delete(sourceBlock.pos, sourceBlock.pos + sourceBlock.node.nodeSize);
-
-  // Insert at the new position
-  tr.insert(adjustedInsertPos, slice.content);
+  // If source is after target, insertPos doesn't need adjustment
+  
+  // Delete source block first
+  tr.delete(sourceStart, sourceEnd);
+  
+  // Insert at adjusted position (using slice content, not the node itself)
+  // Slice.content contains Fragment, which can be inserted directly
+  // Ensure the position is valid after deletion
+  const maxPos = tr.doc.content.size;
+  if (adjustedInsertPos < 0) {
+    adjustedInsertPos = 0;
+  } else if (adjustedInsertPos > maxPos) {
+    adjustedInsertPos = maxPos;
+  }
+  
+  if (adjustedInsertPos >= 0 && adjustedInsertPos <= maxPos) {
+    tr.insert(adjustedInsertPos, slice.content);
+  } else {
+    return false;
+  }
 
   // Preserve selection at the moved block using mapped positions
   tr.setSelection(state.selection.map(tr.doc, tr.mapping));
@@ -188,7 +219,7 @@ export function moveBlock(
 /**
  * Create the DnD ProseMirror plugin
  */
-export function createDndPlugin(): Plugin<DndState> {
+export function createDndPlugin(editor?: Editor): Plugin<DndState> {
   let currentState = initialDndState;
 
   return new Plugin<DndState>({
@@ -198,8 +229,15 @@ export function createDndPlugin(): Plugin<DndState> {
       init(): DndState {
         return initialDndState;
       },
-      apply(_tr, value): DndState {
-        // State is managed externally via dispatch
+      apply(tr, value): DndState {
+        // Extract state from transaction meta if present
+        const meta = tr.getMeta(dndPluginKey);
+        if (meta !== undefined) {
+          currentState = meta as DndState;
+          return meta as DndState;
+        }
+        // Otherwise, update currentState and return existing value
+        currentState = value;
         return value;
       },
     },
@@ -226,6 +264,10 @@ export function createDndPlugin(): Plugin<DndState> {
           event.preventDefault();
           event.dataTransfer.dropEffect = 'move';
 
+          // Get current state from plugin
+          const pluginState = dndPluginKey.getState(view.state) as DndState | null;
+          currentState = pluginState ?? currentState;
+
           // Calculate drop target position
           const pos = view.posAtCoords({
             left: event.clientX,
@@ -250,6 +292,9 @@ export function createDndPlugin(): Plugin<DndState> {
                 pos: block.pos,
                 position: dropPosition,
               });
+
+              // Dispatch state update so it's available in drop handler
+              view.dispatch(view.state.tr.setMeta(dndPluginKey, currentState));
             }
           }
 
@@ -264,26 +309,89 @@ export function createDndPlugin(): Plugin<DndState> {
           }
 
           event.preventDefault();
+          event.stopPropagation();
 
-          const { draggingBlockPos, dropTargetPos, dropPosition } = currentState;
-
-          if (
-            draggingBlockPos !== null &&
-            dropTargetPos !== null &&
-            dropPosition !== null
-          ) {
-            // Perform the move
-            const editor = (view as unknown as { editor?: Editor }).editor;
-            if (editor) {
-              moveBlock(editor, draggingBlockPos, dropTargetPos, dropPosition);
+          // Get current state from plugin
+          const pluginState = dndPluginKey.getState(view.state) as DndState | null;
+          const state = pluginState ?? currentState;
+          
+          // If we don't have draggingBlockPos from state, try to extract from blockId
+          let draggingBlockPos = state.draggingBlockPos;
+          if (draggingBlockPos === null && blockId.startsWith('block-')) {
+            const pos = parseInt(blockId.replace('block-', ''), 10);
+            if (!isNaN(pos)) {
+              draggingBlockPos = pos;
             }
           }
+
+          if (draggingBlockPos === null) {
+            return false;
+          }
+
+          // Use drop target from state if available and valid (from dragover events)
+          // Recalculate if state is null or if it matches the dragging block (invalid drop target)
+          let dropTargetPos = state.dropTargetPos;
+          let dropPosition = state.dropPosition;
+
+          // Always recalculate from event coordinates to ensure accuracy
+          const pos = view.posAtCoords({
+            left: event.clientX,
+            top: event.clientY,
+          });
+
+          if (!pos) {
+            // If we can't get position from coordinates, try to use state
+            if (dropTargetPos !== null && dropPosition !== null && dropTargetPos !== draggingBlockPos) {
+              // Use state values
+            } else {
+              return false;
+            }
+          } else {
+            // Recalculate from event coordinates for accuracy
+            const block = findBlockAtPos(view.state.doc, pos.pos);
+            if (!block) {
+              // Fallback to state if available
+              if (dropTargetPos === null || dropPosition === null || dropTargetPos === draggingBlockPos) {
+                return false;
+              }
+            } else {
+              dropTargetPos = block.pos;
+
+              // If drop target is the same as dragging block, fail
+              if (dropTargetPos === draggingBlockPos) {
+                return false;
+              }
+
+              // Determine if drop is before or after based on mouse position
+              const blockDom = view.nodeDOM(block.pos) as HTMLElement | null;
+              dropPosition = 'after';
+
+              if (blockDom) {
+                const rect = blockDom.getBoundingClientRect();
+                const midpoint = rect.top + rect.height / 2;
+                dropPosition = event.clientY < midpoint ? 'before' : 'after';
+              }
+            }
+          }
+
+          // Final validation
+          if (dropTargetPos === null || dropPosition === null || dropTargetPos === draggingBlockPos) {
+            return false;
+          }
+
+          // Perform the move
+          // Use editor from closure (passed when creating plugin)
+          if (!editor) {
+            return false;
+          }
+
+          const success = moveBlock(editor, draggingBlockPos, dropTargetPos, dropPosition);
 
           // Complete the drag
           currentState = dndReducer(currentState, { type: 'COMPLETE_DRAG' });
           view.dispatch(view.state.tr.setMeta(dndPluginKey, currentState));
 
-          return true;
+          return success;
         },
 
         dragleave(_view: EditorView, event: DragEvent): boolean {

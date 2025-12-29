@@ -1,5 +1,5 @@
-import { PubwaveEditor } from '@pubwave/editor';
-import '../../../src/styles.css';
+import { PubwaveEditor } from '../../../src/ui/PubwaveEditor';
+import '../../../src/index.css';
 
 // Initial content for the editor - Notion-like welcome
 const initialContent = {

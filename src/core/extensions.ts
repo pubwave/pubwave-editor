@@ -25,6 +25,8 @@ import {
   defaultSlashCommands,
   type SlashCommand,
 } from '../ui/SlashMenu';
+import { Extension } from '@tiptap/core';
+import { createDndPlugin } from './plugins/dnd';
 
 /**
  * Supported block types
@@ -118,6 +120,15 @@ export function createExtensions(config: ExtensionConfig = {}): Extension[] {
       width: 2,
     }),
     Gapcursor,
+    
+    // Drag and drop plugin
+    Extension.create({
+      name: 'dragAndDrop',
+      addProseMirrorPlugins() {
+        // Pass editor instance to the plugin
+        return [createDndPlugin(this.editor)];
+      },
+    }),
   ];
 
   // Slash commands (optional)
