@@ -127,6 +127,9 @@ export function BubbleToolbar({
   onVisibilityChange,
 }: BubbleToolbarProps): React.ReactElement | null {
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const isMouseDownRef = useRef(false);
+  const lastMouseUpTimeRef = useRef(0);
+  const mouseDownInEditorRef = useRef(false);
   const [position, setPosition] = useState<ToolbarPosition>({
     top: 0,
     left: 0,
@@ -135,14 +138,17 @@ export function BubbleToolbar({
   const [selectionState, setSelectionState] = useState<SelectionState | null>(
     null
   );
+  const [allowShow, setAllowShow] = useState(false);
 
   // Track whether toolbar should be visible
   const shouldShow = useMemo(() => {
     if (!isEditorReady(editor)) return false;
+    // Only show if mouse is up and we allow showing
+    if (isMouseDownRef.current || !allowShow) return false;
     // Depend on selectionState to trigger recalculation
     void selectionState;
     return shouldShowToolbar(editor);
-  }, [editor, selectionState]);
+  }, [editor, selectionState, allowShow]);
 
   // Update selection state when editor selection changes
   const updateSelectionState = useCallback((): void => {
@@ -167,7 +173,75 @@ export function BubbleToolbar({
     });
   }, [editor, shouldShow]);
 
-  // Subscribe to editor updates
+  // Track mouse down/up events
+  useEffect(() => {
+    if (!isEditorReady(editor)) return;
+
+    const editorElement = editor.view.dom;
+    const editorContainer = editorElement.closest('.pubwave-editor') as HTMLElement | null;
+
+    const handleMouseDown = (e: MouseEvent): void => {
+      // Check if mouse down is inside editor
+      const target = e.target as HTMLElement | null;
+      if (editorContainer && target && editorContainer.contains(target)) {
+        mouseDownInEditorRef.current = true;
+      } else {
+        mouseDownInEditorRef.current = false;
+      }
+      
+      isMouseDownRef.current = true;
+      setAllowShow(false); // Hide toolbar immediately when mouse is pressed
+    };
+
+    const handleMouseUp = (e: MouseEvent): void => {
+      const now = Date.now();
+      const timeSinceLastUp = now - lastMouseUpTimeRef.current;
+      lastMouseUpTimeRef.current = now;
+
+      // Ignore if this is likely a double-click (within 300ms)
+      if (timeSinceLastUp < 300) {
+        isMouseDownRef.current = false;
+        setAllowShow(false);
+        return;
+      }
+
+      isMouseDownRef.current = false;
+
+      // Only check selection if mouse was down in editor
+      if (!mouseDownInEditorRef.current) {
+        setAllowShow(false);
+        return;
+      }
+
+      // After mouse up, wait a bit for selection to complete, then check
+      setTimeout(() => {
+        if (!isEditorReady(editor)) return;
+        
+        // Check if there's actual selected content
+        if (shouldShowToolbar(editor)) {
+          updateSelectionState();
+          setAllowShow(true);
+          safeRequestAnimationFrame(() => {
+            updatePosition();
+          });
+        } else {
+          setAllowShow(false);
+          setPosition((prev) => ({ ...prev, visible: false }));
+        }
+      }, 10); // Small delay to ensure selection is complete
+    };
+
+    // Listen to mouse events on document
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [editor, updateSelectionState, updatePosition]);
+
+  // Subscribe to editor updates (only when mouse is up)
   useEffect(() => {
     if (!isEditorReady(editor)) return;
 
@@ -176,29 +250,41 @@ export function BubbleToolbar({
 
     // Listen for selection and transaction updates
     const handleUpdate = (): void => {
-      updateSelectionState();
+      // Only update if mouse is not pressed and we allow showing
+      if (!isMouseDownRef.current && allowShow) {
+        updateSelectionState();
+      }
     };
 
     const handleSelectionUpdate = (): void => {
-      updateSelectionState();
-      // Delay position update to ensure DOM is ready
-      safeRequestAnimationFrame(() => {
-        updatePosition();
-      });
+      // Only update if mouse is not pressed and we allow showing
+      if (!isMouseDownRef.current && allowShow) {
+        updateSelectionState();
+        // Delay position update to ensure DOM is ready
+        safeRequestAnimationFrame(() => {
+          updatePosition();
+        });
+      }
+    };
+
+    const handleBlur = (): void => {
+      // Hide toolbar when editor loses focus
+      setAllowShow(false);
+      handleUpdate();
     };
 
     editor.on('update', handleUpdate);
     editor.on('selectionUpdate', handleSelectionUpdate);
     editor.on('focus', handleSelectionUpdate);
-    editor.on('blur', handleUpdate);
+    editor.on('blur', handleBlur);
 
     return () => {
       editor.off('update', handleUpdate);
       editor.off('selectionUpdate', handleSelectionUpdate);
       editor.off('focus', handleSelectionUpdate);
-      editor.off('blur', handleUpdate);
+      editor.off('blur', handleBlur);
     };
-  }, [editor, updateSelectionState, updatePosition]);
+  }, [editor, updateSelectionState, updatePosition, allowShow]);
 
   // Update position when shouldShow changes
   useEffect(() => {
@@ -261,12 +347,12 @@ export function BubbleToolbar({
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: tokens.spacing.xs,
-          padding: `${tokens.spacing.xs} ${tokens.spacing.sm}`,
-          backgroundColor: `var(--pubwave-toolbar-bg, ${tokens.colors.surface})`,
-          border: `1px solid var(--pubwave-toolbar-border, ${tokens.colors.border})`,
-          borderRadius: tokens.borderRadius.md,
-          boxShadow: tokens.shadow.md,
+          gap: 0,
+          padding: '4px',
+          backgroundColor: '#ffffff',
+          border: `1px solid #e5e7eb`,
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
         }}
       >
         {children ?? (
@@ -419,22 +505,30 @@ function ToolbarButton({
         height: '28px',
         padding: 0,
         border: 'none',
-        borderRadius: tokens.borderRadius.sm,
+        borderRadius: '4px',
         backgroundColor: active
-          ? `var(--pubwave-button-active-bg, ${tokens.colors.primaryFaded})`
+          ? '#f3f4f6'
           : 'transparent',
-        color: active
-          ? `var(--pubwave-button-active-color, ${tokens.colors.primary})`
-          : `var(--pubwave-button-color, ${tokens.colors.text})`,
+        color: '#374151',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        transition: `background-color ${tokens.transition.fast}, color ${tokens.transition.fast}`,
+        transition: 'background-color 0.1s ease',
       }}
       onClick={onClick}
       disabled={disabled}
       title={title}
       aria-label={ariaLabel}
       aria-pressed={active}
+      onMouseEnter={(e) => {
+        if (!disabled && !active) {
+          e.currentTarget.style.backgroundColor = '#f9fafb';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!disabled && !active) {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }
+      }}
     >
       {children}
     </button>
@@ -450,9 +544,9 @@ function ToolbarDivider(): React.ReactElement {
       className="pubwave-toolbar__divider"
       style={{
         width: '1px',
-        height: '16px',
-        backgroundColor: `var(--pubwave-divider-color, ${tokens.colors.borderLight})`,
-        margin: `0 ${tokens.spacing.xs}`,
+        height: '20px',
+        backgroundColor: '#e5e7eb',
+        margin: '0 2px',
       }}
       role="separator"
       aria-orientation="vertical"
@@ -466,12 +560,12 @@ function ToolbarDivider(): React.ReactElement {
 function BoldIcon(): React.ReactElement {
   return (
     <svg
-      width="16"
-      height="16"
+      width="14"
+      height="14"
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -484,12 +578,12 @@ function BoldIcon(): React.ReactElement {
 function ItalicIcon(): React.ReactElement {
   return (
     <svg
-      width="16"
-      height="16"
+      width="14"
+      height="14"
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -503,12 +597,12 @@ function ItalicIcon(): React.ReactElement {
 function LinkIcon(): React.ReactElement {
   return (
     <svg
-      width="16"
-      height="16"
+      width="14"
+      height="14"
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -521,12 +615,12 @@ function LinkIcon(): React.ReactElement {
 function UnderlineIcon(): React.ReactElement {
   return (
     <svg
-      width="16"
-      height="16"
+      width="14"
+      height="14"
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -539,12 +633,12 @@ function UnderlineIcon(): React.ReactElement {
 function StrikeIcon(): React.ReactElement {
   return (
     <svg
-      width="16"
-      height="16"
+      width="14"
+      height="14"
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -558,12 +652,12 @@ function StrikeIcon(): React.ReactElement {
 function CodeIcon(): React.ReactElement {
   return (
     <svg
-      width="16"
-      height="16"
+      width="14"
+      height="14"
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >

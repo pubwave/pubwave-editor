@@ -17,6 +17,7 @@ import Suggestion, { SuggestionProps, SuggestionKeyDownProps } from '@tiptap/sug
 import { ReactRenderer } from '@tiptap/react';
 import tippy, { Instance as TippyInstance } from 'tippy.js';
 import { tokens } from './theme';
+import { safeRequestAnimationFrame } from '../core/ssr';
 
 /**
  * Command item definition
@@ -126,7 +127,51 @@ export const defaultSlashCommands: SlashCommand[] = [
     icon: <DividerIcon />,
     aliases: ['hr', 'divider', 'line', '---'],
     group: 'advanced',
-    action: (editor) => editor.chain().focus().setHorizontalRule().run(),
+    action: (editor) => {
+      // Set horizontal rule first
+      editor.chain().focus().setHorizontalRule().run();
+      
+      // Then insert paragraph after the divider using requestAnimationFrame
+      // This ensures the divider is fully inserted in the DOM first
+      safeRequestAnimationFrame(() => {
+        const { state } = editor.view;
+        const { $from } = state.selection;
+        
+        // Find the horizontal rule node near the current cursor position
+        // (this should be the one we just inserted)
+        let hrPos = -1;
+        const cursorPos = $from.pos;
+        
+        // Search for horizontalRule node closest to cursor
+        state.doc.descendants((node, pos) => {
+          if (node.type.name === 'horizontalRule') {
+            const distance = Math.abs(pos - cursorPos);
+            // Find the closest hr to cursor position (should be the one we just inserted)
+            if (hrPos === -1 || Math.abs(hrPos - cursorPos) > distance) {
+              hrPos = pos;
+            }
+          }
+        });
+        
+        if (hrPos !== -1) {
+          // Get the position after the hr node
+          const hrNode = state.doc.nodeAt(hrPos);
+          if (hrNode) {
+            const afterHrPos = hrPos + hrNode.nodeSize;
+            // Insert paragraph and set cursor
+            editor
+              .chain()
+              .setTextSelection(afterHrPos)
+              .insertContent({ type: 'paragraph' })
+              .focus()
+              .run();
+          }
+        } else {
+          // Fallback: create paragraph near current position
+          editor.chain().focus().createParagraphNear().run();
+        }
+      });
+    },
   },
 ];
 
@@ -142,16 +187,22 @@ const groupLabels: Record<string, string> = {
 
 /**
  * Filter commands by query
+ * Only matches title and aliases, not description
  */
 function filterCommands(commands: SlashCommand[], query: string): SlashCommand[] {
   if (!query) return commands;
 
   const lowerQuery = query.toLowerCase();
   return commands.filter((cmd) => {
-    const matchTitle = cmd.title.toLowerCase().includes(lowerQuery);
-    const matchDesc = cmd.description.toLowerCase().includes(lowerQuery);
-    const matchAlias = cmd.aliases?.some((a) => a.toLowerCase().includes(lowerQuery));
-    return matchTitle || matchDesc || matchAlias;
+    // Match title (must start with query or contain as word)
+    const titleLower = cmd.title.toLowerCase();
+    const matchTitle = titleLower.startsWith(lowerQuery) || titleLower.includes(` ${lowerQuery}`);
+    
+    // Match aliases (must start with query)
+    const matchAlias = cmd.aliases?.some((a) => a.toLowerCase().startsWith(lowerQuery)) ?? false;
+    
+    // Only match title or aliases, not description
+    return matchTitle || matchAlias;
   });
 }
 
@@ -172,12 +223,83 @@ export const SlashMenuList = React.forwardRef<
   { onKeyDown: (props: SuggestionKeyDownProps) => boolean },
   SlashMenuListProps
 >(function SlashMenuList({ items, command, query = '' }, ref) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+  const selectedItemRef = React.useRef<HTMLButtonElement | null>(null);
 
-  // Reset selection when items change
+  // Auto-select first item when items change and there are filtered results
   useEffect(() => {
-    setSelectedIndex(0);
-  }, [items]);
+    if (items.length > 0 && query.length > 0) {
+      // If there's a query and matching items, select the first one
+      setSelectedIndex(0);
+    } else if (items.length === 0) {
+      // If no items, clear selection
+      setSelectedIndex(-1);
+    } else {
+      // If no query but items exist, don't auto-select
+      setSelectedIndex(-1);
+    }
+  }, [items, query]);
+
+  // Scroll selected item into view when selection changes
+  // Ensure top and bottom content remains visible
+  useEffect(() => {
+    if (selectedIndex >= 0 && selectedItemRef.current && menuRef.current) {
+      const menu = menuRef.current;
+      const selectedItem = selectedItemRef.current;
+      
+      const menuScrollTop = menu.scrollTop;
+      const menuClientHeight = menu.clientHeight;
+      const menuScrollHeight = menu.scrollHeight;
+      const itemOffsetTop = selectedItem.offsetTop;
+      const itemHeight = selectedItem.offsetHeight;
+      
+      // Find first group and first item for top visibility check
+      const firstGroup = menu.querySelector('.pubwave-slash-menu__group') as HTMLElement | null;
+      const firstItem = menu.querySelector('.pubwave-slash-menu__item') as HTMLElement | null;
+      const lastItem = Array.from(menu.querySelectorAll('.pubwave-slash-menu__item')).pop() as HTMLElement | null;
+      
+      // Calculate item position relative to visible area
+      const itemTopRelative = itemOffsetTop - menuScrollTop;
+      const itemBottomRelative = itemTopRelative + itemHeight;
+      
+      // Check if we need to scroll
+      let targetScrollTop = menuScrollTop;
+      
+      // If item is above visible area, scroll up but ensure first group/item remains visible
+      if (itemTopRelative < 0) {
+        targetScrollTop = itemOffsetTop - 4; // 4px padding from top
+        // Ensure first group is still visible (must be at or above scrollTop)
+        if (firstGroup && targetScrollTop > firstGroup.offsetTop) {
+          targetScrollTop = Math.max(0, firstGroup.offsetTop);
+        }
+        // Ensure first item is still visible (must be at or above scrollTop + small padding)
+        if (firstItem && targetScrollTop > firstItem.offsetTop - 2) {
+          targetScrollTop = Math.max(0, firstItem.offsetTop - 2);
+        }
+      }
+      // If item is below visible area, scroll down but ensure last item remains visible
+      else if (itemBottomRelative > menuClientHeight) {
+        targetScrollTop = itemOffsetTop - menuClientHeight + itemHeight + 4; // 4px padding from bottom
+        // Ensure last item is still visible (with some padding at bottom)
+        if (lastItem) {
+          const lastItemBottom = lastItem.offsetTop + lastItem.offsetHeight;
+          const maxScrollTop = lastItemBottom - menuClientHeight + 2; // 2px padding from bottom
+          if (targetScrollTop > maxScrollTop) {
+            targetScrollTop = maxScrollTop;
+          }
+        }
+        // Don't scroll beyond maximum
+        targetScrollTop = Math.min(menuScrollHeight - menuClientHeight, targetScrollTop);
+      }
+      // If item is already visible, don't scroll to preserve top/bottom visibility
+      
+      // Only update scroll if it changed
+      if (Math.abs(targetScrollTop - menuScrollTop) > 0.5) {
+        menu.scrollTop = targetScrollTop;
+      }
+    }
+  }, [selectedIndex]);
 
   // Group items
   const groupedItems = useMemo(() => {
@@ -206,41 +328,59 @@ export const SlashMenuList = React.forwardRef<
   // Expose keyboard handler
   React.useImperativeHandle(ref, () => ({
     onKeyDown: ({ event }: SuggestionKeyDownProps) => {
+      if (flatItems.length === 0) {
+        return false; // No items, let default behavior handle it (allow Enter to create new line)
+      }
+
       if (event.key === 'ArrowUp') {
-        setSelectedIndex((prev) => (prev <= 0 ? flatItems.length - 1 : prev - 1));
+        setSelectedIndex((prev) => {
+          if (prev < 0) {
+            return flatItems.length - 1;
+          }
+          if (prev <= 0) {
+            return 0; // Stop at top
+          }
+          return prev - 1;
+        });
         return true;
       }
 
       if (event.key === 'ArrowDown') {
-        setSelectedIndex((prev) => (prev >= flatItems.length - 1 ? 0 : prev + 1));
+        setSelectedIndex((prev) => {
+          if (prev < 0) {
+            return 0;
+          }
+          if (prev >= flatItems.length - 1) {
+            return flatItems.length - 1; // Stop at bottom
+          }
+          return prev + 1;
+        });
         return true;
       }
 
       if (event.key === 'Enter') {
-        selectItem(selectedIndex);
-        return true;
+        // Only handle Enter if an item is selected
+        if (selectedIndex >= 0 && selectedIndex < flatItems.length) {
+          selectItem(selectedIndex);
+          return true;
+        }
+        // If no item is selected, allow default behavior (create new line)
+        return false;
       }
 
       return false;
     },
   }));
 
-  return (
-    <div className="pubwave-slash-menu" style={menuStyle}>
-      {/* Filter input display */}
-      <div className="pubwave-slash-menu__filter" style={filterStyle}>
-        <span style={{ color: tokens.colors.primary }}>/</span>
-        <span style={{ color: tokens.colors.textMuted }}>
-          {query || 'Filter...'}
-        </span>
-      </div>
+  // Don't render if no items
+  if (items.length === 0) {
+    return null;
+  }
 
-      {items.length === 0 ? (
-        <div style={{ padding: '12px 16px', color: tokens.colors.textMuted }}>
-          No commands found
-        </div>
-      ) : (
-        (() => {
+  return (
+    <div className="pubwave-slash-menu" ref={menuRef} style={menuStyle}>
+      <div style={{ padding: '4px 0' }}>
+        {(() => {
           let globalIndex = 0;
           const groupOrder = ['basic', 'list', 'media', 'advanced'];
           
@@ -249,7 +389,7 @@ export const SlashMenuList = React.forwardRef<
             if (!groupItems || groupItems.length === 0) return null;
 
             return (
-              <div key={group} className="pubwave-slash-menu__group">
+              <div key={group} className="pubwave-slash-menu__group" style={groupContainerStyle}>
                 <div className="pubwave-slash-menu__group-label" style={groupLabelStyle}>
                   {groupLabels[group] || group}
                 </div>
@@ -259,11 +399,12 @@ export const SlashMenuList = React.forwardRef<
                   return (
                     <button
                       key={item.id}
+                      ref={isSelected ? selectedItemRef : null}
                       className={`pubwave-slash-menu__item ${isSelected ? 'pubwave-slash-menu__item--selected' : ''}`}
                       style={{
                         ...itemStyle,
                         backgroundColor: isSelected
-                          ? `var(--pubwave-menu-selected-bg, ${tokens.colors.hover})`
+                          ? '#f3f4f6'
                           : 'transparent',
                       }}
                       onClick={() => selectItem(currentIndex)}
@@ -281,52 +422,54 @@ export const SlashMenuList = React.forwardRef<
               </div>
             );
           });
-        })()
-      )}
+        })()}
+      </div>
     </div>
   );
 });
 
 // Styles
 const menuStyle: React.CSSProperties = {
-  backgroundColor: `var(--pubwave-menu-bg, ${tokens.colors.surface})`,
-  border: `1px solid var(--pubwave-menu-border, ${tokens.colors.border})`,
-  borderRadius: tokens.borderRadius.lg,
-  boxShadow: tokens.shadow.popup,
-  maxHeight: '400px',
+  backgroundColor: '#ffffff',
+  border: `1px solid #e5e7eb`,
+  borderRadius: '8px',
+  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+  maxHeight: '280px',
   overflowY: 'auto',
-  minWidth: '220px',
+  minWidth: '240px',
+  maxWidth: '300px',
+  padding: '4px',
+  display: 'flex',
+  flexDirection: 'column',
 };
 
-const filterStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '2px',
-  padding: '8px 12px',
-  margin: '4px 8px 8px',
-  backgroundColor: `var(--pubwave-filter-bg, ${tokens.colors.hover})`,
-  borderRadius: tokens.borderRadius.md,
-  fontSize: '14px',
+const groupContainerStyle: React.CSSProperties = {
+  marginBottom: '0',
 };
 
 const groupLabelStyle: React.CSSProperties = {
   padding: '8px 12px 4px',
   fontSize: '11px',
-  fontWeight: 500,
-  color: tokens.colors.textMuted,
+  fontWeight: 600,
+  color: '#6b7280',
+  textTransform: 'uppercase',
+  letterSpacing: '0.5px',
 };
 
 const itemStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: '10px',
+  gap: '12px',
   width: '100%',
-  padding: '6px 12px',
+  padding: '8px 12px',
   border: 'none',
   background: 'none',
   cursor: 'pointer',
   textAlign: 'left',
-  transition: `background-color ${tokens.transition.fast}`,
+  borderRadius: '6px',
+  transition: `background-color 0.1s ease`,
+  fontSize: '14px',
+  color: '#1a1a1a',
 };
 
 const iconStyle: React.CSSProperties = {
@@ -335,14 +478,14 @@ const iconStyle: React.CSSProperties = {
   justifyContent: 'center',
   width: '20px',
   height: '20px',
-  color: tokens.colors.textMuted,
+  color: '#4b5563',
   flexShrink: 0,
 };
 
 const titleStyle: React.CSSProperties = {
   fontSize: '14px',
   fontWeight: 400,
-  color: `var(--pubwave-menu-text, ${tokens.colors.text})`,
+  color: '#1a1a1a',
 };
 
 // Icons
@@ -454,7 +597,98 @@ export function createSlashCommandsExtension(commands: SlashCommand[] = defaultS
         suggestion: {
           char: '/',
           command: ({ editor, range, props }: { editor: Editor; range: Range; props: SlashCommand }) => {
-            // Delete the "/" trigger and query text, then execute the command
+            // For task list, handle specially
+            if (props.id === 'taskList') {
+              if (editor.isActive('taskList')) {
+                // If already in task list, toggle it off
+                editor.chain().focus().deleteRange(range).toggleTaskList().run();
+              } else {
+                // Delete range and toggle task list
+                editor.chain().focus().deleteRange(range).toggleTaskList().run();
+                
+                // Use requestAnimationFrame to ensure DOM is updated, then focus the paragraph
+                safeRequestAnimationFrame(() => {
+                  safeRequestAnimationFrame(() => {
+                    const { state } = editor.view;
+                    const { $from } = state.selection;
+                    
+                    // Find the task list node and the first paragraph inside it
+                    let paragraphPos = -1;
+                    
+                    // Search from current position backwards to find the taskList node
+                    for (let depth = $from.depth; depth >= 0; depth--) {
+                      const node = $from.node(depth);
+                      if (node.type.name === 'taskList') {
+                        const taskListStart = $from.start(depth);
+                        const taskListEnd = $from.end(depth);
+                        
+                        // Search for the first paragraph inside the task list
+                        state.doc.nodesBetween(taskListStart, taskListEnd, (node, pos) => {
+                          if (node.type.name === 'paragraph' && paragraphPos === -1) {
+                            paragraphPos = pos + 1; // +1 to position inside the paragraph
+                            return false; // Stop searching after finding first paragraph
+                          }
+                        });
+                        break;
+                      }
+                    }
+                    
+                    // If found, set cursor position and ensure it's visible
+                    if (paragraphPos !== -1 && paragraphPos < state.doc.content.size) {
+                      // Set selection using Tiptap
+                      editor.chain().setTextSelection(paragraphPos).run();
+                      
+                      // Use another requestAnimationFrame to ensure selection is set before focusing
+                      safeRequestAnimationFrame(() => {
+                        // Focus the editor
+                        editor.commands.focus();
+                        
+                        // Directly manipulate DOM to ensure cursor is visible
+                        const editorDom = editor.view.dom as HTMLElement;
+                        const paragraph = editorDom.querySelector('ul[data-type="taskList"] li p.pubwave-editor__paragraph');
+                        
+                        if (paragraph && editorDom) {
+                          // Focus the editor DOM element
+                          editorDom.focus();
+                          
+                          // Get the selection and range
+                          const selection = window.getSelection();
+                          if (!selection) return;
+                          
+                          const range = document.createRange();
+                          const br = paragraph.querySelector('br.ProseMirror-trailingBreak');
+                          
+                          if (br) {
+                            // For empty paragraph with <br>, set cursor after the <br>
+                            range.setStartAfter(br);
+                            range.setEndAfter(br);
+                          } else {
+                            // For paragraph with content, set at start
+                            if (paragraph.firstChild && paragraph.firstChild.nodeType === Node.TEXT_NODE) {
+                              range.setStart(paragraph.firstChild, 0);
+                              range.setEnd(paragraph.firstChild, 0);
+                            } else {
+                              range.setStart(paragraph, 0);
+                              range.setEnd(paragraph, 0);
+                            }
+                          }
+                          
+                          // Apply the selection
+                          selection.removeAllRanges();
+                          selection.addRange(range);
+                        }
+                      });
+                    } else {
+                      // Fallback: just focus the editor
+                      editor.commands.focus();
+                    }
+                  });
+                });
+              }
+              return;
+            }
+            
+            // For other commands, delete range and execute action
             editor.chain().focus().deleteRange(range).run();
             props.action(editor);
           },
@@ -497,10 +731,60 @@ export function createSlashCommandsExtension(commands: SlashCommand[] = defaultS
                   trigger: 'manual',
                   placement: 'bottom-start',
                   offset: [0, 8],
+                  zIndex: tokens.zIndex.dropdown,
+                  arrow: false,
+                  popperOptions: {
+                    modifiers: [
+                      {
+                        name: 'preventOverflow',
+                        options: {
+                          boundary: 'viewport',
+                          padding: 8,
+                          altAxis: true,
+                        },
+                      },
+                      {
+                        name: 'flip',
+                        options: {
+                          fallbackPlacements: ['top-start', 'bottom-end', 'top'],
+                        },
+                      },
+                    ],
+                  },
+                  onShow(instance) {
+                    // Ensure z-index is set correctly
+                    const box = instance.popper.querySelector('.tippy-box') as HTMLElement;
+                    if (box) {
+                      box.style.zIndex = String(tokens.zIndex.dropdown);
+                    }
+                    
+                    // Dynamically adjust max height based on available space
+                    const menu = instance.popper.querySelector('.pubwave-slash-menu') as HTMLElement;
+                    if (menu) {
+                      const proseMirror = document.querySelector('.ProseMirror') as HTMLElement;
+                      if (proseMirror) {
+                        const menuRect = menu.getBoundingClientRect();
+                        const proseMirrorRect = proseMirror.getBoundingClientRect();
+                        
+                        // Calculate available space from menu top to editor bottom
+                        const availableSpace = proseMirrorRect.bottom - menuRect.top - 16;
+                        
+                        // Set max height to available space, but clamp between 200px and 280px
+                        const calculatedMaxHeight = Math.max(200, Math.min(280, availableSpace));
+                        menu.style.maxHeight = `${calculatedMaxHeight}px`;
+                      }
+                    }
+                  },
                 });
               },
 
               onUpdate(props: SuggestionProps) {
+                // If no items found, hide the menu
+                if (props.items.length === 0) {
+                  popup[0]?.hide();
+                  return;
+                }
+
                 component.updateProps({
                   ...props,
                   query: props.query,
@@ -512,6 +796,11 @@ export function createSlashCommandsExtension(commands: SlashCommand[] = defaultS
                 popup[0]?.setProps({
                   getReferenceClientRect: props.clientRect as () => DOMRect,
                 });
+
+                // Ensure menu is shown if it was hidden
+                if (!popup[0]?.state.isVisible) {
+                  popup[0]?.show();
+                }
               },
 
               onKeyDown(props: SuggestionKeyDownProps) {

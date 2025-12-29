@@ -28,7 +28,7 @@ pnpm add @pubwave/editor
 
 ```tsx
 import { PubwaveEditor } from '@pubwave/editor';
-import '@pubwave/editor/styles.css';
+import '@pubwave/editor/index.css';
 
 function MyEditor() {
   const [content, setContent] = useState({
@@ -74,7 +74,7 @@ The library is SSR-safe and can be imported server-side without errors. The edit
 'use client';
 
 import { PubwaveEditor } from '@pubwave/editor';
-import '@pubwave/editor/styles.css';
+import '@pubwave/editor/index.css';
 
 export default function EditorComponent() {
   // Your editor implementation

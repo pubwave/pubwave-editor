@@ -30,7 +30,7 @@ Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ```tsx
 import { PubwaveEditor } from '@pubwave/editor';
-import '@pubwave/editor/styles.css';
+import '@pubwave/editor/index.css';
 
 function App() {
   const [content, setContent] = useState(initialContent);

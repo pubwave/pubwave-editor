@@ -10,7 +10,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@pubwave/editor': resolve(__dirname, '../../src/index.ts'),
-      '@pubwave/editor/styles.css': resolve(__dirname, '../../src/styles.css'),
     },
   },
 });

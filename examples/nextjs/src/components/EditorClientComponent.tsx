@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { PubwaveEditor } from '@pubwave/editor';
-import '@pubwave/editor/styles.css';
+import '@pubwave/editor/index.css';
 
 export default function EditorClientComponent() {
   const [content, setContent] = useState({
