@@ -103,23 +103,68 @@ function dndReducer(state: DndState, action: DndAction): DndState {
 }
 
 /**
- * Find block node at a given document position
+ * Find top-level block node at a given document position
+ * Returns the direct child of doc that contains the position
  */
 export function findBlockAtPos(
   doc: PMNode,
   pos: number
 ): { node: PMNode; pos: number } | null {
-  let result: { node: PMNode; pos: number } | null = null;
+  // Clamp pos to valid range within the document
+  const clampedPos = Math.max(0, Math.min(pos, doc.content.size));
 
-  doc.nodesBetween(pos, pos, (node, nodePos) => {
-    if (node.isBlock && nodePos <= pos && nodePos + node.nodeSize > pos) {
-      result = { node, pos: nodePos };
-      return false; // Stop iteration
+  // Use resolve to find the block at depth 1 (direct child of doc)
+  try {
+    const $pos = doc.resolve(clampedPos);
+
+    // 1. Check if we are inside a top-level container (List or Blockquote)
+    // If so, return the container itself as the draggable unit
+    if ($pos.depth >= 1) {
+      const topNode = $pos.node(1);
+      const containerTypes = ['taskList', 'bulletList', 'orderedList', 'blockquote'];
+      if (containerTypes.includes(topNode.type.name)) {
+        return { node: topNode, pos: $pos.before(1) };
+      }
     }
-    return true;
-  });
 
-  return result;
+    // 2. Otherwise, find the innermost block node (for blockquotes, etc.)
+    for (let d = $pos.depth; d > 0; d--) {
+      const node = $pos.node(d);
+      if (node.isBlock) {
+        return { node, pos: $pos.before(d) };
+      }
+    }
+
+    // 3. Fallback for depth 0 (e.g. at the very end or beginning of doc)
+    if ($pos.depth === 0 && doc.childCount > 0) {
+      let offset = 0;
+      for (let i = 0; i < doc.childCount; i++) {
+        const child = doc.child(i);
+        if (offset + child.nodeSize > clampedPos) {
+          return { node: child, pos: offset };
+        }
+        offset += child.nodeSize;
+      }
+      return { node: doc.lastChild!, pos: doc.content.size - doc.lastChild!.nodeSize };
+    }
+
+    return null;
+  } catch {
+    // If resolve fails, fall back to iteration
+    let result: { node: PMNode; pos: number } | null = null;
+    let offset = 0;
+
+    for (let i = 0; i < doc.childCount; i++) {
+      const child = doc.child(i);
+      if (offset <= clampedPos && offset + child.nodeSize > clampedPos) {
+        result = { node: child, pos: offset };
+        break;
+      }
+      offset += child.nodeSize;
+    }
+
+    return result;
+  }
 }
 
 /**
@@ -159,7 +204,7 @@ export function moveBlock(
   if (sourceBlock.pos === targetBlock.pos) {
     return false;
   }
-  
+
   // Check if we're trying to insert at the exact same position (before or after source)
   // This handles the case where we're moving a block to immediately before/after itself
   if (
@@ -180,16 +225,16 @@ export function moveBlock(
   // Calculate adjusted insert position considering deletion
   // We need to adjust the insert position based on where the source is relative to the target
   let adjustedInsertPos = insertPos;
-  
+
   if (sourceStart < insertPos) {
     // Source is before target: after deletion, insert position decreases by source size
     adjustedInsertPos = insertPos - sourceNode.nodeSize;
   }
   // If source is after target, insertPos doesn't need adjustment
-  
+
   // Delete source block first
   tr.delete(sourceStart, sourceEnd);
-  
+
   // Insert at adjusted position (using slice content, not the node itself)
   // Slice.content contains Fragment, which can be inserted directly
   // Ensure the position is valid after deletion
@@ -199,7 +244,7 @@ export function moveBlock(
   } else if (adjustedInsertPos > maxPos) {
     adjustedInsertPos = maxPos;
   }
-  
+
   if (adjustedInsertPos >= 0 && adjustedInsertPos <= maxPos) {
     tr.insert(adjustedInsertPos, slice.content);
   } else {
@@ -211,9 +256,80 @@ export function moveBlock(
 
   // Apply the transaction
   editor.view.dispatch(tr);
-  editor.commands.focus();
 
   return true;
+}
+
+/**
+ * Resolve the drop target based on the event coordinates
+ * Prioritizes geometric checks for document edges to ensure reliability
+ */
+function resolveDropTarget(
+  view: EditorView,
+  event: DragEvent
+): { pos: number; position: 'before' | 'after' } | null {
+  const doc = view.state.doc;
+  if (doc.childCount === 0) return null;
+
+  // 1. Geometric Edge Detection (Priority High)
+  // This handles dropping at the very top or bottom, and empty spaces
+
+  // Get first block
+  const firstBlockPos = 0;
+  const firstBlockDom = view.nodeDOM(firstBlockPos) as HTMLElement | null;
+
+  // Get last block
+  let lastBlockPos = 0;
+  for (let i = 0; i < doc.childCount - 1; i++) {
+    lastBlockPos += doc.child(i).nodeSize;
+  }
+  const lastBlockDom = view.nodeDOM(lastBlockPos) as HTMLElement | null;
+
+  const clientY = event.clientY;
+
+  // Check top edge
+  if (firstBlockDom) {
+    const rect = firstBlockDom.getBoundingClientRect();
+    // Use a fixed generous valid zone (50px) relative to the top of the content
+    // This allows dropping "before" the first block even if the block is very small (like a paragraph)
+    // Logic: If mouse is anywhere above the block, OR within the top 50px of the block start
+    if (clientY < rect.top + 50) {
+      return { pos: firstBlockPos, position: 'before' };
+    }
+  }
+
+  // Check bottom edge
+  if (lastBlockDom) {
+    const rect = lastBlockDom.getBoundingClientRect();
+    // Logic: If mouse is anywhere below the block, OR within the bottom 50px of the block end
+    if (clientY > rect.bottom - 50) {
+      return { pos: lastBlockPos, position: 'after' };
+    }
+  }
+
+  // 2. Exact Position Detection (Priority Normal)
+  // Use ProseMirror's posAtCoords for internal drops
+  const posAtCoords = view.posAtCoords({
+    left: event.clientX,
+    top: event.clientY,
+  });
+
+  if (posAtCoords) {
+    const block = findBlockAtPos(doc, posAtCoords.pos);
+    if (block) {
+      const blockDom = view.nodeDOM(block.pos) as HTMLElement | null;
+      if (blockDom) {
+        const rect = blockDom.getBoundingClientRect();
+        const midpoint = rect.top + rect.height / 2;
+        return {
+          pos: block.pos,
+          position: clientY < midpoint ? 'before' : 'after'
+        };
+      }
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -268,32 +384,23 @@ export function createDndPlugin(editor?: Editor): Plugin<DndState> {
           const pluginState = dndPluginKey.getState(view.state) as DndState | null;
           currentState = pluginState ?? currentState;
 
-          // Calculate drop target position
-          const pos = view.posAtCoords({
-            left: event.clientX,
-            top: event.clientY,
-          });
+          const target = resolveDropTarget(view, event);
 
-          if (pos) {
-            const block = findBlockAtPos(view.state.doc, pos.pos);
-            if (block) {
-              // Determine if drop is before or after based on mouse position
-              const blockDom = view.nodeDOM(block.pos) as HTMLElement | null;
-              let dropPosition: 'before' | 'after' = 'after';
-
-              if (blockDom) {
-                const rect = blockDom.getBoundingClientRect();
-                const midpoint = rect.top + rect.height / 2;
-                dropPosition = event.clientY < midpoint ? 'before' : 'after';
-              }
-
+          if (target) {
+            currentState = dndReducer(currentState, {
+              type: 'UPDATE_DROP_TARGET',
+              pos: target.pos,
+              position: target.position,
+            });
+            view.dispatch(view.state.tr.setMeta(dndPluginKey, currentState));
+          } else {
+            // If no valid target found but we are dragging, clear the indicator
+            if (currentState.dropTargetPos !== null) {
               currentState = dndReducer(currentState, {
                 type: 'UPDATE_DROP_TARGET',
-                pos: block.pos,
-                position: dropPosition,
+                pos: null,
+                position: null,
               });
-
-              // Dispatch state update so it's available in drop handler
               view.dispatch(view.state.tr.setMeta(dndPluginKey, currentState));
             }
           }
@@ -314,13 +421,13 @@ export function createDndPlugin(editor?: Editor): Plugin<DndState> {
           // Get current state from plugin
           const pluginState = dndPluginKey.getState(view.state) as DndState | null;
           const state = pluginState ?? currentState;
-          
+
           // If we don't have draggingBlockPos from state, try to extract from blockId
           let draggingBlockPos = state.draggingBlockPos;
           if (draggingBlockPos === null && blockId.startsWith('block-')) {
-            const pos = parseInt(blockId.replace('block-', ''), 10);
-            if (!isNaN(pos)) {
-              draggingBlockPos = pos;
+            const extractedPos = parseInt(blockId.replace('block-', ''), 10);
+            if (!isNaN(extractedPos)) {
+              draggingBlockPos = extractedPos;
             }
           }
 
@@ -328,54 +435,18 @@ export function createDndPlugin(editor?: Editor): Plugin<DndState> {
             return false;
           }
 
-          // Use drop target from state if available and valid (from dragover events)
-          // Recalculate if state is null or if it matches the dragging block (invalid drop target)
-          let dropTargetPos = state.dropTargetPos;
-          let dropPosition = state.dropPosition;
+          // Use resolveDropTarget for the final drop decision
+          // This ensures we don't rely on potentially stale state
+          const target = resolveDropTarget(view, event);
 
-          // Always recalculate from event coordinates to ensure accuracy
-          const pos = view.posAtCoords({
-            left: event.clientX,
-            top: event.clientY,
-          });
-
-          if (!pos) {
-            // If we can't get position from coordinates, try to use state
-            if (dropTargetPos !== null && dropPosition !== null && dropTargetPos !== draggingBlockPos) {
-              // Use state values
-            } else {
-              return false;
-            }
-          } else {
-            // Recalculate from event coordinates for accuracy
-            const block = findBlockAtPos(view.state.doc, pos.pos);
-            if (!block) {
-              // Fallback to state if available
-              if (dropTargetPos === null || dropPosition === null || dropTargetPos === draggingBlockPos) {
-                return false;
-              }
-            } else {
-              dropTargetPos = block.pos;
-
-              // If drop target is the same as dragging block, fail
-              if (dropTargetPos === draggingBlockPos) {
-                return false;
-              }
-
-              // Determine if drop is before or after based on mouse position
-              const blockDom = view.nodeDOM(block.pos) as HTMLElement | null;
-              dropPosition = 'after';
-
-              if (blockDom) {
-                const rect = blockDom.getBoundingClientRect();
-                const midpoint = rect.top + rect.height / 2;
-                dropPosition = event.clientY < midpoint ? 'before' : 'after';
-              }
-            }
+          if (!target) {
+            return false;
           }
 
-          // Final validation
-          if (dropTargetPos === null || dropPosition === null || dropTargetPos === draggingBlockPos) {
+          const { pos: dropTargetPos, position: dropPosition } = target;
+
+          // Validate target is not self
+          if (dropTargetPos === draggingBlockPos) {
             return false;
           }
 
@@ -403,6 +474,7 @@ export function createDndPlugin(editor?: Editor): Plugin<DndState> {
               pos: null,
               position: null,
             });
+            _view.dispatch(_view.state.tr.setMeta(dndPluginKey, currentState));
           }
           return false;
         },

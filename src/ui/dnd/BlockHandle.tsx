@@ -21,39 +21,50 @@ export interface BlockHandleProps {
 /**
  * Find the closest block-level element from mouse position
  */
-function getClosestBlock(target: EventTarget | null, proseMirror: HTMLElement): HTMLElement | null {
+/**
+ * Find the innermost block element from mouse position
+ */
+function getClosestBlock(target: EventTarget | null, proseMirror: HTMLElement, editor: Editor): HTMLElement | null {
   if (!target || !(target instanceof Node)) return null;
 
-  // Start from the target node (could be text node or element)
-  let current: Node | null = target;
-  
-  // If it's a text node, start from its parent
-  if (current.nodeType === Node.TEXT_NODE) {
-    current = current.parentElement;
-  }
-  
-  if (!(current instanceof HTMLElement)) return null;
+  try {
+    // Get position in the document from DOM element
+    const pos = editor.view.posAtDOM(target as Node, 0);
+    const $pos = editor.state.doc.resolve(pos);
 
-  // Walk up the DOM tree until we find a block-level element
-  // ProseMirror blocks are typically p, h1, h2, h3, blockquote, pre, ul, ol, etc.
-  const blockTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'UL', 'OL', 'LI', 'HR', 'DIV'];
-  
-  while (current && current !== proseMirror) {
-    // Check if this is a block-level element
-    if (current instanceof HTMLElement) {
-      const tagName = current.tagName;
-      if (blockTags.includes(tagName)) {
-        // Make sure it's within ProseMirror
-        if (proseMirror.contains(current)) {
-          return current;
+    // 1. Check if we are inside a top-level container (List or Blockquote)
+    if ($pos.depth >= 1) {
+      const topNode = $pos.node(1);
+      const containerTypes = ['taskList', 'bulletList', 'orderedList', 'blockquote'];
+      if (containerTypes.includes(topNode.type.name)) {
+        const containerDom = editor.view.nodeDOM($pos.before(1)) as HTMLElement | null;
+        if (containerDom && proseMirror.contains(containerDom)) {
+          return containerDom;
         }
       }
-      // Also check for direct children of ProseMirror (any element)
+    }
+
+    // 2. Otherwise, walk from innermost depth towards root to find the first block node
+    for (let d = $pos.depth; d > 0; d--) {
+      const node = $pos.node(d);
+      if (node.isBlock) {
+        const blockPos = $pos.before(d);
+        // Map back to DOM element
+        const blockDom = editor.view.nodeDOM(blockPos) as HTMLElement | null;
+        if (blockDom && proseMirror.contains(blockDom)) {
+          return blockDom;
+        }
+      }
+    }
+  } catch (err) {
+    // Fallback for simple DOM-based approach
+    let current: HTMLElement | null = target instanceof HTMLElement ? target : target.parentElement;
+    while (current && current.parentElement) {
       if (current.parentElement === proseMirror) {
         return current;
       }
+      current = current.parentElement;
     }
-    current = current.parentElement;
   }
 
   return null;
@@ -68,6 +79,7 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
   const isDraggingRef = useRef(false);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [visible, setVisible] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ top: 0 });
 
   // Position the handle next to the current block (relative to editor container)
@@ -81,11 +93,43 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     if (!editorContainer) return;
 
     const editorRect = editorContainer.getBoundingClientRect();
-    const blockRect = block.getBoundingClientRect();
-    
-    // Calculate position relative to the editor container, centered vertically on the block
-    const top = blockRect.top - editorRect.top + blockRect.height / 2;
-    
+
+    // Calculate vertical position (aligned to top of block)
+    // Try to get line-height for better alignment with the first line of text
+    let offset = 14; // Default fallback (half of standard line height approx)
+
+    let target = block;
+    // For container blocks (lists, blockquotes), align with the first child (e.g. the first list item)
+    if (['UL', 'OL', 'BLOCKQUOTE'].includes(block.tagName) && block.firstElementChild instanceof HTMLElement) {
+      target = block.firstElementChild as HTMLElement;
+    }
+    const targetRect = target.getBoundingClientRect();
+
+    try {
+      const style = window.getComputedStyle(target);
+      const lineHeightStr = style.lineHeight;
+      if (lineHeightStr && lineHeightStr !== 'normal') {
+        const lineHeight = parseFloat(lineHeightStr);
+        if (!isNaN(lineHeight)) {
+          offset = lineHeight / 2;
+        }
+      } else {
+        // If normal, estimate based on font size
+        const fontSize = parseFloat(style.fontSize);
+        if (!isNaN(fontSize)) {
+          offset = (fontSize * 1.5) / 2;
+        }
+      }
+    } catch (e) {
+      // Fallback
+    }
+
+    // Adjust for some specific block types like headings that might have different internal padding
+    // For now, computed line-height should handle headings reasonably well
+
+    // Position relative to the editor container
+    const top = targetRect.top - editorRect.top + offset;
+
     setPosition({ top });
   }, []);
 
@@ -93,7 +137,7 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
   const showHandle = useCallback((block: HTMLElement) => {
     currentBlockRef.current = block;
     setVisible(true);
-    // Use setTimeout to ensure DOM is ready
+    // Use setTimeout to ensure DOM is ready and layout is stable
     setTimeout(updatePosition, 0);
   }, [updatePosition]);
 
@@ -138,9 +182,19 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
         return;
       }
 
-      const block = getClosestBlock(target, proseMirror);
-      if (block && block !== currentBlockRef.current) {
-        showHandle(block);
+      const block = getClosestBlock(target, proseMirror, editor);
+      if (block) {
+        // If moving between children of the same block (e.g. list items), 
+        // getClosestBlock returns the same parent (UL).
+        // We only need to trigger showHandle if the block reference changes
+        // OR if we want to ensure position is correct (though position shouldn't change for same block)
+
+        if (block !== currentBlockRef.current) {
+          showHandle(block);
+        } else {
+          // If hovering same block, just keep it visible
+          setVisible(true);
+        }
       }
     };
 
@@ -148,7 +202,7 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
       if (isDraggingRef.current) return;
 
       const relatedTarget = e.relatedTarget as HTMLElement | null;
-      
+
       // If no related target, mouse left the window
       if (!relatedTarget) {
         clearHideTimeout();
@@ -162,9 +216,16 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
       if (relatedTarget.closest('.pubwave-block-handle')) {
         return;
       }
-      
-      // Check if still inside ProseMirror (might be moving to another block)
-      if (relatedTarget.closest('.ProseMirror')) {
+
+      // Check if still inside ProseMirror
+      // Note: we might be moving from LI to another LI in same UL.
+      // getClosestBlock for relatedTarget will return the same UL.
+      // So we shouldn't hide if we are still in the same top-level block.
+
+      if (proseMirror.contains(relatedTarget)) {
+        // Check if we are still strictly inside the editor
+        // But we might have left the "current block".
+        // Let onMouseOver handle the switch.
         return;
       }
 
@@ -183,9 +244,21 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     proseMirror.addEventListener('mouseover', onMouseOver);
     proseMirror.addEventListener('mouseout', onMouseOut);
 
+    // Hide handle when user starts typing (distraction-free writing)
+    // Hide handle when user starts typing (distraction-free writing)
+    // Only hide if the document actually changed to avoid hiding on clicks/selection
+    const handleTransaction = ({ transaction }: { transaction: any }) => {
+      if (transaction.docChanged && !isDraggingRef.current) {
+        hideHandle();
+      }
+    };
+
+    editor.on('transaction', handleTransaction);
+
     return () => {
       proseMirror.removeEventListener('mouseover', onMouseOver);
       proseMirror.removeEventListener('mouseout', onMouseOut);
+      editor.off('transaction', handleTransaction);
       clearHideTimeout();
     };
   }, [editor, showHandle, hideHandle, clearHideTimeout]);
@@ -193,7 +266,7 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
   // Handle scroll - update position
   useEffect(() => {
     if (!visible) return;
-    
+
     const onScroll = () => {
       if (currentBlockRef.current) {
         updatePosition();
@@ -248,46 +321,97 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     if (!block) return;
 
     isDraggingRef.current = true;
-    
+    // Delay setting isDragging to true to allow the browser to initiate the drag
+    // If the element becomes invisible immediately, the drag might be aborted
+    requestAnimationFrame(() => {
+      setIsDragging(true);
+    });
+
     // Get block position - we need the actual block start position
     const pos = editor.view.posAtDOM(block, 0);
-    
+
     // Use findBlockAtPos to get the actual block start position
     // This ensures we always use the block's start position, not an internal position
     const blockInfo = findBlockAtPos(editor.state.doc, pos);
-    
+
     if (!blockInfo) {
       return;
     }
-    
+
     const blockPos = blockInfo.pos;
-    
+
     // Initialize drag state in the DnD plugin
     const blockId = `block-${blockPos}`;
     startDrag(editor, blockId, blockPos);
-    
+
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('application/x-pubwave-block', blockId);
-    
+
     // Add dragging class
     block.classList.add('pubwave-block--dragging');
-    
+
     // Set drag image
     const dragImage = block.cloneNode(true) as HTMLElement;
-    dragImage.style.opacity = '0.5';
-    dragImage.style.position = 'absolute';
-    dragImage.style.top = '-9999px';
-    document.body.appendChild(dragImage);
+    dragImage.classList.add('pubwave-block--drag-preview');
+    dragImage.style.opacity = '1';
+
+    // Force gray color and variables on the ghost to override editor styles
+    const applyGhostStyles = (el: HTMLElement) => {
+      el.style.setProperty('color', '#9b9a97', 'important');
+      el.style.setProperty('border-color', '#9b9a97', 'important');
+      el.style.setProperty('--pubwave-text', '#9b9a97', 'important');
+      Array.from(el.children).forEach(child => {
+        if (child instanceof HTMLElement) applyGhostStyles(child);
+      });
+    };
+    applyGhostStyles(dragImage);
+
+    // Copy width to ensure correct layout
+    const rect = block.getBoundingClientRect();
+    dragImage.style.width = `${rect.width}px`;
+    // Reset positioning if the block had it (though usually blocks are static)
+    dragImage.style.position = 'static';
+    dragImage.style.transform = 'none';
+
+    // Wrap in editor structure to preserve styles (CSS scopes)
+    const wrapper = document.createElement('div');
+    wrapper.className = 'pubwave-editor';
+    const content = document.createElement('div');
+    content.className = 'pubwave-editor__content';
+    const pm = document.createElement('div');
+    pm.className = 'ProseMirror';
+
+    // Reconstruct hierarchy
+    pm.appendChild(dragImage);
+    content.appendChild(pm);
+    wrapper.appendChild(content);
+
+    // Position off-screen
+    wrapper.style.position = 'absolute';
+    wrapper.style.top = '-9999px';
+    wrapper.style.left = '-9999px';
+
+    // Add to body so it renders styles
+    document.body.appendChild(wrapper);
+
+    // Use the clone as the drag image
     e.dataTransfer.setDragImage(dragImage, 0, 0);
-    setTimeout(() => document.body.removeChild(dragImage), 0);
+
+    // Clean up
+    setTimeout(() => {
+      document.body.removeChild(wrapper);
+    }, 0);
   }, [editor]);
 
   // Drag end
   const handleDragEnd = useCallback(() => {
     isDraggingRef.current = false;
+    setIsDragging(false);
     if (currentBlockRef.current) {
       currentBlockRef.current.classList.remove('pubwave-block--dragging');
     }
+    // Also hide handle after drop for a cleaner transition
+    setVisible(false);
   }, []);
 
   if (!visible) return null;
@@ -307,7 +431,7 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
         pointerEvents: 'auto',
         transition: `opacity ${tokens.transition.fast}`,
         zIndex: tokens.zIndex.dragHandle,
-        opacity: visible ? 1 : 0,
+        opacity: visible && !isDragging ? 1 : 0,
       }}
       onMouseEnter={(e) => {
         // Clear any pending hide when mouse enters handle
@@ -337,8 +461,8 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
         className="pubwave-block-handle__add"
         onClick={handleAdd}
         style={{
-          width: '28px',
-          height: '28px',
+          width: 'var(--pubwave-button-width, 28px)',
+          height: 'var(--pubwave-button-height, 28px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -362,8 +486,8 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         style={{
-          width: '28px',
-          height: '28px',
+          width: 'var(--pubwave-button-width, 28px)',
+          height: 'var(--pubwave-button-height, 28px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

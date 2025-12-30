@@ -25,7 +25,6 @@ import {
   defaultSlashCommands,
   type SlashCommand,
 } from '../ui/SlashMenu';
-import { Extension } from '@tiptap/core';
 import { createDndPlugin } from './plugins/dnd';
 
 /**
@@ -59,7 +58,7 @@ export const SUPPORTED_MARKS: readonly MarkType[] = [
  */
 export interface ExtensionConfig
   extends BlockExtensionsConfig,
-    MarkExtensionsConfig {
+  MarkExtensionsConfig {
   /**
    * Placeholder text for empty editor
    */
@@ -120,7 +119,7 @@ export function createExtensions(config: ExtensionConfig = {}): Extension[] {
       width: 2,
     }),
     Gapcursor,
-    
+
     // Drag and drop plugin
     Extension.create({
       name: 'dragAndDrop',

@@ -21,7 +21,13 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: #f7f6f3;
+  /* More visible trendy mesh gradient background */
+  background-color: #f0f4f8;
+  background-image:
+    radial-gradient(at 0% 0%, hsla(220, 100%, 92%, 1) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(260, 100%, 93%, 1) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, hsla(190, 100%, 95%, 1) 0px, transparent 50%);
+  background-attachment: fixed;
 }
 
 .app-container {
@@ -29,20 +35,22 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
 }
 
 .editor-container {
   width: 100%;
-  max-width: 900px;
+  max-width: 850px;
   background: #ffffff;
-  border-radius: 3px;
-  min-height: 500px;
-  padding: 80px 96px;
+  border-radius: 16px;
+  min-height: 700px;
+  padding: 96px 120px;
   padding-left: 140px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* Sophisticated tiered shadow */
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.04),
+    0 20px 25px -5px rgba(0, 0, 0, 0.05),
+    0 10px 10px -5px rgba(0, 0, 0, 0.02);
   color: #37352f;
   position: relative;
 }
-
-

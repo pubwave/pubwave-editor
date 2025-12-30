@@ -181,8 +181,16 @@ export function BubbleToolbar({
     const editorContainer = editorElement.closest('.pubwave-editor') as HTMLElement | null;
 
     const handleMouseDown = (e: MouseEvent): void => {
-      // Check if mouse down is inside editor
+      // Check if mouse down is inside toolbar - if so, don't hide it
       const target = e.target as HTMLElement | null;
+      const toolbarElement = toolbarRef.current;
+      if (toolbarElement && target && toolbarElement.contains(target)) {
+        // Click is inside toolbar, don't hide it
+        isMouseDownRef.current = false;
+        return;
+      }
+
+      // Check if mouse down is inside editor
       if (editorContainer && target && editorContainer.contains(target)) {
         mouseDownInEditorRef.current = true;
       } else {
@@ -196,12 +204,15 @@ export function BubbleToolbar({
     const handleMouseUp = (e: MouseEvent): void => {
       const now = Date.now();
       const timeSinceLastUp = now - lastMouseUpTimeRef.current;
+      const isDoubleClick = timeSinceLastUp < 300;
       lastMouseUpTimeRef.current = now;
 
-      // Ignore if this is likely a double-click (within 300ms)
-      if (timeSinceLastUp < 300) {
+      // Check if mouse up is inside toolbar - if so, don't process it
+      const target = e.target as HTMLElement | null;
+      const toolbarElement = toolbarRef.current;
+      if (toolbarElement && target && toolbarElement.contains(target)) {
+        // Click is inside toolbar, keep it visible
         isMouseDownRef.current = false;
-        setAllowShow(false);
         return;
       }
 
@@ -214,10 +225,12 @@ export function BubbleToolbar({
       }
 
       // After mouse up, wait a bit for selection to complete, then check
+      // For double-click, wait a bit longer to ensure the selection from double-click is finalized
+      const delay = isDoubleClick ? 100 : 10;
       setTimeout(() => {
         if (!isEditorReady(editor)) return;
         
-        // Check if there's actual selected content
+        // Check if there's actual selected content (even after double-click)
         if (shouldShowToolbar(editor)) {
           updateSelectionState();
           setAllowShow(true);
@@ -228,7 +241,7 @@ export function BubbleToolbar({
           setAllowShow(false);
           setPosition((prev) => ({ ...prev, visible: false }));
         }
-      }, 10); // Small delay to ensure selection is complete
+      }, delay);
     };
 
     // Listen to mouse events on document
@@ -268,9 +281,19 @@ export function BubbleToolbar({
     };
 
     const handleBlur = (): void => {
-      // Hide toolbar when editor loses focus
-      setAllowShow(false);
-      handleUpdate();
+      // Don't hide toolbar if focus moved to toolbar
+      // Use setTimeout to check if focus is now on toolbar
+      setTimeout(() => {
+        const activeElement = document.activeElement;
+        const toolbarElement = toolbarRef.current;
+        if (toolbarElement && activeElement && toolbarElement.contains(activeElement)) {
+          // Focus is on toolbar, don't hide it
+          return;
+        }
+        // Hide toolbar when editor loses focus
+        setAllowShow(false);
+        handleUpdate();
+      }, 0);
     };
 
     editor.on('update', handleUpdate);
@@ -348,11 +371,11 @@ export function BubbleToolbar({
           display: 'flex',
           alignItems: 'center',
           gap: 0,
-          padding: '4px',
-          backgroundColor: '#ffffff',
-          border: `1px solid #e5e7eb`,
-          borderRadius: '8px',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          padding: 'var(--pubwave-spacing-1, 4px)',
+          backgroundColor: 'var(--pubwave-bg, #ffffff)',
+          border: `1px solid var(--pubwave-border, #e5e7eb)`,
+          borderRadius: 'var(--pubwave-radius-lg, 8px)',
+          boxShadow: 'var(--pubwave-shadow, 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06))',
         }}
       >
         {children ?? (
@@ -501,31 +524,38 @@ function ToolbarButton({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: '28px',
-        height: '28px',
+        width: 'var(--pubwave-button-width, 28px)',
+        height: 'var(--pubwave-button-height, 28px)',
         padding: 0,
         border: 'none',
-        borderRadius: '4px',
-        backgroundColor: active
-          ? '#f3f4f6'
-          : 'transparent',
-        color: '#374151',
+        borderRadius: 'var(--pubwave-radius-sm, 4px)',
+        backgroundColor: 'transparent',
+        color: active ? 'var(--pubwave-primary, #3b82f6)' : 'var(--pubwave-text-secondary, #374151)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        transition: 'background-color 0.1s ease',
+        transition: 'color 0.1s ease, background-color 0.1s ease',
       }}
-      onClick={onClick}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick();
+      }}
       disabled={disabled}
       title={title}
       aria-label={ariaLabel}
       aria-pressed={active}
+      onMouseDown={(e) => {
+        // Prevent toolbar from hiding when clicking buttons
+        e.preventDefault();
+        e.stopPropagation();
+      }}
       onMouseEnter={(e) => {
-        if (!disabled && !active) {
-          e.currentTarget.style.backgroundColor = '#f9fafb';
+        if (!disabled) {
+          e.currentTarget.style.backgroundColor = 'var(--pubwave-hover-bg, #f3f4f6)';
         }
       }}
       onMouseLeave={(e) => {
-        if (!disabled && !active) {
+        if (!disabled) {
           e.currentTarget.style.backgroundColor = 'transparent';
         }
       }}
@@ -543,10 +573,10 @@ function ToolbarDivider(): React.ReactElement {
     <div
       className="pubwave-toolbar__divider"
       style={{
-        width: '1px',
-        height: '20px',
-        backgroundColor: '#e5e7eb',
-        margin: '0 2px',
+        width: 'var(--pubwave-divider-width, 1px)',
+        height: 'var(--pubwave-divider-height, 20px)',
+        backgroundColor: 'var(--pubwave-border, #e5e7eb)',
+        margin: '0 var(--pubwave-spacing-1, 4px)',
       }}
       role="separator"
       aria-orientation="vertical"

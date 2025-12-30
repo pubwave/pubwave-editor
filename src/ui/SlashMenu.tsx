@@ -130,18 +130,18 @@ export const defaultSlashCommands: SlashCommand[] = [
     action: (editor) => {
       // Set horizontal rule first
       editor.chain().focus().setHorizontalRule().run();
-      
+
       // Then insert paragraph after the divider using requestAnimationFrame
       // This ensures the divider is fully inserted in the DOM first
       safeRequestAnimationFrame(() => {
         const { state } = editor.view;
         const { $from } = state.selection;
-        
+
         // Find the horizontal rule node near the current cursor position
         // (this should be the one we just inserted)
         let hrPos = -1;
         const cursorPos = $from.pos;
-        
+
         // Search for horizontalRule node closest to cursor
         state.doc.descendants((node, pos) => {
           if (node.type.name === 'horizontalRule') {
@@ -152,7 +152,7 @@ export const defaultSlashCommands: SlashCommand[] = [
             }
           }
         });
-        
+
         if (hrPos !== -1) {
           // Get the position after the hr node
           const hrNode = state.doc.nodeAt(hrPos);
@@ -197,10 +197,10 @@ function filterCommands(commands: SlashCommand[], query: string): SlashCommand[]
     // Match title (must start with query or contain as word)
     const titleLower = cmd.title.toLowerCase();
     const matchTitle = titleLower.startsWith(lowerQuery) || titleLower.includes(` ${lowerQuery}`);
-    
+
     // Match aliases (must start with query)
     const matchAlias = cmd.aliases?.some((a) => a.toLowerCase().startsWith(lowerQuery)) ?? false;
-    
+
     // Only match title or aliases, not description
     return matchTitle || matchAlias;
   });
@@ -247,25 +247,25 @@ export const SlashMenuList = React.forwardRef<
     if (selectedIndex >= 0 && selectedItemRef.current && menuRef.current) {
       const menu = menuRef.current;
       const selectedItem = selectedItemRef.current;
-      
+
       const menuScrollTop = menu.scrollTop;
       const menuClientHeight = menu.clientHeight;
       const menuScrollHeight = menu.scrollHeight;
       const itemOffsetTop = selectedItem.offsetTop;
       const itemHeight = selectedItem.offsetHeight;
-      
+
       // Find first group and first item for top visibility check
       const firstGroup = menu.querySelector('.pubwave-slash-menu__group') as HTMLElement | null;
       const firstItem = menu.querySelector('.pubwave-slash-menu__item') as HTMLElement | null;
       const lastItem = Array.from(menu.querySelectorAll('.pubwave-slash-menu__item')).pop() as HTMLElement | null;
-      
+
       // Calculate item position relative to visible area
       const itemTopRelative = itemOffsetTop - menuScrollTop;
       const itemBottomRelative = itemTopRelative + itemHeight;
-      
+
       // Check if we need to scroll
       let targetScrollTop = menuScrollTop;
-      
+
       // If item is above visible area, scroll up but ensure first group/item remains visible
       if (itemTopRelative < 0) {
         targetScrollTop = itemOffsetTop - 4; // 4px padding from top
@@ -293,7 +293,7 @@ export const SlashMenuList = React.forwardRef<
         targetScrollTop = Math.min(menuScrollHeight - menuClientHeight, targetScrollTop);
       }
       // If item is already visible, don't scroll to preserve top/bottom visibility
-      
+
       // Only update scroll if it changed
       if (Math.abs(targetScrollTop - menuScrollTop) > 0.5) {
         menu.scrollTop = targetScrollTop;
@@ -379,11 +379,11 @@ export const SlashMenuList = React.forwardRef<
 
   return (
     <div className="pubwave-slash-menu" ref={menuRef} style={menuStyle}>
-      <div style={{ padding: '4px 0' }}>
+      <div style={{ padding: 'var(--pubwave-spacing-1, 4px) 0' }}>
         {(() => {
           let globalIndex = 0;
           const groupOrder = ['basic', 'list', 'media', 'advanced'];
-          
+
           return groupOrder.map((group) => {
             const groupItems = groupedItems[group];
             if (!groupItems || groupItems.length === 0) return null;
@@ -404,7 +404,7 @@ export const SlashMenuList = React.forwardRef<
                       style={{
                         ...itemStyle,
                         backgroundColor: isSelected
-                          ? '#f3f4f6'
+                          ? 'var(--pubwave-hover-bg, #f3f4f6)'
                           : 'transparent',
                       }}
                       onClick={() => selectItem(currentIndex)}
@@ -430,15 +430,15 @@ export const SlashMenuList = React.forwardRef<
 
 // Styles
 const menuStyle: React.CSSProperties = {
-  backgroundColor: '#ffffff',
-  border: `1px solid #e5e7eb`,
-  borderRadius: '8px',
-  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+  backgroundColor: 'var(--pubwave-bg, #ffffff)',
+  border: `1px solid var(--pubwave-border, #e5e7eb)`,
+  borderRadius: 'var(--pubwave-radius-lg, 8px)',
+  boxShadow: 'var(--pubwave-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05))',
   maxHeight: '280px',
   overflowY: 'auto',
   minWidth: '240px',
   maxWidth: '300px',
-  padding: '4px',
+  padding: 'var(--pubwave-spacing-1, 4px)',
   display: 'flex',
   flexDirection: 'column',
 };
@@ -448,10 +448,10 @@ const groupContainerStyle: React.CSSProperties = {
 };
 
 const groupLabelStyle: React.CSSProperties = {
-  padding: '8px 12px 4px',
-  fontSize: '11px',
+  padding: 'var(--pubwave-spacing-2, 8px) var(--pubwave-spacing-3, 12px) var(--pubwave-spacing-1, 4px)',
+  fontSize: 'var(--pubwave-font-size-xs, 11px)',
   fontWeight: 600,
-  color: '#6b7280',
+  color: 'var(--pubwave-text-muted, #6b7280)',
   textTransform: 'uppercase',
   letterSpacing: '0.5px',
 };
@@ -459,33 +459,33 @@ const groupLabelStyle: React.CSSProperties = {
 const itemStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: '12px',
+  gap: 'var(--pubwave-spacing-3, 12px)',
   width: '100%',
-  padding: '8px 12px',
+  padding: 'var(--pubwave-spacing-2, 8px) var(--pubwave-spacing-3, 12px)',
   border: 'none',
   background: 'none',
   cursor: 'pointer',
   textAlign: 'left',
-  borderRadius: '6px',
+  borderRadius: 'var(--pubwave-radius-md, 6px)',
   transition: `background-color 0.1s ease`,
-  fontSize: '14px',
-  color: '#1a1a1a',
+  fontSize: 'var(--pubwave-font-size-base, 14px)',
+  color: 'var(--pubwave-text, #1a1a1a)',
 };
 
 const iconStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '20px',
-  height: '20px',
-  color: '#4b5563',
+  width: 'var(--pubwave-icon-size, 20px)',
+  height: 'var(--pubwave-icon-size, 20px)',
+  color: 'var(--pubwave-text-tertiary, #4b5563)',
   flexShrink: 0,
 };
 
 const titleStyle: React.CSSProperties = {
-  fontSize: '14px',
+  fontSize: 'var(--pubwave-font-size-base, 14px)',
   fontWeight: 400,
-  color: '#1a1a1a',
+  color: 'var(--pubwave-text, #1a1a1a)',
 };
 
 // Icons
@@ -597,97 +597,14 @@ export function createSlashCommandsExtension(commands: SlashCommand[] = defaultS
         suggestion: {
           char: '/',
           command: ({ editor, range, props }: { editor: Editor; range: Range; props: SlashCommand }) => {
-            // For task list, handle specially
+            // For to-do lists, we simply toggle the list logic
+            // If we are appending to an existing list, the cursor naturally moves to the new item
+            // If we are creating a new list, the cursor stays formatting the current line
             if (props.id === 'taskList') {
-              if (editor.isActive('taskList')) {
-                // If already in task list, toggle it off
-                editor.chain().focus().deleteRange(range).toggleTaskList().run();
-              } else {
-                // Delete range and toggle task list
-                editor.chain().focus().deleteRange(range).toggleTaskList().run();
-                
-                // Use requestAnimationFrame to ensure DOM is updated, then focus the paragraph
-                safeRequestAnimationFrame(() => {
-                  safeRequestAnimationFrame(() => {
-                    const { state } = editor.view;
-                    const { $from } = state.selection;
-                    
-                    // Find the task list node and the first paragraph inside it
-                    let paragraphPos = -1;
-                    
-                    // Search from current position backwards to find the taskList node
-                    for (let depth = $from.depth; depth >= 0; depth--) {
-                      const node = $from.node(depth);
-                      if (node.type.name === 'taskList') {
-                        const taskListStart = $from.start(depth);
-                        const taskListEnd = $from.end(depth);
-                        
-                        // Search for the first paragraph inside the task list
-                        state.doc.nodesBetween(taskListStart, taskListEnd, (node, pos) => {
-                          if (node.type.name === 'paragraph' && paragraphPos === -1) {
-                            paragraphPos = pos + 1; // +1 to position inside the paragraph
-                            return false; // Stop searching after finding first paragraph
-                          }
-                        });
-                        break;
-                      }
-                    }
-                    
-                    // If found, set cursor position and ensure it's visible
-                    if (paragraphPos !== -1 && paragraphPos < state.doc.content.size) {
-                      // Set selection using Tiptap
-                      editor.chain().setTextSelection(paragraphPos).run();
-                      
-                      // Use another requestAnimationFrame to ensure selection is set before focusing
-                      safeRequestAnimationFrame(() => {
-                        // Focus the editor
-                        editor.commands.focus();
-                        
-                        // Directly manipulate DOM to ensure cursor is visible
-                        const editorDom = editor.view.dom as HTMLElement;
-                        const paragraph = editorDom.querySelector('ul[data-type="taskList"] li p.pubwave-editor__paragraph');
-                        
-                        if (paragraph && editorDom) {
-                          // Focus the editor DOM element
-                          editorDom.focus();
-                          
-                          // Get the selection and range
-                          const selection = window.getSelection();
-                          if (!selection) return;
-                          
-                          const range = document.createRange();
-                          const br = paragraph.querySelector('br.ProseMirror-trailingBreak');
-                          
-                          if (br) {
-                            // For empty paragraph with <br>, set cursor after the <br>
-                            range.setStartAfter(br);
-                            range.setEndAfter(br);
-                          } else {
-                            // For paragraph with content, set at start
-                            if (paragraph.firstChild && paragraph.firstChild.nodeType === Node.TEXT_NODE) {
-                              range.setStart(paragraph.firstChild, 0);
-                              range.setEnd(paragraph.firstChild, 0);
-                            } else {
-                              range.setStart(paragraph, 0);
-                              range.setEnd(paragraph, 0);
-                            }
-                          }
-                          
-                          // Apply the selection
-                          selection.removeAllRanges();
-                          selection.addRange(range);
-                        }
-                      });
-                    } else {
-                      // Fallback: just focus the editor
-                      editor.commands.focus();
-                    }
-                  });
-                });
-              }
+              editor.chain().focus().deleteRange(range).toggleTaskList().run();
               return;
             }
-            
+
             // For other commands, delete range and execute action
             editor.chain().focus().deleteRange(range).run();
             props.action(editor);
@@ -757,7 +674,7 @@ export function createSlashCommandsExtension(commands: SlashCommand[] = defaultS
                     if (box) {
                       box.style.zIndex = String(tokens.zIndex.dropdown);
                     }
-                    
+
                     // Dynamically adjust max height based on available space
                     const menu = instance.popper.querySelector('.pubwave-slash-menu') as HTMLElement;
                     if (menu) {
@@ -765,10 +682,10 @@ export function createSlashCommandsExtension(commands: SlashCommand[] = defaultS
                       if (proseMirror) {
                         const menuRect = menu.getBoundingClientRect();
                         const proseMirrorRect = proseMirror.getBoundingClientRect();
-                        
+
                         // Calculate available space from menu top to editor bottom
                         const availableSpace = proseMirrorRect.bottom - menuRect.top - 16;
-                        
+
                         // Set max height to available space, but clamp between 200px and 280px
                         const calculatedMaxHeight = Math.max(200, Math.min(280, availableSpace));
                         menu.style.maxHeight = `${calculatedMaxHeight}px`;

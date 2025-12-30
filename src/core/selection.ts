@@ -156,6 +156,51 @@ export function isMultiBlockSelection(editor: Editor): boolean {
 }
 
 /**
+ * Check if the selection spans the entire paragraph/block
+ * Used to determine if toolbar should show on double-click
+ */
+export function isFullBlockSelection(editor: Editor): boolean {
+  const { from, to } = editor.state.selection;
+  const $from = editor.state.doc.resolve(from);
+  const $to = editor.state.doc.resolve(to);
+
+  // Find the paragraph/block containing the selection
+  let fromBlockStart = from;
+  let fromBlockEnd = from;
+  let toBlockStart = to;
+  let toBlockEnd = to;
+
+  // Find block boundaries for start position
+  for (let d = $from.depth; d > 0; d--) {
+    const node = $from.node(d);
+    if (node.isBlock) {
+      fromBlockStart = $from.start(d);
+      fromBlockEnd = $from.end(d);
+      break;
+    }
+  }
+
+  // Find block boundaries for end position
+  for (let d = $to.depth; d > 0; d--) {
+    const node = $to.node(d);
+    if (node.isBlock) {
+      toBlockStart = $to.start(d);
+      toBlockEnd = $to.end(d);
+      break;
+    }
+  }
+
+  // Check if selection spans entire block(s)
+  // Either: selection starts at block start and ends at block end
+  // Or: selection spans multiple blocks
+  const spansFullFromBlock = from === fromBlockStart && to >= fromBlockEnd;
+  const spansFullToBlock = to === toBlockEnd && from <= toBlockStart;
+  const spansMultipleBlocks = fromBlockStart !== toBlockStart;
+
+  return spansFullFromBlock || spansFullToBlock || spansMultipleBlocks;
+}
+
+/**
  * Get the block node containing the current selection
  */
 export function getSelectedBlock(

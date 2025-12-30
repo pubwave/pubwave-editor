@@ -25,6 +25,7 @@ import { getReadOnlyClassName } from './readOnlyGuards';
 import { ariaLabels } from './a11y';
 import { BubbleToolbar } from './BubbleToolbar';
 import { BlockHandle } from './dnd/BlockHandle';
+import { DropIndicatorOverlay } from './dnd/DropIndicatorOverlay';
 
 /**
  * Props for the PubwaveEditor component
@@ -245,6 +246,8 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
         {editor && editable && <BubbleToolbar editor={editor} />}
         {/* Block handles - + and drag grip appear on block hover (US3) */}
         {editor && editable && <BlockHandle editor={editor} />}
+        {/* Drop indicator - appears during drag (US4) */}
+        {editor && editable && <DropIndicatorOverlay editor={editor} />}
       </div>
     );
   }
