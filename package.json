@@ -16,7 +16,9 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
-    }
+    },
+    "./dist/index.css": "./dist/index.css",
+    "./index.css": "./dist/index.css"
   },
   "files": [
     "dist",
@@ -30,7 +32,7 @@
     "dev": "vite",
     "dev:lib": "vite --mode lib",
     "build": "tsc -b && vite build",
-    "build:lib": "vite build --mode lib",
+    "build:lib": "vite build --mode lib && (test -f dist/editor.css && mv dist/editor.css dist/index.css || true)",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -111,7 +113,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pubwave/pubwave-editor.git"
+    "url": "git+https://github.com/pubwave/pubwave-editor.git"
   },
   "keywords": [
     "editor",

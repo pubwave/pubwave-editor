@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { PubwaveEditor } from '../../../../src/ui/PubwaveEditor';
-import type { EditorTheme, EditorAPI } from '../../../../src/types/editor';
+import { PubwaveEditor } from '@pubwave/editor';
+import type { EditorTheme, EditorAPI } from '@pubwave/editor';
 import type { JSONContent } from '@tiptap/core';
-import '../../../../src/index.css';
+import '@pubwave/editor/index.css';
 
 interface PreviewModalProps {
   content: JSONContent;

@@ -27,7 +27,7 @@ import {
   type SlashCommand,
 } from '../ui/SlashMenu';
 import { createDndPlugin } from './plugins/dnd';
-import { getLocale, type EditorLocale } from '../i18n';
+import { getLocale } from '../i18n';
 
 /**
  * Supported block types

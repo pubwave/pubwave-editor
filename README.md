@@ -106,31 +106,11 @@ The main React component for rendering the editor.
 | `className` | `string` | `undefined` | Additional CSS class for the container |
 | `data-testid` | `string` | `'pubwave-editor'` | Test ID for testing purposes |
 
-#### TypeScript Interfaces
-
-```typescript
-import type { EditorLocale } from '@pubwave/editor';
-
-interface PubwaveEditorProps {
-  content?: JSONContent;
-  editable?: boolean;
-  placeholder?: string;
-  theme?: EditorTheme;
-  autofocus?: boolean | 'start' | 'end';
-  imageUpload?: ImageUploadConfig;
-  width?: string;
-  onChange?: (content: JSONContent) => void;
-  onSelectionChange?: () => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
-  onReady?: (api: EditorAPI) => void;
-  className?: string;
-  'data-testid'?: string;
-}
-
-// EditorLocale type
-type EditorLocale = 'en' | 'zh' | 'zh-CN' | 'ja' | 'ko' | 'fr' | 'de' | 'es' | 'pt';
-```
+For complete TypeScript type definitions, see the exported types from `@pubwave/editor`:
+- `EditorTheme` - Theme configuration
+- `EditorAPI` - Editor API interface
+- `EditorLocale` - Supported locale codes: `'en' | 'zh' | 'zh-CN' | 'ja' | 'ko' | 'fr' | 'de' | 'es' | 'pt'`
+- `ImageUploadConfig` - Image upload configuration
 
 ### `EditorAPI` Methods
 
@@ -173,29 +153,6 @@ editorRef.current?.toggleBold();
 | `setLink(href)` | Set or remove a link | `href: string \| null` | `void` |
 | `destroy()` | Destroy the editor instance | - | `void` |
 
-#### EditorState Interface
-
-```typescript
-interface EditorState {
-  selection: {
-    hasSelection: boolean;
-    isMultiBlock: boolean;
-    from: number;
-    to: number;
-    isEmpty: boolean;
-  };
-  marks: {
-    isBold: boolean;
-    isItalic: boolean;
-    isLink: boolean;
-    linkHref?: string;
-  };
-  isFocused: boolean;
-  isEditable: boolean;
-  isEmpty: boolean;
-  characterCount: number;
-}
-```
 
 ---
 
@@ -239,30 +196,6 @@ Configure a custom upload handler to upload images to your server:
 />
 ```
 
-### ImageUploadConfig Interface
-
-```typescript
-interface ImageUploadConfig {
-  /**
-   * Custom image upload handler
-   * Should return a Promise that resolves to the image URL
-   * If the function throws or rejects, the editor will fall back to base64
-   */
-  handler?: (file: File) => Promise<string>;
-
-  /**
-   * Maximum file size in bytes
-   * @default 10MB (10 * 1024 * 1024)
-   */
-  maxSize?: number;
-
-  /**
-   * Accepted file types (MIME types)
-   * @default ['image/*']
-   */
-  accept?: string[];
-}
-```
 
 ### Image Upload Features
 
@@ -272,54 +205,28 @@ interface ImageUploadConfig {
 - **File Validation**: Validates file type and size before upload
 - **Error Handling**: Logs errors to console if upload fails
 
-### Example: Upload to Cloudinary
+### Custom Upload Service
+
+The `handler` function receives a `File` object and should return a Promise that resolves to the image URL. The editor will automatically fall back to base64 if the upload fails.
 
 ```tsx
 <PubwaveEditor
   imageUpload={{
     handler: async (file: File) => {
+      // Upload to your server (Cloudinary, AWS S3, etc.)
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'your_upload_preset');
+      formData.append('image', file);
       
-      const response = await fetch(
-        'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload',
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
-      
-      const data = await response.json();
-      return data.secure_url;
-    },
-    maxSize: 10 * 1024 * 1024, // 10MB
-  }}
-/>
-```
-
-### Example: Upload to AWS S3
-
-```tsx
-<PubwaveEditor
-  imageUpload={{
-    handler: async (file: File) => {
-      // Get presigned URL from your backend
-      const { uploadUrl, fileUrl } = await fetch('/api/get-upload-url', {
+      const response = await fetch('/api/upload', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileName: file.name, fileType: file.type }),
-      }).then(res => res.json());
-      
-      // Upload to S3
-      await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type },
+        body: formData,
       });
       
-      return fileUrl;
+      const data = await response.json();
+      return data.url; // Return the image URL
     },
+    maxSize: 10 * 1024 * 1024, // 10MB (optional)
+    accept: ['image/jpeg', 'image/png', 'image/webp'], // Optional
   }}
 />
 ```
@@ -349,112 +256,17 @@ const theme: EditorTheme = {
 <PubwaveEditor theme={theme} />
 ```
 
-### EditorTheme Interface
-
-```typescript
-interface EditorTheme {
-  /**
-   * CSS class name prefix for styling hooks
-   * @default 'pubwave-editor'
-   */
-  classNamePrefix?: string;
-
-  /**
-   * Locale for internationalization
-   * Supported locales: 'en', 'zh', 'zh-CN', 'ja', 'ko', 'fr', 'de', 'es', 'pt'
-   * @default 'en'
-   */
-  locale?: EditorLocale;
-
-  /**
-   * Additional CSS classes to apply to the editor container
-   */
-  containerClassName?: string;
-
-  /**
-   * Additional CSS classes to apply to the content area
-   */
-  contentClassName?: string;
-
-  /**
-   * Color theme configuration
-   */
-  colors?: {
-    /**
-     * Editor background color (supports gradients)
-     */
-    background?: string;
-
-    /**
-     * Primary text color
-     */
-    text?: string;
-
-    /**
-     * Muted/secondary text color (e.g., for placeholders)
-     */
-    textMuted?: string;
-
-    /**
-     * Border color
-     */
-    border?: string;
-
-    /**
-     * Primary color (for links, buttons, etc.)
-     */
-    primary?: string;
-
-    /**
-     * Link color (if not provided, will use primary color)
-     * Useful for dark themes where a brighter link color is needed for visibility
-     */
-    linkColor?: string;
-  };
-
-  /**
-   * Background image configuration
-   * Can be a URL string or CSS background-image value
-   * Background image will be layered on top of background color
-   */
-  backgroundImage?: string;
-
-  /**
-   * Background image display options
-   */
-  backgroundImageOptions?: {
-    /**
-     * Background image repeat behavior
-     * @default 'no-repeat'
-     */
-    repeat?: 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
-
-    /**
-     * Background image position
-     * @default 'center'
-     */
-    position?: string;
-
-    /**
-     * Background image size
-     * @default 'cover'
-     */
-    size?: 'cover' | 'contain' | string;
-
-    /**
-     * Background image attachment
-     * @default 'scroll'
-     */
-    attachment?: 'scroll' | 'fixed' | 'local';
-  };
-}
-```
+For complete `EditorTheme` interface definition, see TypeScript definitions. Key properties:
+- `colors` - Color configuration (background, text, border, primary, linkColor)
+- `locale` - Locale code for internationalization
+- `backgroundImage` - Optional background image URL
+- `backgroundImageOptions` - Background image display options (size, position, repeat, attachment)
 
 ### Predefined Themes
 
-The editor includes 5 beautiful predefined themes:
+The editor includes several predefined themes:
 
-#### 1. Light Theme
+#### Light Theme
 ```tsx
 const lightTheme: EditorTheme = {
   colors: {
@@ -467,7 +279,7 @@ const lightTheme: EditorTheme = {
 };
 ```
 
-#### 2. Dark Theme
+#### Dark Theme
 ```tsx
 const darkTheme: EditorTheme = {
   colors: {
@@ -481,64 +293,7 @@ const darkTheme: EditorTheme = {
 };
 ```
 
-#### 3. Violet Theme
-```tsx
-const violetTheme: EditorTheme = {
-  colors: {
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #6b46c1 50%, #5b21b6 75%, #4c1d95 100%)',
-    text: '#f3f4f6',
-    textMuted: '#e5e7eb',
-    border: '#8b5cf6',
-    primary: '#8b5cf6',
-  },
-};
-```
-
-#### 4. Rose Theme
-```tsx
-const roseTheme: EditorTheme = {
-  colors: {
-    background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 25%, #e91e63 50%, #c2185b 75%, #880e4f 100%)',
-    text: '#fdf2f8',
-    textMuted: '#fce7f3',
-    border: '#ec4899',
-    primary: '#ec4899',
-  },
-};
-```
-
-#### 5. Sky Theme
-```tsx
-const skyTheme: EditorTheme = {
-  colors: {
-    background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 25%, #00d4ff 50%, #0099cc 75%, #006699 100%)',
-    text: '#f0f9ff',
-    textMuted: '#e0f2fe',
-    border: '#38bdf8',
-    primary: '#38bdf8',
-  },
-};
-```
-
-#### 6. Image Theme (with Background Image)
-```tsx
-const imageTheme: EditorTheme = {
-  colors: {
-    background: 'rgba(255, 255, 255, 0.95)',
-    text: '#1f2937',
-    textMuted: '#6b7280',
-    border: '#e5e7eb',
-    primary: '#3b82f6',
-  },
-  backgroundImage: 'https://example.com/background.jpg',
-  backgroundImageOptions: {
-    size: 'cover',
-    position: 'center',
-    repeat: 'no-repeat',
-    attachment: 'fixed',
-  },
-};
-```
+**Other themes:** Violet, Rose, Sky (gradient themes).
 
 ### Background Image
 
@@ -860,16 +615,8 @@ export default function EditorComponent() {
 }
 ```
 
-For a complete example, see [examples/nextjs](./examples/nextjs).
-
 ---
 
-## 📚 Examples
-
-- [Vite + React](./examples/vite-react) - Basic client-side integration
-- [Next.js](./examples/nextjs) - SSR-safe server component integration
-
----
 
 ## 🐛 Troubleshooting
 
@@ -877,7 +624,7 @@ For a complete example, see [examples/nextjs](./examples/nextjs).
 
 **Q: The editor doesn't render in Next.js SSR**
 - Make sure you're using `'use client'` directive
-- See [Next.js example](./examples/nextjs) for proper setup
+- Ensure the component is marked as a client component
 
 **Q: Styles are not applied**
 - Ensure you've imported the CSS: `import '@pubwave/editor/index.css'`

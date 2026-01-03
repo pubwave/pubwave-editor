@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@pubwave/editor": "file:../..",
+    "@pubwave/editor": "^0.1.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.4",
     "next": "^15.0.0",

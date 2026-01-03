@@ -1449,21 +1449,4 @@ function TrashIcon(): React.ReactElement {
   );
 }
 
-function ArrowLeftIcon(): React.ReactElement {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M10 2L4 8l6 6" />
-    </svg>
-  );
-}
-
 export default BubbleToolbar;
