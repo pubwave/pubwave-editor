@@ -105,10 +105,11 @@ export function DragHandle({
         isPressed && 'pubwave-drag-handle--pressed',
         className
       )}
+      data-testid="drag-handle"
       style={{
         // Position to the left of the block
         position: 'absolute',
-        left: '-24px',
+        left: '-32px',
         top: '50%',
         transform: 'translateY(-50%)',
 

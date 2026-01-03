@@ -221,7 +221,6 @@ export const defaultToolbarActions: ToolbarActionDescriptor[] = [
   {
     id: 'link',
     label: 'Link',
-    shortcut: 'Cmd+K',
     icon: 'link',
     action: (editor) => toggleLink(editor),
     isActive: (editor) => editor.isActive('link'),

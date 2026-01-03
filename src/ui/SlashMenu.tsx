@@ -18,6 +18,8 @@ import { ReactRenderer } from '@tiptap/react';
 import tippy, { Instance as TippyInstance } from 'tippy.js';
 import { tokens } from './theme';
 import { safeRequestAnimationFrame } from '../core/ssr';
+import type { ImageUploadConfig } from '../types/editor';
+import type { EditorLocale } from '../i18n';
 
 /**
  * Command item definition
@@ -33,14 +35,39 @@ export interface SlashCommand {
 }
 
 /**
- * Default slash commands
+ * Create default slash commands with image upload config and locale
  */
-export const defaultSlashCommands: SlashCommand[] = [
+function createDefaultSlashCommands(imageUploadConfig?: ImageUploadConfig, locale?: EditorLocale): SlashCommand[] {
+  const localeData = locale || {
+    slashMenu: {
+      groups: { basic: 'Basic', list: 'Lists', media: 'Media', advanced: 'Advanced' },
+      commands: {
+        paragraph: { title: 'Text', description: 'Plain text block' },
+        heading1: { title: 'Heading 1', description: 'Large section heading' },
+        heading2: { title: 'Heading 2', description: 'Medium section heading' },
+        heading3: { title: 'Heading 3', description: 'Small section heading' },
+        bulletList: { title: 'Bullet List', description: 'Create a bulleted list' },
+        orderedList: { title: 'Numbered List', description: 'Create a numbered list' },
+        taskList: { title: 'To-do list', description: 'Create a todo list with checkboxes' },
+        image: { title: 'Image', description: 'Upload or paste an image' },
+        blockquote: { title: 'Blockquote', description: 'Create a quote block' },
+        codeBlock: { title: 'Code', description: 'Create a code snippet' },
+        horizontalRule: { title: 'Divider', description: 'Create a horizontal line' },
+      },
+    },
+    toolbar: {} as any,
+    aria: {} as any,
+    placeholder: '',
+    linkPlaceholder: '',
+  };
+  
+  const cmd = localeData.slashMenu.commands;
+  return [
   // Basic blocks - Style group
   {
     id: 'paragraph',
-    title: 'Text',
-    description: 'Plain text block',
+    title: cmd.paragraph.title,
+    description: cmd.paragraph.description,
     icon: <TextIcon />,
     aliases: ['p', 'text', 'paragraph'],
     group: 'basic',
@@ -48,8 +75,8 @@ export const defaultSlashCommands: SlashCommand[] = [
   },
   {
     id: 'heading1',
-    title: 'Heading 1',
-    description: 'Large section heading',
+    title: cmd.heading1.title,
+    description: cmd.heading1.description,
     icon: <H1Icon />,
     aliases: ['h1', 'title'],
     group: 'basic',
@@ -57,8 +84,8 @@ export const defaultSlashCommands: SlashCommand[] = [
   },
   {
     id: 'heading2',
-    title: 'Heading 2',
-    description: 'Medium section heading',
+    title: cmd.heading2.title,
+    description: cmd.heading2.description,
     icon: <H2Icon />,
     aliases: ['h2', 'subtitle'],
     group: 'basic',
@@ -66,8 +93,8 @@ export const defaultSlashCommands: SlashCommand[] = [
   },
   {
     id: 'heading3',
-    title: 'Heading 3',
-    description: 'Small section heading',
+    title: cmd.heading3.title,
+    description: cmd.heading3.description,
     icon: <H3Icon />,
     aliases: ['h3'],
     group: 'basic',
@@ -76,8 +103,8 @@ export const defaultSlashCommands: SlashCommand[] = [
   // Lists
   {
     id: 'bulletList',
-    title: 'Bullet List',
-    description: 'Create a bulleted list',
+    title: cmd.bulletList.title,
+    description: cmd.bulletList.description,
     icon: <BulletListIcon />,
     aliases: ['ul', 'bullet', 'unordered', '-'],
     group: 'list',
@@ -85,8 +112,8 @@ export const defaultSlashCommands: SlashCommand[] = [
   },
   {
     id: 'orderedList',
-    title: 'Numbered List',
-    description: 'Create a numbered list',
+    title: cmd.orderedList.title,
+    description: cmd.orderedList.description,
     icon: <OrderedListIcon />,
     aliases: ['ol', 'numbered', 'ordered', '1.'],
     group: 'list',
@@ -94,18 +121,48 @@ export const defaultSlashCommands: SlashCommand[] = [
   },
   {
     id: 'taskList',
-    title: 'To-do list',
-    description: 'Create a todo list with checkboxes',
+    title: cmd.taskList.title,
+    description: cmd.taskList.description,
     icon: <TaskListIcon />,
     aliases: ['todo', 'task', 'checkbox', '[]'],
     group: 'list',
     action: (editor) => editor.chain().focus().toggleTaskList().run(),
   },
+  // Media
+  {
+    id: 'image',
+    title: cmd.image.title,
+    description: cmd.image.description,
+    icon: <ImageIcon />,
+    aliases: ['img', 'picture', 'photo', 'pic'],
+    group: 'media',
+    action: (editor) => {
+      // Create a file input element
+      const input = document.createElement('input');
+      input.type = 'file';
+      const accept = imageUploadConfig?.accept ?? ['image/*'];
+      input.accept = accept.join(',');
+      input.style.display = 'none';
+      
+      input.onchange = (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) {
+          handleImageUpload(editor, file, imageUploadConfig);
+        }
+        // Clean up
+        document.body.removeChild(input);
+      };
+      
+      // Append to body and trigger click
+      document.body.appendChild(input);
+      input.click();
+    },
+  },
   // Advanced
   {
     id: 'blockquote',
-    title: 'Blockquote',
-    description: 'Create a quote block',
+    title: cmd.blockquote.title,
+    description: cmd.blockquote.description,
     icon: <QuoteIcon />,
     aliases: ['quote', 'blockquote', '>'],
     group: 'advanced',
@@ -113,8 +170,8 @@ export const defaultSlashCommands: SlashCommand[] = [
   },
   {
     id: 'codeBlock',
-    title: 'Code',
-    description: 'Create a code snippet',
+    title: cmd.codeBlock.title,
+    description: cmd.codeBlock.description,
     icon: <CodeBlockIcon />,
     aliases: ['code', 'pre', 'snippet', '```'],
     group: 'advanced',
@@ -122,8 +179,8 @@ export const defaultSlashCommands: SlashCommand[] = [
   },
   {
     id: 'horizontalRule',
-    title: 'Divider',
-    description: 'Create a horizontal line',
+    title: cmd.horizontalRule.title,
+    description: cmd.horizontalRule.description,
     icon: <DividerIcon />,
     aliases: ['hr', 'divider', 'line', '---'],
     group: 'advanced',
@@ -174,16 +231,13 @@ export const defaultSlashCommands: SlashCommand[] = [
     },
   },
 ];
+}
 
 /**
- * Group labels - Simple names like Notion
+ * Default slash commands (without image upload config, uses base64)
+ * Note: This is deprecated, use createDefaultSlashCommands with locale instead
  */
-const groupLabels: Record<string, string> = {
-  basic: 'Style',
-  list: 'Lists',
-  media: 'Media',
-  advanced: 'Advanced',
-};
+export const defaultSlashCommands: SlashCommand[] = createDefaultSlashCommands();
 
 /**
  * Filter commands by query
@@ -214,6 +268,7 @@ interface SlashMenuListProps {
   command: (item: SlashCommand) => void;
   editor: Editor;
   query?: string;
+  groupLabels?: Record<string, string>;
 }
 
 /**
@@ -222,7 +277,7 @@ interface SlashMenuListProps {
 export const SlashMenuList = React.forwardRef<
   { onKeyDown: (props: SuggestionKeyDownProps) => boolean },
   SlashMenuListProps
->(function SlashMenuList({ items, command, query = '' }, ref) {
+>(function SlashMenuList({ items, command, query = '', groupLabels: groupLabelsProp }, ref) {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const selectedItemRef = React.useRef<HTMLButtonElement | null>(null);
@@ -372,13 +427,21 @@ export const SlashMenuList = React.forwardRef<
     },
   }));
 
+  // Use groupLabels from props or fallback to defaults
+  const groupLabels = groupLabelsProp || {
+    basic: 'Style',
+    list: 'Lists',
+    media: 'Media',
+    advanced: 'Advanced',
+  };
+
   // Don't render if no items
   if (items.length === 0) {
     return null;
   }
 
   return (
-    <div className="pubwave-slash-menu" ref={menuRef} style={menuStyle}>
+    <div className="pubwave-slash-menu" ref={menuRef} style={menuStyle} data-testid="slash-menu">
       <div style={{ padding: 'var(--pubwave-spacing-1, 4px) 0' }}>
         {(() => {
           let globalIndex = 0;
@@ -585,10 +648,111 @@ function DividerIcon() {
   );
 }
 
+function ImageIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <polyline points="21,15 16,10 5,21" />
+    </svg>
+  );
+}
+
+/**
+ * Upload image file and return URL
+ * Uses custom handler if provided, otherwise converts to base64
+ */
+async function uploadImage(
+  file: File,
+  config?: ImageUploadConfig
+): Promise<string> {
+  const maxSize = config?.maxSize ?? 10 * 1024 * 1024; // 10MB default
+  if (file.size > maxSize) {
+    throw new Error(`Image file is too large. Maximum size is ${maxSize / 1024 / 1024}MB`);
+  }
+
+  // If custom handler is provided, use it
+  if (config?.handler) {
+    try {
+      return await config.handler(file);
+    } catch (error) {
+      console.warn('Custom image upload failed, falling back to base64:', error);
+      // Fall through to base64 conversion
+    }
+  }
+
+  // Default: convert to base64
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const src = e.target?.result as string;
+      if (src) {
+        resolve(src);
+      } else {
+        reject(new Error('Failed to read image file'));
+      }
+    };
+    reader.onerror = () => {
+      reject(new Error('Failed to read image file'));
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * Handle image upload from file
+ */
+function handleImageUpload(editor: Editor, file: File, imageUploadConfig?: ImageUploadConfig): void {
+  // Check if file is an image
+  const accept = imageUploadConfig?.accept ?? ['image/*'];
+  const isImage = accept.some((pattern) => {
+    if (pattern === 'image/*') {
+      return file.type.startsWith('image/');
+    }
+    return file.type === pattern;
+  });
+
+  if (!isImage) {
+    console.warn('Selected file is not an image');
+    return;
+  }
+
+  // Upload image (uses custom handler or base64)
+  uploadImage(file, imageUploadConfig)
+    .then((src) => {
+      // Insert image at current position
+      editor
+        .chain()
+        .focus()
+        .setImage({ src })
+        .run();
+    })
+    .catch((error) => {
+      console.error('Failed to upload image:', error);
+    });
+}
+
 /**
  * Create the Slash Commands Extension
  */
-export function createSlashCommandsExtension(commands: SlashCommand[] = defaultSlashCommands) {
+export function createSlashCommandsExtension(
+  commands: SlashCommand[] = defaultSlashCommands,
+  imageUploadConfig?: ImageUploadConfig,
+  locale?: EditorLocale
+) {
+  // If imageUploadConfig or locale is provided, recreate commands with the config
+  const finalCommands = imageUploadConfig || locale
+    ? createDefaultSlashCommands(imageUploadConfig, locale)
+    : commands;
+  
+  // Get group labels from locale or use defaults
+  const groupLabels = locale?.slashMenu?.groups || {
+    basic: 'Style',
+    list: 'Lists',
+    media: 'Media',
+    advanced: 'Advanced',
+  };
+  
   return Extension.create({
     name: 'slashCommands',
 
@@ -614,11 +778,34 @@ export function createSlashCommandsExtension(commands: SlashCommand[] = defaultS
     },
 
     addProseMirrorPlugins() {
+      const editor = this.editor;
       return [
         Suggestion({
           editor: this.editor,
           ...this.options.suggestion,
-          items: ({ query }: { query: string }) => filterCommands(commands, query),
+          // Disable slash commands in code blocks
+          allowed: ({ state, range }: { state: any; range: Range }) => {
+            try {
+              // Use editor instance to check if we're in a code block
+              if (editor.isActive('codeBlock')) {
+                return false;
+              }
+              // Also check the position where "/" was typed as a fallback
+              const $pos = state.doc.resolve(range.from);
+              // Check if we're inside a code block by walking up the node tree
+              for (let d = $pos.depth; d >= 1; d--) {
+                const node = $pos.node(d);
+                if (node.type.name === 'codeBlock') {
+                  return false;
+                }
+              }
+              return true;
+            } catch (e) {
+              // If resolution fails, allow by default
+              return true;
+            }
+          },
+          items: ({ query }: { query: string }) => filterCommands(finalCommands, query),
           render: () => {
             let component: ReactRenderer<
               { onKeyDown: (props: SuggestionKeyDownProps) => boolean },
@@ -628,11 +815,17 @@ export function createSlashCommandsExtension(commands: SlashCommand[] = defaultS
 
             return {
               onStart: (props: SuggestionProps) => {
+                // Check if we're in a code block - if so, don't show the menu
+                if (this.editor.isActive('codeBlock')) {
+                  return;
+                }
+                
                 component = new ReactRenderer(SlashMenuList, {
                   props: {
                     ...props,
                     query: props.query,
                     editor: this.editor,
+                    groupLabels,
                   },
                   editor: this.editor,
                 });
@@ -650,6 +843,9 @@ export function createSlashCommandsExtension(commands: SlashCommand[] = defaultS
                   offset: [0, 8],
                   zIndex: tokens.zIndex.dropdown,
                   arrow: false,
+                  // Disable animations to prevent black block flash
+                  duration: [0, 0],
+                  animation: false,
                   popperOptions: {
                     modifiers: [
                       {
@@ -669,10 +865,14 @@ export function createSlashCommandsExtension(commands: SlashCommand[] = defaultS
                     ],
                   },
                   onShow(instance) {
-                    // Ensure z-index is set correctly
+                    // Ensure z-index is set correctly and background is transparent
                     const box = instance.popper.querySelector('.tippy-box') as HTMLElement;
                     if (box) {
                       box.style.zIndex = String(tokens.zIndex.dropdown);
+                      // Ensure background is transparent to prevent black block flash
+                      box.style.backgroundColor = 'transparent';
+                      box.style.background = 'transparent';
+                      box.style.border = 'none';
                     }
 
                     // Dynamically adjust max height based on available space
@@ -696,17 +896,29 @@ export function createSlashCommandsExtension(commands: SlashCommand[] = defaultS
               },
 
               onUpdate(props: SuggestionProps) {
-                // If no items found, hide the menu
-                if (props.items.length === 0) {
-                  popup[0]?.hide();
-                  return;
-                }
-
+                // Always update component props, even when items.length === 0
+                // This ensures onKeyDown sees the correct empty state
                 component.updateProps({
                   ...props,
                   query: props.query,
                   editor: props.editor,
+                  groupLabels,
                 });
+
+                // If no items found, immediately hide and destroy the menu to prevent black block flash
+                if (props.items.length === 0) {
+                  // Hide immediately without animation
+                  if (popup[0]) {
+                    popup[0].hide();
+                    // Force hide by setting opacity to 0 immediately
+                    const box = popup[0].popper.querySelector('.tippy-box') as HTMLElement;
+                    if (box) {
+                      box.style.opacity = '0';
+                      box.style.pointerEvents = 'none';
+                    }
+                  }
+                  return;
+                }
 
                 if (!props.clientRect) return;
 

@@ -1,0 +1,110 @@
+{
+  "slashMenu": {
+    "groups": {
+      "basic": "Básico",
+      "list": "Listas",
+      "media": "Mídia",
+      "advanced": "Avançado"
+    },
+    "commands": {
+      "paragraph": {
+        "title": "Texto",
+        "description": "Bloco de texto simples"
+      },
+      "heading1": {
+        "title": "Título 1",
+        "description": "Título de seção grande"
+      },
+      "heading2": {
+        "title": "Título 2",
+        "description": "Título de seção médio"
+      },
+      "heading3": {
+        "title": "Título 3",
+        "description": "Título de seção pequeno"
+      },
+      "bulletList": {
+        "title": "Lista com marcadores",
+        "description": "Criar uma lista com marcadores"
+      },
+      "orderedList": {
+        "title": "Lista numerada",
+        "description": "Criar uma lista numerada"
+      },
+      "taskList": {
+        "title": "Lista de tarefas",
+        "description": "Criar uma lista de tarefas com caixas de seleção"
+      },
+      "image": {
+        "title": "Imagem",
+        "description": "Enviar ou colar uma imagem"
+      },
+      "blockquote": {
+        "title": "Citação",
+        "description": "Criar um bloco de citação"
+      },
+      "codeBlock": {
+        "title": "Código",
+        "description": "Criar um trecho de código"
+      },
+      "horizontalRule": {
+        "title": "Divisor",
+        "description": "Criar uma linha horizontal"
+      }
+    }
+  },
+  "toolbar": {
+    "bold": "Negrito",
+    "italic": "Itálico",
+    "underline": "Sublinhado",
+    "strike": "Tachado",
+    "code": "Código inline",
+    "link": "Link",
+    "turnInto": "Converter em",
+    "colorPicker": "Cor do texto e fundo",
+    "textColor": "Cor do texto",
+    "backgroundColor": "Cor de fundo",
+    "recentlyUsed": "Usados recentemente",
+    "openLink": "Abrir link",
+    "removeLink": "Remover link",
+    "blockTypes": {
+      "text": "Texto",
+      "heading1": "Título 1",
+      "heading2": "Título 2",
+      "heading3": "Título 3",
+      "bulletedList": "Lista com marcadores",
+      "numberedList": "Lista numerada"
+    }
+  },
+  "aria": {
+    "editor": "Editor de texto rico",
+    "editorContent": "Área de conteúdo do editor",
+    "toolbar": "Barra de ferramentas de formatação de texto",
+    "boldButton": "Alternar formatação em negrito",
+    "italicButton": "Alternar formatação em itálico",
+    "underlineButton": "Alternar sublinhado",
+    "strikeButton": "Alternar tachado",
+    "codeButton": "Alternar código inline",
+    "linkButton": "Adicionar ou editar link",
+    "turnIntoButton": "Converter em",
+    "colorPickerButton": "Cor do texto e fundo",
+    "headingButton": "Definir nível de título",
+    "paragraphButton": "Converter em parágrafo",
+    "dragHandle": "Arrastar para reorganizar o bloco",
+    "dropIndicator": "Soltar aqui para mover o bloco",
+    "blockMenu": "Menu de opções do bloco",
+    "addBlock": "Adicionar novo bloco",
+    "deleteBlock": "Excluir este bloco",
+    "linkDialog": "Diálogo de edição de link",
+    "linkUrlInput": "Entrada de URL do link",
+    "linkSaveButton": "Salvar link",
+    "linkRemoveButton": "Remover link",
+    "linkCancelButton": "Cancelar edição de link",
+    "addBlockBelow": "Adicionar bloco abaixo",
+    "dragToMove": "Arrastar para reorganizar o bloco",
+    "openLinkInNewTab": "Abrir link em nova aba"
+  },
+  "placeholder": "Digite \"/\" para comandos...",
+  "linkPlaceholder": "Cole um link..."
+}
+

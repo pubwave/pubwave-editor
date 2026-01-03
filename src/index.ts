@@ -11,6 +11,7 @@ export type {
   EditorAPI,
   EditorState,
   EditorTheme,
+  EditorLocale,
   BlockType,
   MarkType,
   SelectionState,

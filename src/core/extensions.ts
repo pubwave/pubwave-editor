@@ -11,11 +11,12 @@ import History from '@tiptap/extension-history';
 import Dropcursor from '@tiptap/extension-dropcursor';
 import Gapcursor from '@tiptap/extension-gapcursor';
 
-import type { BlockType, MarkType } from '../types/editor';
+import type { BlockType, MarkType, EditorLocale as EditorLocaleCode } from '../types/editor';
 import {
   createBlockExtensions,
   type BlockExtensionsConfig,
 } from './extensions/blocks';
+import type { ImageUploadConfig } from '../types/editor';
 import {
   createMarkExtensions,
   type MarkExtensionsConfig,
@@ -26,6 +27,7 @@ import {
   type SlashCommand,
 } from '../ui/SlashMenu';
 import { createDndPlugin } from './plugins/dnd';
+import { getLocale, type EditorLocale } from '../i18n';
 
 /**
  * Supported block types
@@ -39,6 +41,7 @@ export const SUPPORTED_BLOCKS: readonly BlockType[] = [
   'blockquote',
   'codeBlock',
   'horizontalRule',
+  'image',
 ] as const;
 
 /**
@@ -80,6 +83,16 @@ export interface ExtensionConfig
    * Custom slash commands (merged with defaults)
    */
   slashCommands?: SlashCommand[];
+
+  /**
+   * Image upload configuration
+   */
+  imageUpload?: ImageUploadConfig;
+
+  /**
+   * Locale for internationalization
+   */
+  locale?: EditorLocaleCode;
 }
 
 /**
@@ -89,18 +102,24 @@ export interface ExtensionConfig
  */
 export function createExtensions(config: ExtensionConfig = {}): Extension[] {
   const {
-    placeholder = 'Type "/" for commands...',
+    placeholder: placeholderProp,
     historyDepth = 100,
     headingLevels,
     linkOpenInNewTab,
     linkOpenOnClick,
     enableSlashCommands = true,
     slashCommands,
+    imageUpload,
+    locale,
   } = config;
+
+  // Get placeholder from prop or locale data
+  const localeData = locale ? getLocale(locale) : null;
+  const placeholder = placeholderProp ?? localeData?.placeholder ?? 'Type "/" for commands...';
 
   const extensions: Extension[] = [
     // Block extensions (document structure + block types)
-    ...createBlockExtensions({ headingLevels }),
+    ...createBlockExtensions({ headingLevels, imageUpload }),
 
     // Mark extensions (inline formatting)
     ...createMarkExtensions({ linkOpenInNewTab, linkOpenOnClick }),
@@ -132,10 +151,11 @@ export function createExtensions(config: ExtensionConfig = {}): Extension[] {
 
   // Slash commands (optional)
   if (enableSlashCommands) {
+    const localeData = locale ? getLocale(locale) : getLocale('en');
     const commands = slashCommands
       ? [...defaultSlashCommands, ...slashCommands]
       : defaultSlashCommands;
-    extensions.push(createSlashCommandsExtension(commands));
+    extensions.push(createSlashCommandsExtension(commands, imageUpload, localeData));
   }
 
   return extensions as Extension[];

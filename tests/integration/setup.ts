@@ -11,7 +11,7 @@ import { Page, Locator } from '@playwright/test';
  * Editor test utilities
  */
 export class EditorTestHelper {
-  private page: Page;
+  public readonly page: Page;
   private editorSelector: string;
 
   constructor(page: Page, editorSelector = '[data-testid="pubwave-editor"]') {
@@ -196,6 +196,89 @@ export class EditorTestHelper {
     const isActive = await button.getAttribute('data-active');
     return isActive === 'true';
   }
+
+  /**
+   * Get content as text
+   */
+  async getContentText(): Promise<string> {
+    const api = await this.getEditorAPI();
+    if (!api) return '';
+    return await this.page.evaluate(() => {
+      const win = window as any;
+      return win.pubwaveEditor?.getText() ?? '';
+    });
+  }
+
+  /**
+   * Get editor API from window
+   */
+  async getEditorAPI(): Promise<any> {
+    return this.page.evaluate(() => {
+      const win = window as unknown as { pubwaveEditor?: any };
+      return win.pubwaveEditor ?? null;
+    });
+  }
+
+  /**
+   * Get editor state
+   */
+  async getEditorState(): Promise<any> {
+    const api = await this.getEditorAPI();
+    if (!api) return null;
+    return await this.page.evaluate(() => {
+      const win = window as any;
+      return win.pubwaveEditor?.getState() ?? null;
+    });
+  }
+
+  /**
+   * Clear content via API
+   */
+  async clearContent(): Promise<void> {
+    await this.page.evaluate(() => {
+      const win = window as any;
+      if (win.pubwaveEditor) {
+        win.pubwaveEditor.setContent({ type: 'doc', content: [] });
+      }
+    });
+    await this.page.waitForTimeout(300);
+  }
+
+  /**
+   * Double click to select a word
+   */
+  async doubleClickWord(): Promise<void> {
+    const content = this.getContent();
+    await content.click();
+    const box = await content.boundingBox();
+    if (box) {
+      await this.page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, { clickCount: 2 });
+    }
+    await this.page.waitForTimeout(200);
+  }
+
+  /**
+   * Triple click to select a line
+   */
+  async tripleClickLine(): Promise<void> {
+    const content = this.getContent();
+    await content.click();
+    const box = await content.boundingBox();
+    if (box) {
+      await this.page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, { clickCount: 3 });
+    }
+    await this.page.waitForTimeout(200);
+  }
+
+  /**
+   * Hover over a block to reveal drag handle
+   */
+  async hoverBlock(index: number): Promise<void> {
+    const block = this.page.locator('.pubwave-block, .pubwave-editor__content > p, .pubwave-editor__content > h1, .pubwave-editor__content > h2, .pubwave-editor__content > h3').nth(index);
+    await block.waitFor({ state: 'visible', timeout: 5000 });
+    await block.hover();
+    await this.page.waitForTimeout(500);
+  }
 }
 
 /**
@@ -203,11 +286,32 @@ export class EditorTestHelper {
  */
 export async function navigateToEditor(
   page: Page,
-  path = '/'
+  path = '/',
+  clearContent = true
 ): Promise<EditorTestHelper> {
+  await page.addInitScript(() => {
+    (window as any).__TESTING__ = true;
+  });
   await page.goto(path);
   const helper = new EditorTestHelper(page);
   await helper.waitForReady();
+  
+  await page.waitForFunction(
+    () => {
+      const win = window as any;
+      return win.pubwaveEditor != null;
+    },
+    { timeout: 5000 }
+  );
+  
+  if (clearContent) {
+    await helper.clearContent();
+    const text = await helper.getContentText();
+    if (text.trim().length > 0) {
+      await helper.clearContent();
+      await page.waitForTimeout(300);
+    }
+  }
   return helper;
 }
 

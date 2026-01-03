@@ -1,0 +1,110 @@
+{
+  "slashMenu": {
+    "groups": {
+      "basic": "Basic",
+      "list": "Lists",
+      "media": "Media",
+      "advanced": "Advanced"
+    },
+    "commands": {
+      "paragraph": {
+        "title": "Text",
+        "description": "Plain text block"
+      },
+      "heading1": {
+        "title": "Heading 1",
+        "description": "Large section heading"
+      },
+      "heading2": {
+        "title": "Heading 2",
+        "description": "Medium section heading"
+      },
+      "heading3": {
+        "title": "Heading 3",
+        "description": "Small section heading"
+      },
+      "bulletList": {
+        "title": "Bullet List",
+        "description": "Create a bulleted list"
+      },
+      "orderedList": {
+        "title": "Numbered List",
+        "description": "Create a numbered list"
+      },
+      "taskList": {
+        "title": "To-do list",
+        "description": "Create a todo list with checkboxes"
+      },
+      "image": {
+        "title": "Image",
+        "description": "Upload or paste an image"
+      },
+      "blockquote": {
+        "title": "Blockquote",
+        "description": "Create a quote block"
+      },
+      "codeBlock": {
+        "title": "Code",
+        "description": "Create a code snippet"
+      },
+      "horizontalRule": {
+        "title": "Divider",
+        "description": "Create a horizontal line"
+      }
+    }
+  },
+  "toolbar": {
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "strike": "Strikethrough",
+    "code": "Inline Code",
+    "link": "Link",
+    "turnInto": "Turn Into",
+    "colorPicker": "Text and background color",
+    "textColor": "Text color",
+    "backgroundColor": "Background color",
+    "recentlyUsed": "Recently used",
+    "openLink": "Open link",
+    "removeLink": "Remove link",
+    "blockTypes": {
+      "text": "Text",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bulletedList": "Bulleted list",
+      "numberedList": "Numbered list"
+    }
+  },
+  "aria": {
+    "editor": "Rich text editor",
+    "editorContent": "Editor content area",
+    "toolbar": "Text formatting toolbar",
+    "boldButton": "Toggle bold formatting",
+    "italicButton": "Toggle italic formatting",
+    "underlineButton": "Toggle underline formatting",
+    "strikeButton": "Toggle strikethrough formatting",
+    "codeButton": "Toggle inline code formatting",
+    "linkButton": "Add or edit link",
+    "turnIntoButton": "Turn into",
+    "colorPickerButton": "Text and background color",
+    "headingButton": "Set heading level",
+    "paragraphButton": "Convert to paragraph",
+    "dragHandle": "Drag to reorder block",
+    "dropIndicator": "Drop here to move block",
+    "blockMenu": "Block options menu",
+    "addBlock": "Add new block",
+    "deleteBlock": "Delete this block",
+    "linkDialog": "Link editor dialog",
+    "linkUrlInput": "Link URL input",
+    "linkSaveButton": "Save link",
+    "linkRemoveButton": "Remove link",
+    "linkCancelButton": "Cancel link editing",
+    "addBlockBelow": "Add block below",
+    "dragToMove": "Drag to reorder block",
+    "openLinkInNewTab": "Open link in new tab"
+  },
+  "placeholder": "Type \"/\" for commands...",
+  "linkPlaceholder": "Paste a link..."
+}
+

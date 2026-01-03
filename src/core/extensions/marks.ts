@@ -15,6 +15,7 @@ import Underline from '@tiptap/extension-underline';
 import Strike from '@tiptap/extension-strike';
 import Code from '@tiptap/extension-code';
 import Link from '@tiptap/extension-link';
+import { TextColor, BackgroundColor } from './color';
 
 export interface MarkExtensionsConfig {
   /**
@@ -25,7 +26,7 @@ export interface MarkExtensionsConfig {
 
   /**
    * Whether to open links on click (within editor)
-   * @default false - users must use Ctrl/Cmd+Click
+   * @default true - links open on click
    */
   linkOpenOnClick?: boolean;
 }
@@ -44,7 +45,7 @@ export interface MarkExtensionsConfig {
 export function createMarkExtensions(
   config: MarkExtensionsConfig = {}
 ): Extension[] {
-  const { linkOpenInNewTab = true, linkOpenOnClick = false } = config;
+  const { linkOpenInNewTab = true, linkOpenOnClick = true } = config;
 
   return [
     // Text formatting marks
@@ -95,6 +96,18 @@ export function createMarkExtensions(
           // Relative URLs are also valid
           return href.startsWith('/') || href.startsWith('#');
         }
+      },
+    }),
+
+    // Color marks
+    TextColor.configure({
+      HTMLAttributes: {
+        class: 'pubwave-editor__mark--text-color',
+      },
+    }),
+    BackgroundColor.configure({
+      HTMLAttributes: {
+        class: 'pubwave-editor__mark--background-color',
       },
     }),
   ] as Extension[];

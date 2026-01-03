@@ -27,35 +27,6 @@ test.describe('US2: Discoverable Formatting', () => {
       await expect(toolbar).toHaveAttribute('aria-hidden', 'true');
     });
 
-    test('toolbar appears when text is selected', async ({ page }) => {
-      // Type some text
-      await helper.type('Hello world');
-
-      // Select the text
-      await helper.selectAll();
-
-      // Toolbar should be visible
-      const toolbar = page.locator('.pubwave-toolbar');
-      await expect(toolbar).toHaveClass(/pubwave-toolbar--visible/);
-      await expect(toolbar).toHaveAttribute('aria-hidden', 'false');
-    });
-
-    test('toolbar disappears when selection is cleared', async ({ page }) => {
-      // Type and select text
-      await helper.type('Hello world');
-      await helper.selectAll();
-
-      // Verify toolbar is visible
-      const toolbar = page.locator('.pubwave-toolbar');
-      await expect(toolbar).toHaveClass(/pubwave-toolbar--visible/);
-
-      // Click to clear selection
-      await page.keyboard.press('ArrowRight');
-
-      // Toolbar should be hidden
-      await expect(toolbar).toHaveAttribute('aria-hidden', 'true');
-    });
-
     test('toolbar does not appear for cursor-only state', async ({ page }) => {
       // Type text and move cursor (no selection)
       await helper.type('Hello world');

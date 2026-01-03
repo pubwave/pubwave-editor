@@ -1,0 +1,110 @@
+{
+  "slashMenu": {
+    "groups": {
+      "basic": "기본",
+      "list": "목록",
+      "media": "미디어",
+      "advanced": "고급"
+    },
+    "commands": {
+      "paragraph": {
+        "title": "텍스트",
+        "description": "일반 텍스트 블록"
+      },
+      "heading1": {
+        "title": "제목 1",
+        "description": "큰 섹션 제목"
+      },
+      "heading2": {
+        "title": "제목 2",
+        "description": "중간 섹션 제목"
+      },
+      "heading3": {
+        "title": "제목 3",
+        "description": "작은 섹션 제목"
+      },
+      "bulletList": {
+        "title": "글머리 기호 목록",
+        "description": "글머리 기호 목록 만들기"
+      },
+      "orderedList": {
+        "title": "번호 매기기 목록",
+        "description": "번호 매기기 목록 만들기"
+      },
+      "taskList": {
+        "title": "할 일 목록",
+        "description": "확인란 있는 할 일 목록 만들기"
+      },
+      "image": {
+        "title": "이미지",
+        "description": "이미지 업로드 또는 붙여넣기"
+      },
+      "blockquote": {
+        "title": "인용",
+        "description": "인용 블록 만들기"
+      },
+      "codeBlock": {
+        "title": "코드",
+        "description": "코드 스니펫 만들기"
+      },
+      "horizontalRule": {
+        "title": "구분선",
+        "description": "수평선 만들기"
+      }
+    }
+  },
+  "toolbar": {
+    "bold": "굵게",
+    "italic": "기울임",
+    "underline": "밑줄",
+    "strike": "취소선",
+    "code": "인라인 코드",
+    "link": "링크",
+    "turnInto": "변환",
+    "colorPicker": "텍스트 및 배경색",
+    "textColor": "텍스트 색상",
+    "backgroundColor": "배경 색상",
+    "recentlyUsed": "최근 사용",
+    "openLink": "링크 열기",
+    "removeLink": "링크 제거",
+    "blockTypes": {
+      "text": "텍스트",
+      "heading1": "제목 1",
+      "heading2": "제목 2",
+      "heading3": "제목 3",
+      "bulletedList": "글머리 기호 목록",
+      "numberedList": "번호 매기기 목록"
+    }
+  },
+  "aria": {
+    "editor": "리치 텍스트 에디터",
+    "editorContent": "에디터 내용 영역",
+    "toolbar": "텍스트 서식 도구 모음",
+    "boldButton": "굵게 서식 전환",
+    "italicButton": "기울임 서식 전환",
+    "underlineButton": "밑줄 서식 전환",
+    "strikeButton": "취소선 서식 전환",
+    "codeButton": "인라인 코드 서식 전환",
+    "linkButton": "링크 추가 또는 편집",
+    "turnIntoButton": "변환",
+    "colorPickerButton": "텍스트 및 배경색",
+    "headingButton": "제목 수준 설정",
+    "paragraphButton": "단락으로 변환",
+    "dragHandle": "블록 재정렬을 위해 드래그",
+    "dropIndicator": "블록 이동을 위해 여기에 놓기",
+    "blockMenu": "블록 옵션 메뉴",
+    "addBlock": "새 블록 추가",
+    "deleteBlock": "이 블록 삭제",
+    "linkDialog": "링크 편집 대화 상자",
+    "linkUrlInput": "링크 URL 입력",
+    "linkSaveButton": "링크 저장",
+    "linkRemoveButton": "링크 제거",
+    "linkCancelButton": "링크 편집 취소",
+    "addBlockBelow": "아래에 블록 추가",
+    "dragToMove": "블록 재정렬을 위해 드래그",
+    "openLinkInNewTab": "새 탭에서 링크 열기"
+  },
+  "placeholder": "명령을 표시하려면 \"/\" 입력...",
+  "linkPlaceholder": "링크 붙여넣기..."
+}
+

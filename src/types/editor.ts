@@ -19,7 +19,8 @@ export type BlockType =
   | 'taskList'
   | 'blockquote'
   | 'codeBlock'
-  | 'horizontalRule';
+  | 'horizontalRule'
+  | 'image';
 
 /**
  * Supported mark types for inline formatting
@@ -30,12 +31,24 @@ export type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'code' | 'li
  * Theme configuration using CSS custom property tokens
  * All colors must be CSS custom properties, never hard-coded values
  */
+/**
+ * Locale for internationalization
+ * @default 'en'
+ */
+export type EditorLocale = 'en' | 'zh' | 'zh-CN' | 'ja' | 'ko' | 'fr' | 'de' | 'es' | 'pt';
+
 export interface EditorTheme {
   /**
    * CSS class name prefix for styling hooks
    * @default 'pubwave-editor'
    */
   classNamePrefix?: string;
+
+  /**
+   * Locale for internationalization
+   * @default 'en'
+   */
+  locale?: EditorLocale;
 
   /**
    * Additional CSS classes to apply to the editor container
@@ -46,6 +59,113 @@ export interface EditorTheme {
    * Additional CSS classes to apply to the content area
    */
   contentClassName?: string;
+
+  /**
+   * Color theme configuration
+   * Colors will be applied as CSS custom properties to the editor container
+   * If not provided, default theme colors will be used
+   */
+  colors?: {
+    /**
+     * Editor background color
+     */
+    background?: string;
+
+    /**
+     * Primary text color
+     */
+    text?: string;
+
+    /**
+     * Muted/secondary text color (e.g., for placeholders)
+     */
+    textMuted?: string;
+
+    /**
+     * Border color
+     */
+    border?: string;
+
+    /**
+     * Primary color (for links, buttons, etc.)
+     */
+    primary?: string;
+
+    /**
+     * Link color (if not provided, will use primary color)
+     * Useful for dark themes where a brighter link color is needed for visibility
+     */
+    linkColor?: string;
+  };
+
+  /**
+   * Background image configuration
+   * Can be a URL string or CSS background-image value
+   * If provided, will be applied as the editor container background image
+   * Background image will be layered on top of background color
+   */
+  backgroundImage?: string;
+
+  /**
+   * Background image options
+   * Controls how the background image is displayed
+   */
+  backgroundImageOptions?: {
+    /**
+     * Background image repeat behavior
+     * @default 'no-repeat'
+     */
+    repeat?: 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
+
+    /**
+     * Background image position
+     * @default 'center'
+     */
+    position?: string;
+
+    /**
+     * Background image size
+     * @default 'cover'
+     */
+    size?: 'cover' | 'contain' | string;
+
+    /**
+     * Background image attachment
+     * @default 'scroll'
+     */
+    attachment?: 'scroll' | 'fixed' | 'local';
+  };
+}
+
+/**
+ * Image upload handler function
+ * Should return a Promise that resolves to the image URL
+ * If the function throws or rejects, the editor will fall back to base64
+ */
+export type ImageUploadHandler = (file: File) => Promise<string>;
+
+/**
+ * Image upload configuration
+ */
+export interface ImageUploadConfig {
+  /**
+   * Custom image upload handler
+   * If provided, images will be uploaded using this function
+   * If not provided, images will be converted to base64 (default)
+   */
+  handler?: ImageUploadHandler;
+
+  /**
+   * Maximum file size in bytes
+   * @default 10MB (10 * 1024 * 1024)
+   */
+  maxSize?: number;
+
+  /**
+   * Accepted file types
+   * @default ['image/*']
+   */
+  accept?: string[];
 }
 
 /**
@@ -83,6 +203,12 @@ export interface EditorConfig {
    * @default false
    */
   autofocus?: boolean | 'start' | 'end';
+
+  /**
+   * Image upload configuration
+   * If not provided, images will be converted to base64 by default
+   */
+  imageUpload?: ImageUploadConfig;
 
   /**
    * Callback fired when the editor content changes

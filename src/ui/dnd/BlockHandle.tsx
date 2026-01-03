@@ -420,9 +420,10 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     <div
       ref={containerRef}
       className="pubwave-block-handle"
+      data-testid="block-handle"
       style={{
         position: 'absolute',
-        left: '-64px',
+        left: 'calc(var(--pubwave-container-padding-left, 140px) - 80px)',
         top: `${position.top}px`,
         transform: 'translateY(-50%)',
         display: 'flex',
@@ -460,6 +461,7 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
         type="button"
         className="pubwave-block-handle__add"
         onClick={handleAdd}
+        data-testid="add-block-button"
         style={{
           width: 'var(--pubwave-button-width, 28px)',
           height: 'var(--pubwave-button-height, 28px)',
@@ -469,7 +471,7 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
           border: 'none',
           borderRadius: tokens.borderRadius.sm,
           background: 'transparent',
-          color: `var(--pubwave-handle-color, ${tokens.colors.textMuted})`,
+          color: `var(--pubwave-text-muted, ${tokens.colors.textMuted})`,
           cursor: 'pointer',
           transition: `background-color ${tokens.transition.fast}, color ${tokens.transition.fast}`,
         }}
@@ -485,15 +487,19 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
         draggable
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        data-testid="drag-handle"
         style={{
-          width: 'var(--pubwave-button-width, 28px)',
-          height: 'var(--pubwave-button-height, 28px)',
+          // Hit area (minimum 44px for accessibility)
+          // Use padding to increase hit area while keeping visual size at 28px
+          width: '44px',
+          height: '44px',
+          padding: '8px', // (44 - 28) / 2 = 8px padding on each side
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: tokens.borderRadius.sm,
           background: 'transparent',
-          color: `var(--pubwave-handle-color, ${tokens.colors.textMuted})`,
+          color: `var(--pubwave-text-muted, ${tokens.colors.textMuted})`,
           cursor: 'grab',
           transition: `background-color ${tokens.transition.fast}, color ${tokens.transition.fast}`,
         }}

@@ -1,43 +1,194 @@
-# Pubwave Editor - Next.js Example
+# Next.js Example
 
-This example demonstrates SSR-safe integration of Pubwave Editor with Next.js.
+This example demonstrates how to integrate Pubwave Editor in a Next.js application, including both client-side and server-side rendering approaches.
 
-## Key Features
-
-- **SSR-Safe**: The editor library can be imported server-side without errors
-- **Client-Side Rendering**: The editor component itself renders only on the client
-- **App Router**: Uses Next.js 15 App Router pattern
-- **TypeScript**: Fully typed
-
-## Running the Example
+## 🚀 Quick Start
 
 ```bash
-# From the repository root
+# Install dependencies
 npm install
-cd examples/nextjs
+
+# Start development server
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) in your browser.
+Then open in your browser:
+- **Client-side example**: http://localhost:3000
+- **SSR example**: http://localhost:3000/ssr
 
-## SSR Integration Pattern
+## 📄 Example Overview
 
-The editor is wrapped in a client component (marked with `'use client'`):
+### 1. Client-Side Rendering Example (`/`)
+
+**File location**: `src/app/page.tsx`
+
+This is the simplest integration approach where the editor is fully rendered on the client side.
+
+**Use cases:**
+- No SEO optimization needed
+- Editor content is user-private
+- Fast development setup
+
+**Features:**
+- ✅ Simple setup
+- ✅ Great development experience
+- ✅ All editor features supported
+- ✅ Theme switcher included
+
+### 2. Server-Side Rendered Example (`/ssr`)
+
+**File location**: `src/app/ssr/page.tsx`
+
+This example demonstrates SSR usage in Next.js, where the page structure is server-rendered and the editor hydrates on the client.
+
+**Use cases:**
+- SEO optimization needed
+- Faster initial page load
+- Page structure needs server rendering
+
+**Features:**
+- ✅ SEO friendly
+- ✅ Fast initial load
+- ✅ Progressive enhancement
+- ✅ All editor features supported
+
+## 💻 Usage
+
+### Basic Integration
 
 ```tsx
 'use client';
 
 import { PubwaveEditor } from '@pubwave/editor';
+import '@pubwave/editor/index.css';
+import { useState } from 'react';
 
-export default function EditorClientComponent() {
-  // Client-only editor logic
+export default function Page() {
+  const [content, setContent] = useState({
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: [{ type: 'text', text: 'Start writing...' }],
+      },
+    ],
+  });
+
+  return (
+    <PubwaveEditor
+      content={content}
+      onChange={(newContent) => setContent(newContent)}
+    />
+  );
 }
 ```
 
-This ensures the editor only renders in the browser, while the rest of your Next.js app can use server components and SSR.
+### Using Reusable Component
 
-## Important Notes
+The example provides a reusable editor component `EditorClientComponent`:
 
-1. **Import Safety**: `@pubwave/editor` can be imported server-side - it doesn't throw on module load
-2. **Rendering**: The actual editor view must render client-side (expected for DOM manipulation)
-3. **Transpilation**: The `transpilePackages` config ensures the editor works with Next.js
+```tsx
+import EditorClientComponent from '@/components/EditorClientComponent';
+
+export default function Page() {
+  return (
+    <div>
+      <h1>My Editor</h1>
+      <EditorClientComponent
+        showThemeSwitcher={true}
+        initialTheme="dark"
+      />
+    </div>
+  );
+}
+```
+
+**Component Props:**
+- `showThemeSwitcher?: boolean` - Show/hide theme switcher (default: `true`)
+- `initialTheme?: string` - Initial theme name (default: `'violet'`)
+
+## 🖼️ Image Upload Configuration
+
+### Base64 Mode (Default)
+
+```tsx
+<PubwaveEditor
+  content={content}
+  onChange={setContent}
+/>
+```
+
+### Custom Upload Service
+
+```tsx
+<PubwaveEditor
+  content={content}
+  onChange={setContent}
+  imageUpload={{
+    handler: async (file: File) => {
+      // Upload to your server
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const data = await response.json();
+      return data.url;
+    },
+    maxSize: 5 * 1024 * 1024, // 5MB
+  }}
+/>
+```
+
+## 🎨 Theme Configuration
+
+The example includes 5 predefined themes:
+
+- **Light** - Light theme
+- **Dark** - Dark theme
+- **Violet** - Purple gradient
+- **Rose** - Rose gradient
+- **Sky** - Sky blue gradient
+
+You can also create custom themes:
+
+```tsx
+<PubwaveEditor
+  theme={{
+    locale: 'en', // Optional: Set locale for internationalization (default: 'en')
+    colors: {
+      background: '#ffffff',
+      text: '#1f2937',
+      textMuted: '#6b7280',
+      border: '#e5e7eb',
+      primary: '#3b82f6',
+    },
+  }}
+/>
+```
+
+**Note:** The editor supports multiple locales through the `locale` option in the theme. Currently, only English (`'en'`) is fully implemented. See the [main documentation](../../README.md#internationalization-i18n) for more details.
+
+## 🔧 Customizing the Component
+
+You can modify `EditorClientComponent.tsx` to:
+
+- Add custom event handlers
+- Integrate with your backend API
+- Add custom features
+- Modify theme configuration
+
+## 📦 Building for Production
+
+```bash
+npm run build
+npm start
+```
+
+## 📚 More Information
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Pubwave Editor Complete Documentation](../../README.md)

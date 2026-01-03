@@ -187,6 +187,19 @@ export function cn(
 }
 
 /**
+ * Shared styles for dropdown section headers
+ * Used in TurnIntoButton, ColorPicker, and other dropdown menus
+ */
+export const dropdownSectionHeaderStyle = {
+  padding: 'var(--pubwave-spacing-2, 8px) var(--pubwave-spacing-3, 12px) var(--pubwave-spacing-1, 4px)',
+  fontSize: 'var(--pubwave-font-size-xs, 11px)',
+  fontWeight: 600,
+  color: 'var(--pubwave-text-muted)',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.5px',
+} as const;
+
+/**
  * Create a CSS variable reference
  */
 export function cssVar(name: string, fallback?: string): string {

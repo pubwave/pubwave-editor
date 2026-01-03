@@ -1,0 +1,110 @@
+{
+  "slashMenu": {
+    "groups": {
+      "basic": "Basis",
+      "list": "Listen",
+      "media": "Medien",
+      "advanced": "Erweitert"
+    },
+    "commands": {
+      "paragraph": {
+        "title": "Text",
+        "description": "Einfacher Textblock"
+      },
+      "heading1": {
+        "title": "Überschrift 1",
+        "description": "Große Abschnittsüberschrift"
+      },
+      "heading2": {
+        "title": "Überschrift 2",
+        "description": "Mittlere Abschnittsüberschrift"
+      },
+      "heading3": {
+        "title": "Überschrift 3",
+        "description": "Kleine Abschnittsüberschrift"
+      },
+      "bulletList": {
+        "title": "Aufzählungsliste",
+        "description": "Aufzählungsliste erstellen"
+      },
+      "orderedList": {
+        "title": "Nummerierte Liste",
+        "description": "Nummerierte Liste erstellen"
+      },
+      "taskList": {
+        "title": "To-do-Liste",
+        "description": "To-do-Liste mit Kontrollkästchen erstellen"
+      },
+      "image": {
+        "title": "Bild",
+        "description": "Bild hochladen oder einfügen"
+      },
+      "blockquote": {
+        "title": "Zitat",
+        "description": "Zitatblock erstellen"
+      },
+      "codeBlock": {
+        "title": "Code",
+        "description": "Codeausschnitt erstellen"
+      },
+      "horizontalRule": {
+        "title": "Trennlinie",
+        "description": "Horizontale Linie erstellen"
+      }
+    }
+  },
+  "toolbar": {
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "underline": "Unterstrichen",
+    "strike": "Durchgestrichen",
+    "code": "Inline-Code",
+    "link": "Link",
+    "turnInto": "Umwandeln in",
+    "colorPicker": "Text- und Hintergrundfarbe",
+    "textColor": "Textfarbe",
+    "backgroundColor": "Hintergrundfarbe",
+    "recentlyUsed": "Zuletzt verwendet",
+    "openLink": "Link öffnen",
+    "removeLink": "Link entfernen",
+    "blockTypes": {
+      "text": "Text",
+      "heading1": "Überschrift 1",
+      "heading2": "Überschrift 2",
+      "heading3": "Überschrift 3",
+      "bulletedList": "Aufzählungsliste",
+      "numberedList": "Nummerierte Liste"
+    }
+  },
+  "aria": {
+    "editor": "Rich-Text-Editor",
+    "editorContent": "Editor-Inhaltsbereich",
+    "toolbar": "Textformatierungs-Symbolleiste",
+    "boldButton": "Fettformatierung ein/aus",
+    "italicButton": "Kursivformatierung ein/aus",
+    "underlineButton": "Unterstreichung ein/aus",
+    "strikeButton": "Durchstreichung ein/aus",
+    "codeButton": "Inline-Code-Formatierung ein/aus",
+    "linkButton": "Link hinzufügen oder bearbeiten",
+    "turnIntoButton": "Umwandeln in",
+    "colorPickerButton": "Text- und Hintergrundfarbe",
+    "headingButton": "Überschriftsebene festlegen",
+    "paragraphButton": "In Absatz umwandeln",
+    "dragHandle": "Zum Neuordnen des Blocks ziehen",
+    "dropIndicator": "Hier ablegen, um Block zu verschieben",
+    "blockMenu": "Block-Optionsmenü",
+    "addBlock": "Neuen Block hinzufügen",
+    "deleteBlock": "Diesen Block löschen",
+    "linkDialog": "Link-Bearbeitungsdialog",
+    "linkUrlInput": "Link-URL-Eingabe",
+    "linkSaveButton": "Link speichern",
+    "linkRemoveButton": "Link entfernen",
+    "linkCancelButton": "Link-Bearbeitung abbrechen",
+    "addBlockBelow": "Block darunter hinzufügen",
+    "dragToMove": "Zum Neuordnen des Blocks ziehen",
+    "openLinkInNewTab": "Link in neuem Tab öffnen"
+  },
+  "placeholder": "Tippen Sie \"/\" für Befehle...",
+  "linkPlaceholder": "Link einfügen..."
+}
+

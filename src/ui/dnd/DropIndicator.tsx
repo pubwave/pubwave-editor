@@ -39,6 +39,7 @@ export function DropIndicator({
         `pubwave-drop-indicator--${position}`,
         className
       )}
+      data-testid="drop-indicator"
       style={{
         position: 'absolute',
         left: 0,

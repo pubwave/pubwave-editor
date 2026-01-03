@@ -1,0 +1,109 @@
+{
+  "slashMenu": {
+    "groups": {
+      "basic": "基礎",
+      "list": "列表",
+      "media": "媒體",
+      "advanced": "高級"
+    },
+    "commands": {
+      "paragraph": {
+        "title": "文本",
+        "description": "普通文本塊"
+      },
+      "heading1": {
+        "title": "標題 1",
+        "description": "大標題"
+      },
+      "heading2": {
+        "title": "標題 2",
+        "description": "中標題"
+      },
+      "heading3": {
+        "title": "標題 3",
+        "description": "小標題"
+      },
+      "bulletList": {
+        "title": "無序列表",
+        "description": "創建無序列表"
+      },
+      "orderedList": {
+        "title": "有序列表",
+        "description": "創建有序列表"
+      },
+      "taskList": {
+        "title": "待辦清單",
+        "description": "創建帶複選框的待辦清單"
+      },
+      "image": {
+        "title": "圖片",
+        "description": "上傳或粘貼圖片"
+      },
+      "blockquote": {
+        "title": "引用",
+        "description": "創建引用塊"
+      },
+      "codeBlock": {
+        "title": "代碼",
+        "description": "創建代碼片段"
+      },
+      "horizontalRule": {
+        "title": "分割線",
+        "description": "創建水平分割線"
+      }
+    }
+  },
+  "toolbar": {
+    "bold": "粗體",
+    "italic": "斜體",
+    "underline": "下劃線",
+    "strike": "刪除線",
+    "code": "行內代碼",
+    "link": "鏈接",
+    "turnInto": "轉換為",
+    "colorPicker": "文字和背景顏色",
+    "textColor": "文字顏色",
+    "backgroundColor": "背景顏色",
+    "recentlyUsed": "最近使用",
+    "openLink": "打開鏈接",
+    "removeLink": "移除鏈接",
+    "blockTypes": {
+      "text": "文本",
+      "heading1": "標題 1",
+      "heading2": "標題 2",
+      "heading3": "標題 3",
+      "bulletedList": "無序列表",
+      "numberedList": "有序列表"
+    }
+  },
+  "aria": {
+    "editor": "富文本編輯器",
+    "editorContent": "編輯器內容區域",
+    "toolbar": "文本格式化工具欄",
+    "boldButton": "切換粗體格式",
+    "italicButton": "切換斜體格式",
+    "underlineButton": "切換下劃線格式",
+    "strikeButton": "切換刪除線格式",
+    "codeButton": "切換行內代碼格式",
+    "linkButton": "添加或編輯鏈接",
+    "turnIntoButton": "轉換為",
+    "colorPickerButton": "文字和背景顏色",
+    "headingButton": "設置標題級別",
+    "paragraphButton": "轉換為段落",
+    "dragHandle": "拖拽以重新排序塊",
+    "dropIndicator": "放置此處以移動塊",
+    "blockMenu": "塊選項菜單",
+    "addBlock": "添加新塊",
+    "deleteBlock": "刪除此塊",
+    "linkDialog": "鏈接編輯對話框",
+    "linkUrlInput": "鏈接 URL 輸入",
+    "linkSaveButton": "保存鏈接",
+    "linkRemoveButton": "移除鏈接",
+    "linkCancelButton": "取消鏈接編輯",
+    "addBlockBelow": "在下方添加塊",
+    "dragToMove": "拖拽以重新排序塊",
+    "openLinkInNewTab": "在新標籤頁中打開鏈接"
+  },
+  "placeholder": "輸入 \"/\" 顯示命令...",
+  "linkPlaceholder": "粘貼鏈接..."
+}

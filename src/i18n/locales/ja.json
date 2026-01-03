@@ -1,0 +1,110 @@
+{
+  "slashMenu": {
+    "groups": {
+      "basic": "基本",
+      "list": "リスト",
+      "media": "メディア",
+      "advanced": "高度"
+    },
+    "commands": {
+      "paragraph": {
+        "title": "テキスト",
+        "description": "プレーンテキストブロック"
+      },
+      "heading1": {
+        "title": "見出し1",
+        "description": "大きなセクション見出し"
+      },
+      "heading2": {
+        "title": "見出し2",
+        "description": "中サイズのセクション見出し"
+      },
+      "heading3": {
+        "title": "見出し3",
+        "description": "小さなセクション見出し"
+      },
+      "bulletList": {
+        "title": "箇条書きリスト",
+        "description": "箇条書きリストを作成"
+      },
+      "orderedList": {
+        "title": "番号付きリスト",
+        "description": "番号付きリストを作成"
+      },
+      "taskList": {
+        "title": "To-doリスト",
+        "description": "チェックボックス付きのTo-doリストを作成"
+      },
+      "image": {
+        "title": "画像",
+        "description": "画像をアップロードまたは貼り付け"
+      },
+      "blockquote": {
+        "title": "引用",
+        "description": "引用ブロックを作成"
+      },
+      "codeBlock": {
+        "title": "コード",
+        "description": "コードスニペットを作成"
+      },
+      "horizontalRule": {
+        "title": "区切り線",
+        "description": "水平線を作成"
+      }
+    }
+  },
+  "toolbar": {
+    "bold": "太字",
+    "italic": "斜体",
+    "underline": "下線",
+    "strike": "取り消し線",
+    "code": "インラインコード",
+    "link": "リンク",
+    "turnInto": "変換",
+    "colorPicker": "テキストと背景色",
+    "textColor": "文字色",
+    "backgroundColor": "背景色",
+    "recentlyUsed": "最近使用",
+    "openLink": "リンクを開く",
+    "removeLink": "リンクを削除",
+    "blockTypes": {
+      "text": "テキスト",
+      "heading1": "見出し1",
+      "heading2": "見出し2",
+      "heading3": "見出し3",
+      "bulletedList": "箇条書きリスト",
+      "numberedList": "番号付きリスト"
+    }
+  },
+  "aria": {
+    "editor": "リッチテキストエディタ",
+    "editorContent": "エディタコンテンツ領域",
+    "toolbar": "テキスト書式設定ツールバー",
+    "boldButton": "太字書式を切り替え",
+    "italicButton": "斜体書式を切り替え",
+    "underlineButton": "下線書式を切り替え",
+    "strikeButton": "取り消し線書式を切り替え",
+    "codeButton": "インラインコード書式を切り替え",
+    "linkButton": "リンクを追加または編集",
+    "turnIntoButton": "変換",
+    "colorPickerButton": "テキストと背景色",
+    "headingButton": "見出しレベルを設定",
+    "paragraphButton": "段落に変換",
+    "dragHandle": "ブロックを並び替えるためにドラッグ",
+    "dropIndicator": "ブロックを移動するためにここにドロップ",
+    "blockMenu": "ブロックオプションメニュー",
+    "addBlock": "新しいブロックを追加",
+    "deleteBlock": "このブロックを削除",
+    "linkDialog": "リンク編集ダイアログ",
+    "linkUrlInput": "リンクURL入力",
+    "linkSaveButton": "リンクを保存",
+    "linkRemoveButton": "リンクを削除",
+    "linkCancelButton": "リンク編集をキャンセル",
+    "addBlockBelow": "下にブロックを追加",
+    "dragToMove": "ブロックを並び替えるためにドラッグ",
+    "openLinkInNewTab": "新しいタブでリンクを開く"
+  },
+  "placeholder": "コマンドを表示するには \"/\" を入力...",
+  "linkPlaceholder": "リンクを貼り付け..."
+}
+

@@ -46,6 +46,7 @@ export function createEditor(config: EditorConfig = {}): Editor {
     placeholder,
     headingLevels: [1, 2, 3],
     linkOpenInNewTab: true,
+    linkOpenOnClick: true,
   });
 
   // Build Tiptap editor options

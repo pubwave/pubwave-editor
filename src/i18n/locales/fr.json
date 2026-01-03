@@ -1,0 +1,110 @@
+{
+  "slashMenu": {
+    "groups": {
+      "basic": "De base",
+      "list": "Listes",
+      "media": "Médias",
+      "advanced": "Avancé"
+    },
+    "commands": {
+      "paragraph": {
+        "title": "Texte",
+        "description": "Bloc de texte simple"
+      },
+      "heading1": {
+        "title": "Titre 1",
+        "description": "Grand titre de section"
+      },
+      "heading2": {
+        "title": "Titre 2",
+        "description": "Titre de section moyen"
+      },
+      "heading3": {
+        "title": "Titre 3",
+        "description": "Petit titre de section"
+      },
+      "bulletList": {
+        "title": "Liste à puces",
+        "description": "Créer une liste à puces"
+      },
+      "orderedList": {
+        "title": "Liste numérotée",
+        "description": "Créer une liste numérotée"
+      },
+      "taskList": {
+        "title": "Liste de tâches",
+        "description": "Créer une liste de tâches avec cases à cocher"
+      },
+      "image": {
+        "title": "Image",
+        "description": "Télécharger ou coller une image"
+      },
+      "blockquote": {
+        "title": "Citation",
+        "description": "Créer un bloc de citation"
+      },
+      "codeBlock": {
+        "title": "Code",
+        "description": "Créer un extrait de code"
+      },
+      "horizontalRule": {
+        "title": "Séparateur",
+        "description": "Créer une ligne horizontale"
+      }
+    }
+  },
+  "toolbar": {
+    "bold": "Gras",
+    "italic": "Italique",
+    "underline": "Souligné",
+    "strike": "Barré",
+    "code": "Code en ligne",
+    "link": "Lien",
+    "turnInto": "Convertir en",
+    "colorPicker": "Couleur du texte et du fond",
+    "textColor": "Couleur du texte",
+    "backgroundColor": "Couleur de fond",
+    "recentlyUsed": "Récemment utilisés",
+    "openLink": "Ouvrir le lien",
+    "removeLink": "Supprimer le lien",
+    "blockTypes": {
+      "text": "Texte",
+      "heading1": "Titre 1",
+      "heading2": "Titre 2",
+      "heading3": "Titre 3",
+      "bulletedList": "Liste à puces",
+      "numberedList": "Liste numérotée"
+    }
+  },
+  "aria": {
+    "editor": "Éditeur de texte riche",
+    "editorContent": "Zone de contenu de l'éditeur",
+    "toolbar": "Barre d'outils de formatage de texte",
+    "boldButton": "Activer/désactiver le formatage en gras",
+    "italicButton": "Activer/désactiver le formatage en italique",
+    "underlineButton": "Activer/désactiver le soulignement",
+    "strikeButton": "Activer/désactiver le texte barré",
+    "codeButton": "Activer/désactiver le code en ligne",
+    "linkButton": "Ajouter ou modifier un lien",
+    "turnIntoButton": "Convertir en",
+    "colorPickerButton": "Couleur du texte et du fond",
+    "headingButton": "Définir le niveau de titre",
+    "paragraphButton": "Convertir en paragraphe",
+    "dragHandle": "Glisser pour réorganiser le bloc",
+    "dropIndicator": "Déposer ici pour déplacer le bloc",
+    "blockMenu": "Menu des options de bloc",
+    "addBlock": "Ajouter un nouveau bloc",
+    "deleteBlock": "Supprimer ce bloc",
+    "linkDialog": "Boîte de dialogue d'édition de lien",
+    "linkUrlInput": "Entrée d'URL de lien",
+    "linkSaveButton": "Enregistrer le lien",
+    "linkRemoveButton": "Supprimer le lien",
+    "linkCancelButton": "Annuler l'édition du lien",
+    "addBlockBelow": "Ajouter un bloc en dessous",
+    "dragToMove": "Glisser pour réorganiser le bloc",
+    "openLinkInNewTab": "Ouvrir le lien dans un nouvel onglet"
+  },
+  "placeholder": "Tapez \"/\" pour afficher les commandes...",
+  "linkPlaceholder": "Collez un lien..."
+}
+

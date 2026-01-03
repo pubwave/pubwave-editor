@@ -1,75 +1,74 @@
-# Pubwave Editor - Examples
+# Examples
 
-This directory contains example integrations of Pubwave Editor with different frameworks and build tools.
+This directory contains complete examples of Pubwave Editor integration with different frameworks to help you get started quickly.
 
-## Available Examples
+## 📚 Available Examples
 
 ### [Vite + React](./vite-react)
 
-A simple client-side React application using Vite for development.
+**The simplest integration approach**, perfect for rapid prototyping and development.
 
-- **Use case**: Standard single-page applications
-- **Port**: http://localhost:5173
+- ✅ Zero-config setup
+- ✅ Hot Module Replacement (HMR)
+- ✅ TypeScript support
+- ✅ Full feature demonstration
 
-```bash
-cd examples/vite-react
-npm install
-npm run dev
-```
+[View Example →](./vite-react)
 
 ### [Next.js](./nextjs)
 
-An SSR-safe integration with Next.js 15 using the App Router.
+**Next.js integration example** with both client-side and server-side rendering approaches.
 
-- **Use case**: Server-side rendered applications
-- **Port**: http://localhost:3000
+- ✅ SSR support
+- ✅ SEO friendly
+- ✅ Production ready
+- ✅ Full feature demonstration
+
+[View Example →](./nextjs)
+
+## 🚀 Quick Start
+
+Each example can be run independently:
 
 ```bash
+# Vite React example
+cd examples/vite-react
+npm install
+npm run dev
+
+# Next.js example
 cd examples/nextjs
 npm install
 npm run dev
 ```
 
-## Running All Examples
+## 💡 Which Example Should I Choose?
 
-From the repository root:
+- **Vite + React**: If you're using Vite, Create React App, or other React frameworks
+- **Next.js**: If you're using Next.js or need SSR support
 
-```bash
-# Install dependencies for all examples
-npm install
+## 📖 Learning Path
 
-# Run Vite example
-cd examples/vite-react && npm run dev
+1. **Start with Vite example** - Learn basic usage and configuration
+2. **Then check Next.js example** - Learn SSR integration approach
+3. **Refer to main docs** - Check complete API documentation
 
-# Or run Next.js example
-cd examples/nextjs && npm run dev
-```
+## 🎯 Features Demonstrated
 
-## What to Test
+All examples demonstrate:
 
-Each example demonstrates the core features specified in the constitution:
+- ✍️ Basic editing features
+- ⌨️ Slash command menu
+- 🎨 Text formatting toolbar
+- 🎨 Color picker
+- 🖼️ Image upload (base64 and custom service)
+- 🔄 Block type conversion
+- 🖱️ Drag and drop reordering
+- ⌨️ Keyboard shortcuts
+- 👁️ Read-only mode
+- 🎨 Theme switching
 
-1. **Premium Writing Experience** (US1 - Journey A)
-   - Type naturally across blocks
-   - No focus loss, cursor jumps, or flicker
-   - Consistent spacing and typography
+## 📚 More Resources
 
-2. **Selection-Only Toolbar** (US2 - Journey B)
-   - Toolbar appears only on non-empty selection
-   - Hidden with cursor-only state
-   - Clean hide/show transitions
-
-3. **Block Drag & Drop** (US3 - Journey C)
-   - Discoverable drag handles
-   - Clear drop indicators
-   - Cancel with Escape
-   - Stable selection after drop
-
-## Integration Patterns
-
-Both examples show recommended integration patterns:
-
-- **Vite**: Direct client-side integration
-- **Next.js**: SSR-safe server component + client-only editor
-
-Choose the example that matches your tech stack and use it as a starting point.
+- [Complete Documentation](../README.md) - View all API and configuration options
+- [GitHub Repository](https://github.com/pubwave/pubwave-editor) - View source code and issues

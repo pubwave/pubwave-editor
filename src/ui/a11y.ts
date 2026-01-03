@@ -17,7 +17,12 @@ export const ariaLabels = {
   toolbar: 'Text formatting toolbar',
   boldButton: 'Toggle bold formatting',
   italicButton: 'Toggle italic formatting',
+  underlineButton: 'Toggle underline formatting',
+  strikeButton: 'Toggle strikethrough formatting',
+  codeButton: 'Toggle inline code formatting',
   linkButton: 'Add or edit link',
+  turnIntoButton: 'Turn into',
+  colorPickerButton: 'Text and background color',
   headingButton: 'Set heading level',
   paragraphButton: 'Convert to paragraph',
   
@@ -44,7 +49,9 @@ export const ariaLabels = {
 export const keyboardShortcuts = {
   bold: 'Cmd+B',
   italic: 'Cmd+I',
-  link: 'Cmd+K',
+  underline: 'Cmd+U',
+  strike: 'Cmd+Shift+X',
+  code: 'Cmd+E',
   undo: 'Cmd+Z',
   redo: 'Cmd+Shift+Z',
   selectAll: 'Cmd+A',

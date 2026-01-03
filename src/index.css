@@ -139,9 +139,30 @@
 /* Editor container */
 .pubwave-editor {
   position: relative;
-  width: 100%;
+  width: var(--pubwave-container-width, 100%);
+  max-width: var(--pubwave-container-max-width, none);
   font-family: var(--pubwave-font-family);
   color: var(--pubwave-text);
+  background: var(--pubwave-bg, #ffffff);
+  border-radius: var(--pubwave-container-border-radius, 16px);
+  min-height: var(--pubwave-container-min-height, 700px);
+  padding: var(--pubwave-container-padding-y, 96px) var(--pubwave-container-padding-x, 120px);
+  padding-left: var(--pubwave-container-padding-left, 140px);
+  /* Sophisticated tiered shadow */
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.04),
+    0 20px 25px -5px rgba(0, 0, 0, 0.05),
+    0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .pubwave-editor {
+    padding: var(--pubwave-container-padding-y-mobile, 20px) var(--pubwave-container-padding-x-mobile, 16px);
+    padding-left: var(--pubwave-container-padding-left-mobile, 16px);
+    border-radius: var(--pubwave-container-border-radius-mobile, 12px);
+    min-height: var(--pubwave-container-min-height-mobile, 400px);
+  }
 }
 
 .pubwave-editor,
@@ -191,6 +212,44 @@
 /* Block spacing */
 .pubwave-editor__content .ProseMirror>*+* {
   margin-top: 0.75em;
+}
+
+/* Mobile: Reduce block spacing and font sizes */
+@media (max-width: 768px) {
+  .pubwave-editor__content .ProseMirror>*+* {
+    margin-top: 0.35em;
+  }
+  
+  /* Also reduce spacing for headings */
+  .pubwave-editor__content .ProseMirror h1 + *,
+  .pubwave-editor__content .ProseMirror h2 + *,
+  .pubwave-editor__content .ProseMirror h3 + * {
+    margin-top: 0.4em;
+  }
+  
+  /* Reduce spacing for paragraphs after headings */
+  .pubwave-editor__content .ProseMirror h1,
+  .pubwave-editor__content .ProseMirror h2,
+  .pubwave-editor__content .ProseMirror h3 {
+    margin-top: 0.6em;
+  }
+  
+  /* Responsive font sizes for mobile */
+  .pubwave-editor__content .ProseMirror {
+    font-size: var(--pubwave-font-size-base-mobile, 15px);
+  }
+  
+  .pubwave-editor__content .ProseMirror h1 {
+    font-size: var(--pubwave-font-size-3xl-mobile, 1.75rem);
+  }
+  
+  .pubwave-editor__content .ProseMirror h2 {
+    font-size: var(--pubwave-font-size-2xl-mobile, 1.375rem);
+  }
+  
+  .pubwave-editor__content .ProseMirror h3 {
+    font-size: var(--pubwave-font-size-xl-mobile, 1.125rem);
+  }
 }
 
 .pubwave-editor__content .pubwave-editor__bullet-list,
@@ -465,6 +524,33 @@ li>label input[type="checkbox"] {
   background: none !important;
 }
 
+/* Image */
+.pubwave-editor__content .ProseMirror img,
+.pubwave-editor__content img,
+.pubwave-editor__content .pubwave-editor__image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1em auto;
+  border-radius: var(--pubwave-radius-md, 6px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.pubwave-editor__content .ProseMirror img:hover,
+.pubwave-editor__content img:hover,
+.pubwave-editor__content .pubwave-editor__image:hover {
+  opacity: 0.9;
+}
+
+.pubwave-editor__content .ProseMirror img.ProseMirror-selectednode,
+.pubwave-editor__content img.ProseMirror-selectednode,
+.pubwave-editor__content .pubwave-editor__image.ProseMirror-selectednode {
+  outline: 2px solid var(--pubwave-primary, #2383e2);
+  outline-offset: 2px;
+}
+
 /* Inline marks */
 .pubwave-editor__content .ProseMirror strong {
   font-weight: 600;
@@ -491,14 +577,17 @@ li>label input[type="checkbox"] {
 }
 
 /* Links */
-.pubwave-editor__content .ProseMirror a {
-  color: var(--pubwave-primary);
+.pubwave-editor__content .ProseMirror a,
+.pubwave-editor .ProseMirror a {
+  color: var(--pubwave-link-color, #2383e2) !important;
   text-decoration: underline;
   cursor: pointer;
 }
 
-.pubwave-editor__content .ProseMirror a:hover {
-  color: var(--pubwave-selection);
+.pubwave-editor__content .ProseMirror a:hover,
+.pubwave-editor .ProseMirror a:hover {
+  color: var(--pubwave-link-hover-color, var(--pubwave-link-color, #2383e2)) !important;
+  opacity: 0.8;
 }
 
 /* Selection highlight */
@@ -522,15 +611,15 @@ li>label input[type="checkbox"] {
 
 /* Specific styling for the drag image (ghost) */
 .pubwave-block--drag-preview {
-  color: #9b9a97 !important;
-  --pubwave-text: #9b9a97 !important;
+  color: var(--pubwave-text-muted, #9b9a97) !important;
+  opacity: 0.6 !important;
 }
 
 .pubwave-block--drag-preview div,
 .pubwave-block--drag-preview p,
 .pubwave-block--drag-preview label,
 .pubwave-block--drag-preview .pubwave-editor__task-item>div {
-  color: #9b9a97 !important;
+  color: var(--pubwave-text-muted, #9b9a97) !important;
 }
 
 /* Hide the real input in the ghost to prevent layering */
@@ -540,13 +629,13 @@ li>label input[type="checkbox"] {
 
 /* Force 16px checkbox in the ghost */
 .pubwave-block--drag-preview label::before {
-  border-color: #9b9a97 !important;
+  border-color: var(--pubwave-text-muted, #9b9a97) !important;
   width: 16px !important;
   height: 16px !important;
 }
 
 .pubwave-block--drag-preview label::after {
-  border-color: #ffffff !important;
+  border-color: var(--pubwave-bg, #ffffff) !important;
   left: 4px !important;
   top: 2px !important;
 }
@@ -581,6 +670,20 @@ li>label input[type="checkbox"] {
 /* Tippy.js popup styles for SlashMenu */
 .tippy-box {
   z-index: var(--pubwave-z-dropdown, 60) !important;
+  /* Fix black block flash issue - make tippy-box transparent by default */
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Ensure tippy-box with slash menu is transparent */
+.tippy-box:has(.pubwave-slash-menu) {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Ensure slash menu border uses theme color */
+.pubwave-slash-menu {
+  border: 1px solid var(--pubwave-border, #e3e2e0) !important;
 }
 
 /* Drop cursor */
@@ -590,11 +693,27 @@ li>label input[type="checkbox"] {
 }
 
 /* Style the "/" character when slash menu is active */
+/* Only apply styles when suggestion element exists (menu is active) */
 .pubwave-editor .ProseMirror .suggestion {
-  background-color: #f3f4f6 !important;
-  border-radius: 6px !important;
+  /* Use semi-transparent white background for visibility */
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid var(--pubwave-border, #e3e2e0) !important;
+  border-radius: var(--pubwave-radius-md, 6px) !important;
   padding: 2px 4px !important;
   display: inline-block !important;
+  /* Use dark text color for visibility on light background */
+  /* This ensures readability regardless of theme */
+  color: #1f2937 !important;
+}
+
+/* Ensure all text inside suggestion uses dark color for visibility */
+.pubwave-editor .ProseMirror .suggestion,
+.pubwave-editor .ProseMirror .suggestion *,
+.pubwave-editor .ProseMirror .suggestion span,
+.pubwave-editor .ProseMirror .suggestion strong,
+.pubwave-editor .ProseMirror .suggestion em,
+.pubwave-editor .ProseMirror .suggestion code {
+  color: #1f2937 !important;
 }
 
 /* ============================================
@@ -614,4 +733,36 @@ li>label input[type="checkbox"] {
 
 .tippy-box[data-theme~='pubwave'] .tippy-content {
   padding: 0;
+}
+
+/* ColorPicker tooltip theme - always black background with white text */
+.tippy-box[data-theme~='light-border'] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: var(--pubwave-radius, 6px);
+  box-shadow: var(--pubwave-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+/* Ensure tooltip content text is white */
+.tippy-box[data-theme~='light-border'] .tippy-content {
+  color: #ffffff !important;
+}
+
+/* Drag handle icon styles - elegant and theme-aware */
+.pubwave-block-handle__drag,
+.pubwave-block-handle__add {
+  color: var(--pubwave-text-muted, #9b9a97) !important;
+}
+
+/* Toolbar button hover styles */
+.pubwave-toolbar__button:not(:disabled):hover {
+  background-color: var(--pubwave-hover) !important;
+}
+
+/* Turn Into dropdown button hover - only when not active */
+.pubwave-toolbar__turn-into-option:not(.pubwave-toolbar__turn-into-option--active):hover {
+  background-color: var(--pubwave-hover) !important;
 }

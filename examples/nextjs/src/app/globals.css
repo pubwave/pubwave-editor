@@ -18,11 +18,6 @@
   }
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
 
 html,
 body {
@@ -77,4 +72,93 @@ body {
 
 .app-footer p {
   margin: 0.5rem 0;
+}
+
+/* Editor wrapper */
+.editor-wrapper {
+  width: 100%;
+}
+
+/* Theme switcher */
+.theme-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.theme-switcher__label {
+  font-weight: 600;
+  color: var(--color-text);
+  margin-right: 0.5rem;
+}
+
+.theme-switcher__button {
+  padding: 0.5rem 1rem;
+  border: 1px solid;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+}
+
+.theme-switcher__button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.theme-switcher__button--active {
+  font-weight: 700;
+}
+
+/* Info section for SSR example */
+.info-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}
+
+.info-section h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.info-section ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.info-section li {
+  margin-bottom: 0.5rem;
+}
+
+/* Example navigation */
+.example-nav {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.example-nav a {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  color: var(--color-text);
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.example-nav a:hover {
+  background: var(--color-hover);
+  border-color: var(--color-selection);
 }
