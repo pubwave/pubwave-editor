@@ -43,6 +43,7 @@ body {
 .app-header {
   text-align: center;
   margin-bottom: 2rem;
+  position: relative;
 }
 
 .app-header h1 {
