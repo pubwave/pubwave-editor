@@ -317,10 +317,10 @@
 .pubwave-editor__content.ProseMirror ul[data-type="taskList"] li,
 .ProseMirror.pubwave-editor__content ul[data-type="taskList"] li {
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   flex-direction: row !important;
   gap: 0.5em !important;
-  padding: 0 !important;
+  padding: 0.25em 0 !important;
   border-radius: var(--pubwave-radius-sm, 4px) !important;
   margin: 0 !important;
   list-style: none !important;
@@ -335,7 +335,8 @@
 }
 
 .pubwave-editor__task-item {
-  height: var(--pubwave-task-item-height, 30px);
+  min-height: var(--pubwave-task-item-height, 30px);
+  height: auto !important;
 }
 
 .pubwave-editor__content .ProseMirror ul[data-type="taskList"] li::marker,
@@ -376,10 +377,11 @@
   min-height: var(--pubwave-checkbox-size, 20px) !important;
   max-height: var(--pubwave-checkbox-size, 20px) !important;
   display: block !important;
-  align-self: center !important;
+  align-self: flex-start !important;
   line-height: 1 !important;
   padding: 0 !important;
   overflow: hidden !important;
+  margin-top: 0.125em !important;
 }
 
 li>label input[type="checkbox"] {
