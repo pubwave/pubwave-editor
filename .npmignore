@@ -19,6 +19,7 @@ playwright.config.ts
 
 # Build artifacts
 *.tsbuildinfo
+*.map
 .cache/
 
 # Development

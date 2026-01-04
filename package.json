@@ -1,6 +1,6 @@
 {
   "name": "@pubwave/editor",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A Notion-level block editor built with React and Tiptap",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -20,7 +20,11 @@
     "./style.css": "./dist/index.css"
   },
   "files": [
-    "dist",
+    "dist/**/*.js",
+    "dist/**/*.cjs",
+    "dist/**/*.d.ts",
+    "dist/**/*.d.cts",
+    "dist/**/*.css",
     "README.md",
     "LICENSE"
   ],
