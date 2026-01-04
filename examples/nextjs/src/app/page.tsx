@@ -12,11 +12,9 @@ import GitHubIcon from '@/components/GitHubIcon';
  */
 export default function Home() {
   return (
-    <div className="app-container">
+    <div className="app-container" style={{ position: 'relative' }}>
+      <GitHubIcon />
       <header className="app-header">
-        <div style={{ position: 'relative', width: '100%' }}>
-          <GitHubIcon />
-        </div>
         <h1>Pubwave Editor - Next.js Example</h1>
         <p>A Notion-level block editor with SSR-safe integration</p>
       </header>

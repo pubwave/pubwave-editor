@@ -29,7 +29,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   
   /* Opt out of parallel tests on CI, use more workers locally for speed */
-  workers: process.env.CI ? 1 : '90%', // Use 50% of CPU cores for parallel execution
+  workers: process.env.CI ? 1 : '50%', // Use 50% of CPU cores for parallel execution
   
   /* Reporter to use */
   reporter: [

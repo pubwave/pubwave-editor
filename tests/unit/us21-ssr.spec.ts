@@ -88,26 +88,26 @@ describe('US21: SSR Safety', () => {
     describe('20.2.1 Safe Access', () => {
       it('should use canUseDOM check', async () => {
         // Check if canUseDOM is used
-        const ssrModule = await import('../../src/core/ssr');
-        expect(ssrModule).toBeTruthy();
+        const utilModule = await import('../../src/core/util');
+        expect(utilModule).toBeTruthy();
       });
 
       it('should use isSSR check', async () => {
         // Check if isSSR is used
-        const ssrModule = await import('../../src/core/ssr');
-        expect(ssrModule).toBeTruthy();
+        const utilModule = await import('../../src/core/util');
+        expect(utilModule).toBeTruthy();
       });
 
       it('should use safeRequestAnimationFrame', async () => {
-        const ssrModule = await import('../../src/core/ssr');
-        expect(ssrModule).toBeTruthy();
+        const utilModule = await import('../../src/core/util');
+        expect(utilModule).toBeTruthy();
         // safeRequestAnimationFrame should be available
         expect(true).toBe(true);
       });
 
       it('should use safeSetTimeout', async () => {
-        const ssrModule = await import('../../src/core/ssr');
-        expect(ssrModule).toBeTruthy();
+        const utilModule = await import('../../src/core/util');
+        expect(utilModule).toBeTruthy();
         // safeSetTimeout should be available
         expect(true).toBe(true);
       });

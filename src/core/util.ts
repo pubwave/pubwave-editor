@@ -1,7 +1,8 @@
 /**
- * SSR Safety Utilities
+ * Utility Functions
  *
- * This module provides utilities for safe SSR (Server-Side Rendering) integration.
+ * This module provides utility functions for safe SSR (Server-Side Rendering) integration
+ * and general browser environment utilities.
  *
  * RULE: No window/document access at module top-level anywhere in the library.
  * All browser API access must be guarded by these utilities or occur in
@@ -100,3 +101,33 @@ export function getBrowserAPI<K extends keyof Window>(
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return (window as unknown as Record<string, Window[K]>)[key as string];
 }
+
+/**
+ * Check if the device is a mobile/touch device
+ * Returns true for mobile devices, false for desktop
+ * 
+ * This function safely checks for mobile device characteristics:
+ * - Touch support
+ * - Coarse pointer type (touch screen)
+ * - Hover capability (mobile devices typically don't support hover)
+ * 
+ * @returns true if the device appears to be a mobile/touch device, false otherwise
+ */
+export function isMobileDevice(): boolean {
+  if (!canUseDOM) return false;
+  
+  // Check for touch support
+  const hasTouchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  
+  // Check for coarse pointer (touch screen)
+  const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+  
+  // Check for hover capability (mobile devices typically don't support hover)
+  const hasHover = window.matchMedia('(hover: hover)').matches;
+  
+  // Consider it mobile if:
+  // 1. Has touch support AND has coarse pointer, OR
+  // 2. Has touch support AND doesn't support hover
+  return (hasTouchSupport && hasCoarsePointer) || (hasTouchSupport && !hasHover);
+}
+

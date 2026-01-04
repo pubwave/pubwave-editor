@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { PubwaveEditor } from '../../../src/index';
+import { PubwaveEditor } from '@pubwave/editor';
 import type { EditorTheme, EditorLocale } from '@pubwave/editor';
 import type { JSONContent } from '@tiptap/core';
 import { PreviewModal } from './PreviewModal';
 import '@pubwave/editor/style.css';
+
 
 // Chart images as base64 (SVG converted to data URLs) - AI themed
 const chartBar = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHlsZT0iYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgI2Y4ZmFmYyAwJSwgI2ZmZmZmZiAxMDAlKTsiPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM2MzY2ZjEiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjOGI1Y2Y2Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZmZmZiIvPgo8dGV4dCB4PSI0MCIgeT0iMzUiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzFmMjkzNyI+QUkgVGVjaG5vbG9neSBBZG9wdGlvbiBTdGF0aXN0aWNzPC90ZXh0Pgo8cmVjdCB4PSI4MCIgeT0iMjgwIiB3aWR0aD0iODAiIGhlaWdodD0iMTAwIiBmaWxsPSJ1cmwoI2dyYWQpIiByeD0iNCIvPgo8dGV4dCB4PSIxMjAiIHk9IjM5NSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMWYyOTM3IiBmb250LXdlaWdodD0iNTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5NTCBNb2RlbHM8L3RleHQ+CjxyZWN0IHg9IjIwMCIgeT0iMjQwIiB3aWR0aD0iODAiIGhlaWdodD0iMTQwIiBmaWxsPSJ1cmwoI2dyYWQpIiByeD0iNCIvPgo8dGV4dCB4PSIyNDAiIHk9IjM5NSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMWYyOTM3IiBmb250LXdlaWdodD0iNTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5OZXVyYWwgTmV0czwvdGV4dD4KPHJlY3QgeD0iMzIwIiB5PSIyMjAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxNjAiIGZpbGw9InVybCgjZ3JhZCkiIHJ4PSI0Ii8+Cjx0ZXh0IHg9IjM2MCIgeT0iMzk1IiBmb250LWZhbWlseT0iLWFwcGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzFmMjkzNyIgZm9udC13ZWlnaHQ9IjUwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TkxQIEFwcHM8L3RleHQ+CjxyZWN0IHg9IjQ0MCIgeT0iMjAwIiB3aWR0aD0iODAiIGhlaWdodD0iMTgwIiBmaWxsPSJ1cmwoI2dyYWQpIiByeD0iNCIvPgo8dGV4dCB4PSI0ODAiIHk9IjM5NSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMWYyOTM3IiBmb250LXdlaWdodD0iNTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5DVjwvdGV4dD4KPHJlY3QgeD0iNTYwIiB5PSIyNjAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxMjAiIGZpbGw9InVybCgjZ3JhZCkiIHJ4PSI0Ii8+Cjx0ZXh0IHg9IjYwMCIgeT0iMzk1IiBmb250LWZhbWlseT0iLWFwcGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzFmMjkzNyIgZm9udC13ZWlnaHQ9IjUwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Um9ib3RpY3M8L3RleHQ+CjxyZWN0IHg9IjY4MCIgeT0iMjQwIiB3aWR0aD0iODAiIGhlaWdodD0iMTQwIiBmaWxsPSJ1cmwoI2dyYWQpIiByeD0iNCIvPgo8dGV4dCB4PSI3MjAiIHk9IjM5NSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMWYyOTM3IiBmb250LXdlaWdodD0iNTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5BdXRvbWF0aW9uPC90ZXh0Pgo8L3N2Zz4=';
@@ -607,34 +608,7 @@ function App() {
         href="https://github.com/pubwave/pubwave-editor"
         target="_blank"
         rel="noopener noreferrer"
-        style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '40px',
-          height: '40px',
-          borderRadius: '8px',
-          color: '#374151',
-          textDecoration: 'none',
-          transition: 'all 0.2s ease',
-          border: '1px solid #e5e7eb',
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-          zIndex: 1000,
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#f3f4f6';
-          e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.15)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-        }}
+        className="github-icon"
         aria-label="View on GitHub"
       >
         <svg
@@ -649,8 +623,23 @@ function App() {
       </a>
 
       {/* Theme switcher and preview button */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%', maxWidth: '850px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '1rem', 
+        width: '100%', 
+        maxWidth: '850px',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '1rem',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          width: '100%',
+        }}>
         <div className="theme-switcher">
         <div className="theme-switcher__label">Theme:</div>
         {Object.keys(themes).map((themeName) => {
@@ -729,6 +718,7 @@ function App() {
               cursor: 'pointer',
               outline: 'none',
               transition: 'all 0.2s',
+              minWidth: '120px',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = '#3b82f6';
@@ -761,6 +751,7 @@ function App() {
             cursor: 'pointer',
             transition: 'background-color 0.2s',
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            whiteSpace: 'nowrap',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = '#2563eb';
@@ -774,23 +765,25 @@ function App() {
         </div>
       </div>
 
-      <PubwaveEditor
-        key={currentLocale}
-        content={typeof window !== 'undefined' && (window as any).__TESTING__ ? undefined : initialContent}
-        onChange={(newContent) => {
-          setEditorContent(newContent);
-          console.log('Content changed:', newContent);
-        }}
-        onReady={(api) => {
-          // Expose editor API to window for testing
-          (window as any).pubwaveEditor = api;
-        }}
-        theme={{
-          ...themes[currentTheme],
-          locale: currentLocale,
-        }}
-        width='850px'
-      />
+      <div style={{ width: '100%', maxWidth: '850px' }}>
+        <PubwaveEditor
+          key={currentLocale}
+          content={typeof window !== 'undefined' && (window as any).__TESTING__ ? undefined : initialContent}
+          onChange={(newContent) => {
+            setEditorContent(newContent);
+            console.log('Content changed:', newContent);
+          }}
+          onReady={(api) => {
+            // Expose editor API to window for testing
+            (window as any).pubwaveEditor = api;
+          }}
+          theme={{
+            ...themes[currentTheme],
+            locale: currentLocale,
+          }}
+          width='100%'
+        />
+      </div>
 
       {/* Preview Modal */}
       {showPreview && (

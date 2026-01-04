@@ -6,7 +6,7 @@
  */
 
 import type { Editor } from '@tiptap/core';
-import { safeRequestAnimationFrame } from '../core/ssr';
+import { safeRequestAnimationFrame } from '../core/util';
 
 /**
  * Focus position options

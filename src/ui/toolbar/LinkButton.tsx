@@ -11,7 +11,7 @@ import { tokens } from '../theme';
 import { getLabelWithShortcut } from '../a11y';
 import { useLocale } from '../LocaleContext';
 import { PositionedDropdown } from '../PositionedDropdown';
-import { safeRequestAnimationFrame } from '../../core/ssr';
+import { safeRequestAnimationFrame } from '../../core/util';
 import { saveSelection, restoreSelection, type SavedSelection } from '../focus';
 import type { SelectionState } from '../../core/selection';
 import { ToolbarButton } from './ToolbarButton';

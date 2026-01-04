@@ -30,17 +30,6 @@ export default function SSRExample() {
         <p>{serverRenderedContent.description}</p>
       </header>
 
-      {/* Server-rendered content */}
-      <section className="info-section">
-        <h2>How This Works</h2>
-        <ul>
-          <li>The page HTML is generated on the server</li>
-          <li>The editor component hydrates on the client</li>
-          <li>Initial content can be passed from the server</li>
-          <li>Perfect for SEO and fast initial page loads</li>
-        </ul>
-      </section>
-
       <main className="editor-container">
         <EditorClientComponent showThemeSwitcher={true} initialTheme="dark" />
       </main>

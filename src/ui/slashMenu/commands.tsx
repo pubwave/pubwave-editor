@@ -6,7 +6,7 @@
 
 import React from 'react';
 import type { Editor } from '@tiptap/core';
-import { safeRequestAnimationFrame } from '../../core/ssr';
+import { safeRequestAnimationFrame } from '../../core/util';
 import type { ImageUploadConfig } from '../../types/editor';
 import type { EditorLocale } from '../../i18n';
 import {

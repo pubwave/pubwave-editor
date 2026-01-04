@@ -8,7 +8,7 @@
 import { Editor, EditorOptions } from '@tiptap/core';
 import { createExtensions } from './extensions';
 import type { EditorConfig } from '../types/editor';
-import { canUseDOM } from './ssr';
+import { canUseDOM } from './util';
 
 /**
  * Create a new editor instance

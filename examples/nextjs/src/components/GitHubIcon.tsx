@@ -6,32 +6,7 @@ export default function GitHubIcon() {
       href="https://github.com/pubwave/pubwave-editor"
       target="_blank"
       rel="noopener noreferrer"
-      style={{
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '40px',
-        height: '40px',
-        borderRadius: '8px',
-        color: 'var(--color-text)',
-        textDecoration: 'none',
-        transition: 'all 0.2s ease',
-        border: '1px solid var(--color-border)',
-        backgroundColor: 'var(--color-background)',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = 'var(--color-hover)';
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'var(--color-background)';
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = 'none';
-      }}
+      className="github-icon"
       aria-label="View on GitHub"
     >
       <svg

@@ -26,7 +26,7 @@ import { cn, tokens } from './theme';
 import { ariaLabels } from './a11y';
 import { getSelectionState, shouldShowToolbar } from '../core/selection';
 import type { SelectionState } from '../core/selection';
-import { safeRequestAnimationFrame } from '../core/ssr';
+import { safeRequestAnimationFrame } from '../core/util';
 import { useLocale } from './LocaleContext';
 import { DefaultToolbarContent } from './toolbar/DefaultToolbarContent';
 import { calculatePosition, isEditorReady, type ToolbarPosition } from './toolbar/position';

@@ -15,7 +15,7 @@ import { describe, it, expect } from 'vitest';
 describe('SSR Import Safety', () => {
   it('should export isSSR and canUseDOM utilities', async () => {
     // Dynamic import to simulate SSR import behavior
-    const { isSSR, canUseDOM } = await import('../../src/core/ssr');
+    const { isSSR, canUseDOM } = await import('../../src/core/util');
 
     // In jsdom environment, these will indicate browser
     expect(typeof isSSR).toBe('boolean');
@@ -75,7 +75,7 @@ describe('SSR Import Safety', () => {
   });
 
   it('should detect jsdom as browser-like environment', async () => {
-    const { isSSR, canUseDOM } = await import('../../src/core/ssr');
+    const { isSSR, canUseDOM } = await import('../../src/core/util');
 
     // In jsdom environment (which mocks browser), isSSR is false
     // This is expected behavior - jsdom simulates a browser

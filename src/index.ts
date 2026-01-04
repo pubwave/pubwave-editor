@@ -123,4 +123,4 @@ export { Toast, ToastContainer, createToastId } from './ui/toast';
 export type { ToastProps, ToastItem, ToastContainerProps } from './ui/toast';
 
 // Utilities
-export { isSSR, canUseDOM } from './core/ssr';
+export { isSSR, canUseDOM, isMobileDevice } from './core/util';

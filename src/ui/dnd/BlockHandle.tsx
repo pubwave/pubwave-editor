@@ -12,6 +12,7 @@ import React, { useEffect, useRef, useCallback, useState } from 'react';
 import type { Editor } from '@tiptap/core';
 import { tokens } from '../theme';
 import { startDrag, findBlockAtPos } from '../../core/plugins/dnd';
+import { isMobileDevice } from '../../core/util';
 
 export interface BlockHandleProps {
   /** The Tiptap editor instance */
@@ -81,6 +82,23 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
   const [visible, setVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ top: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile device on mount and window resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(isMobileDevice());
+    };
+    
+    checkMobile();
+    
+    // Re-check on resize in case of device orientation change
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   // Position the handle next to the current block (relative to editor container)
   const updatePosition = useCallback(() => {
@@ -91,6 +109,9 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     // Get the editor container (parent of ProseMirror)
     const editorContainer = container.closest('.pubwave-editor') as HTMLElement | null;
     if (!editorContainer) return;
+
+    // Force a reflow to ensure layout is calculated
+    void editorContainer.offsetHeight;
 
     const editorRect = editorContainer.getBoundingClientRect();
 
@@ -103,6 +124,9 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     if (['UL', 'OL', 'BLOCKQUOTE'].includes(block.tagName) && block.firstElementChild instanceof HTMLElement) {
       target = block.firstElementChild as HTMLElement;
     }
+    
+    // Force a reflow for the target element as well
+    void target.offsetHeight;
     const targetRect = target.getBoundingClientRect();
 
     try {
@@ -130,15 +154,23 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     // Position relative to the editor container
     const top = targetRect.top - editorRect.top + offset;
 
-    setPosition({ top });
+    // Only update if we have a valid position (not NaN or invalid)
+    if (!isNaN(top) && isFinite(top) && top >= 0) {
+      setPosition({ top });
+    }
   }, []);
 
   // Show handle for a block
   const showHandle = useCallback((block: HTMLElement) => {
     currentBlockRef.current = block;
     setVisible(true);
-    // Use setTimeout to ensure DOM is ready and layout is stable
-    setTimeout(updatePosition, 0);
+    // Use requestAnimationFrame to ensure DOM is ready and layout is stable
+    // Double RAF ensures layout has been calculated
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        updatePosition();
+      });
+    });
   }, [updatePosition]);
 
   // Hide handle
@@ -241,8 +273,19 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
       }, 150);
     };
 
+    // Handle mouse leaving the entire editor container
+    const onEditorMouseLeave = (): void => {
+      if (isDraggingRef.current) return;
+      clearHideTimeout();
+      hideTimeoutRef.current = setTimeout(() => {
+        hideHandle();
+      }, 150);
+    };
+
     proseMirror.addEventListener('mouseover', onMouseOver);
     proseMirror.addEventListener('mouseout', onMouseOut);
+    // Also listen to mouseleave on the entire editor container to catch when mouse leaves editor
+    editorContainer.addEventListener('mouseleave', onEditorMouseLeave);
 
     // Hide handle when user starts typing (distraction-free writing)
     // Hide handle when user starts typing (distraction-free writing)
@@ -258,10 +301,23 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     return () => {
       proseMirror.removeEventListener('mouseover', onMouseOver);
       proseMirror.removeEventListener('mouseout', onMouseOut);
+      editorContainer.removeEventListener('mouseleave', onEditorMouseLeave);
       editor.off('transaction', handleTransaction);
       clearHideTimeout();
     };
   }, [editor, showHandle, hideHandle, clearHideTimeout]);
+
+  // Update position when visible state changes
+  useEffect(() => {
+    if (visible && currentBlockRef.current) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          updatePosition();
+        });
+      });
+    }
+  }, [visible, updatePosition]);
 
   // Handle scroll - update position
   useEffect(() => {
@@ -414,7 +470,8 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     setVisible(false);
   }, []);
 
-  if (!visible) return null;
+  // Don't show on mobile devices
+  if (isMobile || !visible) return null;
 
   return (
     <div

@@ -1,7 +1,7 @@
 /**
- * SSR Utilities Unit Tests
+ * Utility Functions Unit Tests
  *
- * Tests for SSR safety utilities in src/core/ssr.ts
+ * Tests for utility functions in src/core/util.ts
  */
 
 import { describe, it, expect, vi } from 'vitest';
@@ -14,7 +14,7 @@ import {
   safeClearTimeout,
   runInBrowser,
   getBrowserAPI,
-} from '../../src/core/ssr';
+} from '../../src/core/util';
 
 describe('SSR Utilities', () => {
   describe('isSSR', () => {

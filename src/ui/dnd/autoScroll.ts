@@ -10,7 +10,7 @@
  * - Cleans up properly when drag ends
  */
 
-import { safeRequestAnimationFrame } from '../../core/ssr';
+import { safeRequestAnimationFrame } from '../../core/util';
 
 /**
  * Edge detection threshold in pixels
