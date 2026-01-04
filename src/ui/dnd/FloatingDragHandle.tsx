@@ -20,6 +20,12 @@ export interface FloatingDragHandleProps {
 }
 
 /**
+ * Minimum window width to show drag handle (in pixels)
+ * Below this width, the drag handle will be hidden to save space
+ */
+const MIN_WINDOW_WIDTH = 768;
+
+/**
  * Get the closest block element from an event target
  */
 function getClosestBlock(target: EventTarget | null): HTMLElement | null {
@@ -57,6 +63,12 @@ export function FloatingDragHandle({
     const handle = handleRef.current;
     if (!handle) return;
 
+    // Check if window is too small
+    if (window.innerWidth < MIN_WINDOW_WIDTH) {
+      hideHandle();
+      return;
+    }
+
     const rect = blockElement.getBoundingClientRect();
     const editorRect = blockElement.closest('.pubwave-editor')?.getBoundingClientRect();
     if (!editorRect) return;
@@ -74,13 +86,22 @@ export function FloatingDragHandle({
     handle.style.pointerEvents = 'none';
   }, []);
 
-  // Setup mouse tracking
+  // Setup mouse tracking and window resize listener
   useEffect(() => {
     const editorElement = editor.view.dom.closest('.pubwave-editor') as HTMLElement | null;
     if (!editorElement) return;
 
     const onMouseMove = (e: MouseEvent): void => {
       if (isDraggingRef.current) return;
+
+      // Check if window is too small
+      if (window.innerWidth < MIN_WINDOW_WIDTH) {
+        if (currentBlockRef.current) {
+          currentBlockRef.current = null;
+          hideHandle();
+        }
+        return;
+      }
 
       const block = getClosestBlock(e.target);
       if (block && block !== currentBlockRef.current) {
@@ -99,12 +120,24 @@ export function FloatingDragHandle({
       }
     };
 
+    const onWindowResize = (): void => {
+      // Hide handle if window becomes too small
+      if (window.innerWidth < MIN_WINDOW_WIDTH) {
+        if (currentBlockRef.current) {
+          currentBlockRef.current = null;
+          hideHandle();
+        }
+      }
+    };
+
     editorElement.addEventListener('mousemove', onMouseMove);
     editorElement.addEventListener('mouseleave', onMouseLeave);
+    window.addEventListener('resize', onWindowResize);
 
     return () => {
       editorElement.removeEventListener('mousemove', onMouseMove);
       editorElement.removeEventListener('mouseleave', onMouseLeave);
+      window.removeEventListener('resize', onWindowResize);
     };
   }, [editor, showHandle, hideHandle]);
 

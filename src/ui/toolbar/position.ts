@@ -5,7 +5,7 @@
  */
 
 import type { Editor } from '@tiptap/core';
-import { calculateVerticalPosition } from '../positionUtils';
+import { calculateVerticalPosition, calculateHorizontalPosition } from '../positionUtils';
 
 /**
  * Toolbar position calculated relative to viewport
@@ -56,12 +56,10 @@ export function calculatePosition(
   const toolbarWidth = toolbarRect.width;
   const toolbarHeight = toolbarRect.height;
 
-  // Position above the selection, centered
-  const centerX = (selectionLeft + selectionRight) / 2;
-  let left = centerX - toolbarWidth / 2;
+  // Calculate selection bounds for positioning
+  const selectionBottom = Math.max(start.bottom, end.bottom);
   
   // Calculate vertical position using shared utility
-  const selectionBottom = Math.max(start.bottom, end.bottom);
   const verticalPosition = calculateVerticalPosition(
     selectionTop,
     selectionBottom,
@@ -76,25 +74,29 @@ export function calculatePosition(
     top = selectionBottom + TOOLBAR_OFFSET;
   }
 
-  // Clamp to viewport bounds
+  // Calculate horizontal position using shared utility
+  // Use center alignment as default for toolbar (centered on selection)
+  const horizontalPos = calculateHorizontalPosition(
+    selectionLeft,
+    selectionRight,
+    toolbarWidth,
+    'center', // Default to center alignment
+    TOOLBAR_OFFSET
+  );
+  
+  const left = horizontalPos.left;
+
+  // Final clamp to viewport bounds (safety check)
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
-  const padding = 8;
+  const padding = TOOLBAR_OFFSET;
 
-  // Keep toolbar within horizontal viewport
-  if (left < padding) {
-    left = padding;
-  } else if (left + toolbarWidth > viewportWidth - padding) {
-    left = viewportWidth - toolbarWidth - padding;
-  }
+  // Keep toolbar within horizontal viewport (should already be handled by calculateHorizontalPosition, but add safety clamp)
+  const clampedLeft = Math.max(padding, Math.min(left, viewportWidth - toolbarWidth - padding));
 
   // Keep toolbar within vertical viewport
-  if (top < padding) {
-    top = padding;
-  } else if (top + toolbarHeight > viewportHeight - padding) {
-    top = viewportHeight - toolbarHeight - padding;
-  }
+  const clampedTop = Math.max(padding, Math.min(top, viewportHeight - toolbarHeight - padding));
 
-  return { top, left, visible: true };
+  return { top: clampedTop, left: clampedLeft, visible: true };
 }
 

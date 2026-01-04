@@ -20,6 +20,12 @@ export interface BlockHandleProps {
 }
 
 /**
+ * Minimum window width to show drag handle (in pixels)
+ * Below this width, the drag handle will be hidden to save space
+ */
+const MIN_WINDOW_WIDTH = 768;
+
+/**
  * Find the closest block-level element from mouse position
  */
 /**
@@ -83,20 +89,23 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ top: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  const [isWindowTooSmall, setIsWindowTooSmall] = useState(false);
 
-  // Detect mobile device on mount and window resize
+  // Detect mobile device and window width on mount and window resize
   useEffect(() => {
-    const checkMobile = () => {
+    const checkDeviceAndWindow = () => {
       setIsMobile(isMobileDevice());
+      // Check if window width is too small
+      setIsWindowTooSmall(window.innerWidth < MIN_WINDOW_WIDTH);
     };
     
-    checkMobile();
+    checkDeviceAndWindow();
     
-    // Re-check on resize in case of device orientation change
-    window.addEventListener('resize', checkMobile);
+    // Re-check on resize in case of device orientation change or window resize
+    window.addEventListener('resize', checkDeviceAndWindow);
     
     return () => {
-      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('resize', checkDeviceAndWindow);
     };
   }, []);
 
@@ -470,8 +479,8 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     setVisible(false);
   }, []);
 
-  // Don't show on mobile devices
-  if (isMobile || !visible) return null;
+  // Don't show on mobile devices or when window is too small
+  if (isMobile || isWindowTooSmall || !visible) return null;
 
   return (
     <div

@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useRef, useEffect, ReactNode } from 'react';
-import { calculateVerticalPositionFromRect } from './positionUtils';
+import { calculateVerticalPositionFromRect, calculateHorizontalPositionFromRect, type HorizontalAlign } from './positionUtils';
 
 export interface PositionedDropdownProps {
   /** Whether the dropdown is open */
@@ -54,10 +54,11 @@ export function PositionedDropdown({
   onClick,
   'data-testid': dataTestId,
 }: PositionedDropdownProps): React.ReactElement | null {
-  const [position, setPosition] = useState<'top' | 'bottom'>('top');
+  const [verticalPosition, setVerticalPosition] = useState<'top' | 'bottom'>('top');
+  const [horizontalPosition, setHorizontalPosition] = useState<{ align: HorizontalAlign; left: number } | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Calculate position (top or bottom) based on available space
+  // Calculate position (top/bottom and left/right) based on available space
   useEffect(() => {
     if (!isOpen || !buttonRef.current) return;
 
@@ -66,8 +67,41 @@ export function PositionedDropdown({
 
       const buttonRect = buttonRef.current.getBoundingClientRect();
       const dropdownHeight = dropdownRef.current.offsetHeight || 300; // Fallback estimate
-      const newPosition = calculateVerticalPositionFromRect(buttonRect, dropdownHeight, margin);
-      setPosition(newPosition);
+      const dropdownWidth = dropdownRef.current.offsetWidth || 240; // Fallback estimate
+      
+      // Calculate vertical position
+      const newVerticalPosition = calculateVerticalPositionFromRect(buttonRect, dropdownHeight, margin);
+      setVerticalPosition(newVerticalPosition);
+
+      // Calculate horizontal position
+      // Find the positioning parent (nearest ancestor with position: relative, absolute, or fixed)
+      let parentContainer: HTMLElement | null = buttonRef.current.parentElement;
+      while (parentContainer) {
+        const style = window.getComputedStyle(parentContainer);
+        if (style.position === 'relative' || style.position === 'absolute' || style.position === 'fixed') {
+          break;
+        }
+        parentContainer = parentContainer.parentElement;
+      }
+      
+      // Calculate horizontal position in viewport coordinates
+      const horizontalPos = calculateHorizontalPositionFromRect(
+        buttonRect,
+        dropdownWidth,
+        align,
+        margin
+      );
+      
+      if (parentContainer) {
+        // Convert to relative position from parent
+        const parentRect = parentContainer.getBoundingClientRect();
+        const relativeLeft = horizontalPos.left - parentRect.left;
+        setHorizontalPosition({ align: horizontalPos.align, left: relativeLeft });
+      } else {
+        // No positioning parent found, use viewport coordinates directly
+        // This should be rare, but handle it gracefully
+        setHorizontalPosition(horizontalPos);
+      }
     };
 
     // Check immediately and after DOM updates
@@ -77,7 +111,7 @@ export function PositionedDropdown({
     });
 
     return () => cancelAnimationFrame(rafId);
-  }, [isOpen, buttonRef, margin]);
+  }, [isOpen, buttonRef, margin, align]);
 
   // Handle click outside
   useEffect(() => {
@@ -102,8 +136,16 @@ export function PositionedDropdown({
 
   if (!isOpen) return null;
 
-  // Calculate horizontal alignment
+  // Calculate horizontal style based on computed position
   const getHorizontalStyle = (): React.CSSProperties => {
+    if (horizontalPosition) {
+      // Use calculated position
+      return {
+        left: `${horizontalPosition.left}px`,
+      };
+    }
+    
+    // Fallback to original behavior if position not calculated yet
     switch (align) {
       case 'center':
         return {
@@ -129,7 +171,7 @@ export function PositionedDropdown({
       data-testid={dataTestId}
       style={{
         position: 'absolute',
-        ...(position === 'top'
+        ...(verticalPosition === 'top'
           ? {
               bottom: '100%',
               marginBottom: `${margin}px`,
