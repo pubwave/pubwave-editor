@@ -14,6 +14,7 @@ import 'tippy.js/dist/tippy.css';
 import { tokens, dropdownSectionHeaderStyle } from './theme';
 import { PositionedDropdown } from './PositionedDropdown';
 import { useLocale } from './LocaleContext';
+import { isMobileDevice } from '../core/util';
 
 export interface ColorPickerProps {
   editor: Editor;
@@ -151,6 +152,11 @@ export function ColorPicker({ editor, onClose, buttonRef }: ColorPickerProps): R
 
   // Initialize tooltips for all color buttons
   useEffect(() => {
+    // Don't initialize tooltips on mobile devices
+    if (isMobileDevice()) {
+      return;
+    }
+
     if (!pickerRef.current) return;
 
     // Clean up previous instances

@@ -11,7 +11,7 @@ import { tokens } from '../theme';
 import { getLabelWithShortcut } from '../a11y';
 import { useLocale } from '../LocaleContext';
 import { PositionedDropdown } from '../PositionedDropdown';
-import { safeRequestAnimationFrame } from '../../core/util';
+import { safeRequestAnimationFrame, isMobileDevice } from '../../core/util';
 import { saveSelection, restoreSelection, type SavedSelection } from '../focus';
 import type { SelectionState } from '../../core/selection';
 import { ToolbarButton } from './ToolbarButton';
@@ -60,6 +60,11 @@ export function LinkButton({ editor, isOpen, onToggle, onClose, selectionState }
 
   // Initialize tooltips for dropdown buttons
   useEffect(() => {
+    // Don't initialize tooltips on mobile devices
+    if (isMobileDevice()) {
+      return;
+    }
+
     if (!isOpen) {
       // Clean up tooltips when dropdown is closed
       tippyInstancesRef.current.forEach((instance) => instance.destroy());

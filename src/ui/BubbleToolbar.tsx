@@ -26,7 +26,7 @@ import { cn, tokens } from './theme';
 import { ariaLabels } from './a11y';
 import { getSelectionState, shouldShowToolbar } from '../core/selection';
 import type { SelectionState } from '../core/selection';
-import { safeRequestAnimationFrame } from '../core/util';
+import { safeRequestAnimationFrame, isMobileDevice } from '../core/util';
 import { useLocale } from './LocaleContext';
 import { DefaultToolbarContent } from './toolbar/DefaultToolbarContent';
 import { calculatePosition, isEditorReady, type ToolbarPosition } from './toolbar/position';
@@ -272,6 +272,11 @@ export function BubbleToolbar({
 
   // Initialize tooltips for all toolbar buttons
   useEffect(() => {
+    // Don't initialize tooltips on mobile devices
+    if (isMobileDevice()) {
+      return;
+    }
+
     if (!shouldShow || !position.visible || !toolbarRef.current) {
       // Clean up tooltips when toolbar is hidden
       tippyInstancesRef.current.forEach((instance) => instance.destroy());
