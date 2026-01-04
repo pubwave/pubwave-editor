@@ -67,6 +67,8 @@
     "recentlyUsed": "Récemment utilisés",
     "openLink": "Ouvrir le lien",
     "removeLink": "Supprimer le lien",
+    "confirmLink": "Confirmer le lien",
+    "clearLink": "Effacer le lien",
     "blockTypes": {
       "text": "Texte",
       "heading1": "Titre 1",
@@ -102,7 +104,10 @@
     "linkCancelButton": "Annuler l'édition du lien",
     "addBlockBelow": "Ajouter un bloc en dessous",
     "dragToMove": "Glisser pour réorganiser le bloc",
-    "openLinkInNewTab": "Ouvrir le lien dans un nouvel onglet"
+    "openLinkInNewTab": "Ouvrir le lien dans un nouvel onglet",
+    "linkConfirmButton": "Confirmer le lien",
+    "linkOpenButton": "Ouvrir le lien dans un nouvel onglet",
+    "linkClearButton": "Effacer la saisie du lien"
   },
   "placeholder": "Tapez \"/\" pour afficher les commandes...",
   "linkPlaceholder": "Collez un lien..."

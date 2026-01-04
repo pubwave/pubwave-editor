@@ -5,6 +5,8 @@
  * All exports here are considered stable and part of the public contract.
  */
 
+import './index.css';
+
 // Types
 export type {
   EditorConfig,

@@ -67,6 +67,8 @@
     "recentlyUsed": "최근 사용",
     "openLink": "링크 열기",
     "removeLink": "링크 제거",
+    "confirmLink": "링크 확인",
+    "clearLink": "링크 지우기",
     "blockTypes": {
       "text": "텍스트",
       "heading1": "제목 1",
@@ -102,7 +104,10 @@
     "linkCancelButton": "링크 편집 취소",
     "addBlockBelow": "아래에 블록 추가",
     "dragToMove": "블록 재정렬을 위해 드래그",
-    "openLinkInNewTab": "새 탭에서 링크 열기"
+    "openLinkInNewTab": "새 탭에서 링크 열기",
+    "linkConfirmButton": "링크 확인",
+    "linkOpenButton": "새 탭에서 링크 열기",
+    "linkClearButton": "링크 입력 지우기"
   },
   "placeholder": "명령을 표시하려면 \"/\" 입력...",
   "linkPlaceholder": "링크 붙여넣기..."

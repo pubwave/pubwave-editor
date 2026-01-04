@@ -61,6 +61,8 @@ export interface EditorLocale {
     recentlyUsed: string;
     openLink: string;
     removeLink: string;
+    confirmLink: string;
+    clearLink: string;
     // Block types
     blockTypes: {
       text: string;
@@ -97,6 +99,9 @@ export interface EditorLocale {
     linkSaveButton: string;
     linkRemoveButton: string;
     linkCancelButton: string;
+    linkConfirmButton: string;
+    linkOpenButton: string;
+    linkClearButton: string;
     addBlockBelow: string;
     dragToMove: string;
     openLinkInNewTab: string;

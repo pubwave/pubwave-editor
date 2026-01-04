@@ -39,7 +39,7 @@ pnpm add @pubwave/editor
 
 ```tsx
 import { PubwaveEditor } from '@pubwave/editor';
-import '@pubwave/editor/index.css';
+import '@pubwave/editor/style.css';
 
 function MyEditor() {
   const [content, setContent] = useState({
@@ -608,7 +608,7 @@ The library is SSR-safe and can be imported server-side without errors. The edit
 'use client';
 
 import { PubwaveEditor } from '@pubwave/editor';
-import '@pubwave/editor/index.css';
+import '@pubwave/editor/style.css';
 
 export default function EditorComponent() {
   return <PubwaveEditor />;
@@ -627,7 +627,7 @@ export default function EditorComponent() {
 - Ensure the component is marked as a client component
 
 **Q: Styles are not applied**
-- Ensure you've imported the CSS: `import '@pubwave/editor/index.css'`
+- Ensure you've imported the CSS: `import '@pubwave/editor/style.css'`
 - Check that CSS custom properties are defined
 
 **Q: Slash commands don't work**

@@ -33,7 +33,7 @@ This example demonstrates all core features of the editor:
 
 ```tsx
 import { PubwaveEditor } from '@pubwave/editor';
-import '@pubwave/editor/index.css';
+import '@pubwave/editor/style.css';
 import { useState } from 'react';
 
 function App() {

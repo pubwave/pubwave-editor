@@ -67,6 +67,8 @@
     "recentlyUsed": "Recently used",
     "openLink": "Open link",
     "removeLink": "Remove link",
+    "confirmLink": "Confirm link",
+    "clearLink": "Clear link",
     "blockTypes": {
       "text": "Text",
       "heading1": "Heading 1",
@@ -102,7 +104,10 @@
     "linkCancelButton": "Cancel link editing",
     "addBlockBelow": "Add block below",
     "dragToMove": "Drag to reorder block",
-    "openLinkInNewTab": "Open link in new tab"
+    "openLinkInNewTab": "Open link in new tab",
+    "linkConfirmButton": "Confirm link",
+    "linkOpenButton": "Open link in new tab",
+    "linkClearButton": "Clear link input"
   },
   "placeholder": "Type \"/\" for commands...",
   "linkPlaceholder": "Paste a link..."

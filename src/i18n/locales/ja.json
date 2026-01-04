@@ -67,6 +67,8 @@
     "recentlyUsed": "最近使用",
     "openLink": "リンクを開く",
     "removeLink": "リンクを削除",
+    "confirmLink": "リンクを確認",
+    "clearLink": "リンクをクリア",
     "blockTypes": {
       "text": "テキスト",
       "heading1": "見出し1",
@@ -102,7 +104,10 @@
     "linkCancelButton": "リンク編集をキャンセル",
     "addBlockBelow": "下にブロックを追加",
     "dragToMove": "ブロックを並び替えるためにドラッグ",
-    "openLinkInNewTab": "新しいタブでリンクを開く"
+    "openLinkInNewTab": "新しいタブでリンクを開く",
+    "linkConfirmButton": "リンクを確認",
+    "linkOpenButton": "新しいタブでリンクを開く",
+    "linkClearButton": "リンク入力をクリア"
   },
   "placeholder": "コマンドを表示するには \"/\" を入力...",
   "linkPlaceholder": "リンクを貼り付け..."

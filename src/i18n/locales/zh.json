@@ -67,6 +67,8 @@
     "recentlyUsed": "最近使用",
     "openLink": "打開鏈接",
     "removeLink": "移除鏈接",
+    "confirmLink": "確認鏈接",
+    "clearLink": "清空鏈接",
     "blockTypes": {
       "text": "文本",
       "heading1": "標題 1",
@@ -102,7 +104,10 @@
     "linkCancelButton": "取消鏈接編輯",
     "addBlockBelow": "在下方添加塊",
     "dragToMove": "拖拽以重新排序塊",
-    "openLinkInNewTab": "在新標籤頁中打開鏈接"
+    "openLinkInNewTab": "在新標籤頁中打開鏈接",
+    "linkConfirmButton": "確認鏈接",
+    "linkOpenButton": "在新標籤頁中打開鏈接",
+    "linkClearButton": "清空鏈接輸入"
   },
   "placeholder": "輸入 \"/\" 顯示命令...",
   "linkPlaceholder": "粘貼鏈接..."

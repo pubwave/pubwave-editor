@@ -67,6 +67,8 @@
     "recentlyUsed": "Recientemente usados",
     "openLink": "Abrir enlace",
     "removeLink": "Eliminar enlace",
+    "confirmLink": "Confirmar enlace",
+    "clearLink": "Limpiar enlace",
     "blockTypes": {
       "text": "Texto",
       "heading1": "Título 1",
@@ -102,7 +104,10 @@
     "linkCancelButton": "Cancelar edición de enlace",
     "addBlockBelow": "Añadir bloque debajo",
     "dragToMove": "Arrastrar para reorganizar el bloque",
-    "openLinkInNewTab": "Abrir enlace en nueva pestaña"
+    "openLinkInNewTab": "Abrir enlace en nueva pestaña",
+    "linkConfirmButton": "Confirmar enlace",
+    "linkOpenButton": "Abrir enlace en nueva pestaña",
+    "linkClearButton": "Limpiar entrada de enlace"
   },
   "placeholder": "Escriba \"/\" para comandos...",
   "linkPlaceholder": "Pegue un enlace..."

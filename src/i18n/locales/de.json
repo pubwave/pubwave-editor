@@ -67,6 +67,8 @@
     "recentlyUsed": "Zuletzt verwendet",
     "openLink": "Link öffnen",
     "removeLink": "Link entfernen",
+    "confirmLink": "Link bestätigen",
+    "clearLink": "Link löschen",
     "blockTypes": {
       "text": "Text",
       "heading1": "Überschrift 1",
@@ -102,7 +104,10 @@
     "linkCancelButton": "Link-Bearbeitung abbrechen",
     "addBlockBelow": "Block darunter hinzufügen",
     "dragToMove": "Zum Neuordnen des Blocks ziehen",
-    "openLinkInNewTab": "Link in neuem Tab öffnen"
+    "openLinkInNewTab": "Link in neuem Tab öffnen",
+    "linkConfirmButton": "Link bestätigen",
+    "linkOpenButton": "Link in neuem Tab öffnen",
+    "linkClearButton": "Link-Eingabe löschen"
   },
   "placeholder": "Tippen Sie \"/\" für Befehle...",
   "linkPlaceholder": "Link einfügen..."

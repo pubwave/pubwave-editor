@@ -60,7 +60,7 @@ This example demonstrates SSR usage in Next.js, where the page structure is serv
 'use client';
 
 import { PubwaveEditor } from '@pubwave/editor';
-import '@pubwave/editor/index.css';
+import '@pubwave/editor/style.css';
 import { useState } from 'react';
 
 export default function Page() {

@@ -67,6 +67,8 @@
     "recentlyUsed": "最近使用",
     "openLink": "打开链接",
     "removeLink": "移除链接",
+    "confirmLink": "确认链接",
+    "clearLink": "清空链接",
     "blockTypes": {
       "text": "文本",
       "heading1": "标题 1",
@@ -102,7 +104,10 @@
     "linkCancelButton": "取消链接编辑",
     "addBlockBelow": "在下方添加块",
     "dragToMove": "拖拽以重新排序块",
-    "openLinkInNewTab": "在新标签页中打开链接"
+    "openLinkInNewTab": "在新标签页中打开链接",
+    "linkConfirmButton": "确认链接",
+    "linkOpenButton": "在新标签页中打开链接",
+    "linkClearButton": "清空链接输入"
   },
   "placeholder": "输入 \"/\" 显示命令...",
   "linkPlaceholder": "粘贴链接..."
