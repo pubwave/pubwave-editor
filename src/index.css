@@ -145,7 +145,6 @@
   color: var(--pubwave-text);
   background: var(--pubwave-bg, #ffffff);
   border-radius: var(--pubwave-container-border-radius, 16px);
-  min-height: var(--pubwave-container-min-height, 700px);
   padding: var(--pubwave-container-padding-y, 96px) var(--pubwave-container-padding-x, 120px);
   padding-left: var(--pubwave-container-padding-left, 140px);
   /* Sophisticated tiered shadow */
@@ -155,12 +154,20 @@
     0 10px 10px -5px rgba(0, 0, 0, 0.02);
 }
 
+/* Default min-height only when not using fixed height mode */
+.pubwave-editor:not(.pubwave-editor--fixed-height) {
+  min-height: var(--pubwave-container-min-height, 700px);
+}
+
 /* Mobile responsive styles */
 @media (max-width: 768px) {
   .pubwave-editor {
     padding: var(--pubwave-container-padding-y-mobile, 20px) var(--pubwave-container-padding-x-mobile, 16px);
     padding-left: var(--pubwave-container-padding-left-mobile, 16px);
     border-radius: var(--pubwave-container-border-radius-mobile, 12px);
+  }
+  
+  .pubwave-editor:not(.pubwave-editor--fixed-height) {
     min-height: var(--pubwave-container-min-height-mobile, 400px);
   }
 }
@@ -178,6 +185,10 @@
   min-height: 1em;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  /* When parent has fixed height, content should scroll */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .pubwave-editor__content .ProseMirror {
@@ -188,6 +199,12 @@
   /* Large drop zone at bottom */
   padding-top: var(--pubwave-spacing-md, 1rem);
   /* Ensure drop zone at top */
+}
+
+/* When editor has fixed height, reduce padding to avoid excessive scrolling */
+.pubwave-editor--fixed-height .pubwave-editor__content .ProseMirror {
+  padding-bottom: 2rem;
+  /* Smaller padding for fixed height containers */
 }
 
 /* Placeholder styling */

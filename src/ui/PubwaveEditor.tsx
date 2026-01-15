@@ -103,6 +103,18 @@ export interface PubwaveEditorProps {
   width?: string;
 
   /**
+   * Editor container height
+   * Can be a CSS value like '500px', '80vh', 'auto', etc.
+   */
+  height?: string;
+
+  /**
+   * Editor container minimum height
+   * Can be a CSS value like '200px', '50vh', etc.
+   */
+  minHeight?: string;
+
+  /**
    * Test ID for testing
    */
   'data-testid'?: string;
@@ -133,6 +145,8 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
       onReady,
       className,
       width,
+      height,
+      minHeight,
       'data-testid': testId = 'pubwave-editor',
     } = props;
 
@@ -269,6 +283,8 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
       theme?.classNamePrefix ?? '',
       theme?.containerClassName ?? '',
       editor ? getReadOnlyClassName(editor) : '',
+      // Add class when height is constrained
+      (height || minHeight) ? 'pubwave-editor--fixed-height' : '',
       className,
     ]
       .filter(Boolean)
@@ -277,7 +293,13 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
     // Build CSS variables from theme colors
     const themeStyles: React.CSSProperties & Record<string, string> = {
       position: 'relative',
-      overflow: 'visible',
+      // When height or minHeight is set, we need overflow handling for scrolling
+      // Otherwise, use visible overflow for normal flow
+      overflow: (height || minHeight) ? 'hidden' : 'visible',
+      ...(height || minHeight ? {
+        display: 'flex' as const,
+        flexDirection: 'column' as const,
+      } : {}),
     };
 
     // Apply width if provided (use CSS variable for better override capability)
@@ -288,6 +310,18 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
       // This ensures width takes effect even when max-width would otherwise limit it
       themeStyles['--pubwave-container-max-width'] = width;
       themeStyles.maxWidth = width;
+    }
+
+    // Apply height if provided
+    if (height) {
+      themeStyles['--pubwave-container-height'] = height;
+      themeStyles.height = height;
+    }
+
+    // Apply minHeight if provided
+    if (minHeight) {
+      themeStyles['--pubwave-container-min-height'] = minHeight;
+      themeStyles.minHeight = minHeight;
     }
 
     if (theme?.colors) {

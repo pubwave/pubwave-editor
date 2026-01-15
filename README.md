@@ -98,6 +98,8 @@ The main React component for rendering the editor.
 | `autofocus` | `boolean \| 'start' \| 'end'` | `false` | Enable autofocus on mount. `true` or `'end'` focuses at the end, `'start'` focuses at the beginning |
 | `imageUpload` | `ImageUploadConfig` | `undefined` | Image upload configuration (see [Image Upload](#-image-upload)) |
 | `width` | `string` | `'100%'` | Editor container width. Can be a CSS value like `'100%'`, `'1200px'`, `'90vw'`, etc. Defaults to `'100%'` (full width of parent container) |
+| `height` | `string` | `undefined` | Editor container height. Can be a CSS value like `'500px'`, `'80vh'`, `'auto'`, etc. When set, the editor becomes a fixed-height scrollable container |
+| `minHeight` | `string` | `undefined` | Editor container minimum height. Can be a CSS value like `'200px'`, `'50vh'`, etc. The editor will expand with content but maintain at least this height |
 | `onChange` | `(content: JSONContent) => void` | `undefined` | Callback fired when the editor content changes |
 | `onSelectionChange` | `() => void` | `undefined` | Callback fired when the selection changes |
 | `onFocus` | `() => void` | `undefined` | Callback fired when the editor gains focus |
@@ -497,6 +499,35 @@ By default, the editor takes 100% of the parent container width. You can customi
 ```
 
 The `width` prop accepts any valid CSS width value. When set, it will override the default `max-width` constraint.
+
+### Setting Editor Height
+
+You can control the editor's height using the `height` and `minHeight` props:
+
+```tsx
+// Fixed height with scrollable content
+<PubwaveEditor height="500px" />
+
+// Minimum height (expands with content)
+<PubwaveEditor minHeight="300px" />
+
+// Combined: fixed height with minimum fallback
+<PubwaveEditor 
+  height="600px" 
+  minHeight="400px" 
+/>
+
+// Using viewport units
+<PubwaveEditor height="80vh" />
+```
+
+**Important Notes:**
+- The editor has default padding of **96px top and bottom** (192px total). Your `height` value should account for this padding to ensure content is visible.
+- For example, `height="100px"` would leave no space for content (100px - 192px padding = negative space).
+- **Recommended minimum height:** At least `300px` for desktop to accommodate padding and content.
+- When `height` is set, the editor becomes a scrollable container - content will scroll vertically when it exceeds the height.
+- When only `minHeight` is set, the editor will grow automatically with content but maintain at least the minimum height.
+- Both props accept any valid CSS height value (`px`, `vh`, `rem`, `%`, etc.).
 
 ### Programmatic Content Manipulation
 
