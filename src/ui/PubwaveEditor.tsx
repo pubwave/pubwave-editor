@@ -155,7 +155,7 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
     
     // Get placeholder from prop or locale data (prioritize locale for i18n)
     // Only use locale.placeholder if placeholder prop is not provided
-    const placeholderText = placeholder ?? locale.placeholder ?? 'Start writing...';
+    const placeholderText = placeholder ?? locale.placeholder ?? 'Write,type "/" for commands...';
 
     // Create Tiptap editor instance
     const editor = useEditor({

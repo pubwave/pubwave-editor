@@ -216,9 +216,9 @@
   height: 0;
 }
 
-/* Empty paragraph placeholder when editor is focused */
-.pubwave-editor__content.ProseMirror-focused p.pubwave-editor__node--empty::before,
-.ProseMirror.ProseMirror-focused p.pubwave-editor__node--empty::before {
+/* Empty paragraph placeholder - always visible when empty, not just when focused */
+.pubwave-editor__content p.pubwave-editor__node--empty::before,
+.ProseMirror p.pubwave-editor__node--empty::before {
   content: attr(data-placeholder);
   float: left;
   color: var(--pubwave-text-muted);

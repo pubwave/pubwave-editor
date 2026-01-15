@@ -109,7 +109,7 @@
     "linkOpenButton": "在新标签页中打开链接",
     "linkClearButton": "清空链接输入"
   },
-  "placeholder": "输入 \"/\" 显示命令...",
+  "placeholder": "开始写作，输入 \"/\" 显示命令...",
   "linkPlaceholder": "粘贴链接..."
 }
 

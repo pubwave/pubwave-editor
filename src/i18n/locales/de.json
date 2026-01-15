@@ -109,7 +109,7 @@
     "linkOpenButton": "Link in neuem Tab öffnen",
     "linkClearButton": "Link-Eingabe löschen"
   },
-  "placeholder": "Tippen Sie \"/\" für Befehle...",
+  "placeholder": "Schreiben, tippen Sie \"/\" für Befehle...",
   "linkPlaceholder": "Link einfügen..."
 }
 

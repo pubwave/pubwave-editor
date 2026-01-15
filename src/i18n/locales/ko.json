@@ -109,7 +109,7 @@
     "linkOpenButton": "새 탭에서 링크 열기",
     "linkClearButton": "링크 입력 지우기"
   },
-  "placeholder": "명령을 표시하려면 \"/\" 입력...",
+  "placeholder": "작성 시작, 명령을 표시하려면 \"/\" 입력...",
   "linkPlaceholder": "링크 붙여넣기..."
 }
 

@@ -115,7 +115,7 @@ export function createExtensions(config: ExtensionConfig = {}): Extension[] {
 
   // Get placeholder from prop or locale data
   const localeData = locale ? getLocale(locale) : null;
-  const placeholder = placeholderProp ?? localeData?.placeholder ?? 'Type "/" for commands...';
+  const placeholder = placeholderProp ?? localeData?.placeholder ?? 'Write,type "/" for commands...';
 
   const extensions: Extension[] = [
     // Block extensions (document structure + block types)

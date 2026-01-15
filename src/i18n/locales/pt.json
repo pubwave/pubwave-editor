@@ -109,7 +109,7 @@
     "linkOpenButton": "Abrir link em nova aba",
     "linkClearButton": "Limpar entrada de link"
   },
-  "placeholder": "Digite \"/\" para comandos...",
+  "placeholder": "Escreva, digite \"/\" para comandos...",
   "linkPlaceholder": "Cole um link..."
 }
 

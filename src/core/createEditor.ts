@@ -58,7 +58,7 @@ export function createEditor(config: EditorConfig = {}): Editor {
     editorProps: {
       attributes: {
         class: 'pubwave-editor__content',
-        'data-placeholder': placeholder ?? 'Start writing...',
+        'data-placeholder': placeholder ?? 'Write,type "/" for commands...',
       },
     },
     onUpdate: onUpdate

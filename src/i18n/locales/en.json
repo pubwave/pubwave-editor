@@ -109,7 +109,7 @@
     "linkOpenButton": "Open link in new tab",
     "linkClearButton": "Clear link input"
   },
-  "placeholder": "Type \"/\" for commands...",
+  "placeholder": "Write, type \"/\" for commands...",
   "linkPlaceholder": "Paste a link..."
 }
 

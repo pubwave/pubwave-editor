@@ -109,7 +109,7 @@
     "linkOpenButton": "Ouvrir le lien dans un nouvel onglet",
     "linkClearButton": "Effacer la saisie du lien"
   },
-  "placeholder": "Tapez \"/\" pour afficher les commandes...",
+  "placeholder": "Écrivez, tapez \"/\" pour afficher les commandes...",
   "linkPlaceholder": "Collez un lien..."
 }
 

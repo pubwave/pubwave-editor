@@ -109,7 +109,7 @@
     "linkOpenButton": "新しいタブでリンクを開く",
     "linkClearButton": "リンク入力をクリア"
   },
-  "placeholder": "コマンドを表示するには \"/\" を入力...",
+  "placeholder": "書き始めましょう、コマンドを表示するには \"/\" を入力...",
   "linkPlaceholder": "リンクを貼り付け..."
 }
 

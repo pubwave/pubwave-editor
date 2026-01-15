@@ -109,7 +109,7 @@
     "linkOpenButton": "Abrir enlace en nueva pestaña",
     "linkClearButton": "Limpiar entrada de enlace"
   },
-  "placeholder": "Escriba \"/\" para comandos...",
+  "placeholder": "Escribe, escribe \"/\" para comandos...",
   "linkPlaceholder": "Pegue un enlace..."
 }
 

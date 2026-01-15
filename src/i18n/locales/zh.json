@@ -109,6 +109,6 @@
     "linkOpenButton": "在新標籤頁中打開鏈接",
     "linkClearButton": "清空鏈接輸入"
   },
-  "placeholder": "輸入 \"/\" 顯示命令...",
+  "placeholder": "開始寫作，輸入 \"/\" 顯示命令...",
   "linkPlaceholder": "粘貼鏈接..."
 }
