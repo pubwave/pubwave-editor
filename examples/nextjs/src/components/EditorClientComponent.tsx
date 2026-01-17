@@ -616,150 +616,150 @@ export default function EditorClientComponent({
     <div className="editor-wrapper" style={{ position: 'relative' }}>
       {/* Theme switcher and preview button */}
       {showThemeSwitcher && (
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '1rem', 
-          width: '100%', 
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem',
+          width: '100%',
           maxWidth: '850px',
           flexWrap: 'wrap',
           justifyContent: 'center',
         }}>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
             gap: '1rem',
             flexWrap: 'wrap',
             justifyContent: 'center',
             width: '100%',
           }}>
-          <div className="theme-switcher">
-          <div className="theme-switcher__label">Theme:</div>
-          {Object.keys(themes).map((themeName) => {
-            const theme = themes[themeName];
-            const isActive = currentTheme === themeName;
-            const bgColor = theme.colors?.background || '#ffffff';
-            const primaryColor = theme.colors?.primary || '#2383e2';
-            let textColor = theme.colors?.text || '#000000';
-            const borderColor = theme.colors?.border || '#e3e2e0';
+            <div className="theme-switcher">
+              <div className="theme-switcher__label">Theme:</div>
+              {Object.keys(themes).map((themeName) => {
+                const theme = themes[themeName];
+                const isActive = currentTheme === themeName;
+                const bgColor = theme.colors?.background || '#ffffff';
+                const primaryColor = theme.colors?.primary || '#2383e2';
+                let textColor = theme.colors?.text || '#000000';
+                const borderColor = theme.colors?.border || '#e3e2e0';
 
-            // For dark theme buttons, force light text color for visibility
-            if (themeName === 'dark' || themeName === 'violet' || themeName === 'rose' || themeName === 'sky') {
-              textColor = '#ffffff';
-            }
-            // Image theme uses dark text on light background
-            if (themeName === 'image') {
-              textColor = '#1f2937';
-            }
+                // For dark theme buttons, force light text color for visibility
+                if (themeName === 'dark' || themeName === 'violet' || themeName === 'rose' || themeName === 'sky') {
+                  textColor = '#ffffff';
+                }
+                // Image theme uses dark text on light background
+                if (themeName === 'image') {
+                  textColor = '#1f2937';
+                }
 
-            // Create gradient from primary color to background
-            // For dark themes, use a lighter gradient to ensure text visibility
-            let gradient;
-            if (themeName === 'dark') {
-              // Use a gradient that includes more of the primary color for better visibility
-              gradient = `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}40 30%, #334155 70%, #1e293b 100%)`;
-            } else if (themeName === 'violet' || themeName === 'rose' || themeName === 'sky') {
-              // For tech themes, create a vibrant gradient from primary to darker shades
-              gradient = `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}80 30%, ${primaryColor}40 70%, ${primaryColor}20 100%)`;
-            } else if (themeName === 'image') {
-              // For image theme, use a subtle gradient with primary color
-              gradient = `linear-gradient(135deg, ${primaryColor} 0%, #ffffff 100%)`;
-            } else {
-              gradient = `linear-gradient(135deg, ${primaryColor} 0%, ${bgColor} 100%)`;
-            }
+                // Create gradient from primary color to background
+                // For dark themes, use a lighter gradient to ensure text visibility
+                let gradient;
+                if (themeName === 'dark') {
+                  // Use a gradient that includes more of the primary color for better visibility
+                  gradient = `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}40 30%, #334155 70%, #1e293b 100%)`;
+                } else if (themeName === 'violet' || themeName === 'rose' || themeName === 'sky') {
+                  // For tech themes, create a vibrant gradient from primary to darker shades
+                  gradient = `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}80 30%, ${primaryColor}40 70%, ${primaryColor}20 100%)`;
+                } else if (themeName === 'image') {
+                  // For image theme, use a subtle gradient with primary color
+                  gradient = `linear-gradient(135deg, ${primaryColor} 0%, #ffffff 100%)`;
+                } else {
+                  gradient = `linear-gradient(135deg, ${primaryColor} 0%, ${bgColor} 100%)`;
+                }
 
-            return (
-              <button
-                key={themeName}
-                className={`theme-switcher__button ${isActive ? 'theme-switcher__button--active' : ''}`}
+                return (
+                  <button
+                    key={themeName}
+                    className={`theme-switcher__button ${isActive ? 'theme-switcher__button--active' : ''}`}
+                    style={{
+                      background: gradient,
+                      color: textColor,
+                      borderColor: isActive ? primaryColor : borderColor,
+                      borderWidth: isActive ? '2px' : '1px',
+                      boxShadow: isActive ? `0 0 0 3px ${primaryColor}40, 0 4px 6px -1px rgba(0, 0, 0, 0.1)` : 'none',
+                      textShadow: (themeName === 'dark' || themeName === 'violet' || themeName === 'rose' || themeName === 'sky')
+                        ? '0 0 4px rgba(0, 0, 0, 1), 0 0 8px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.9)'
+                        : 'none', // Very strong text shadow for dark themes
+                      fontWeight: (themeName === 'dark' || themeName === 'violet' || themeName === 'rose' || themeName === 'sky')
+                        ? '700'
+                        : themeName === 'image' ? '600' : '500', // Make dark theme text even bolder
+                    }}
+                    onClick={() => setCurrentTheme(themeName)}
+                    title={`Switch to ${themeName} theme`}
+                  >
+                    {themeName}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Locale Selector */}
+            <div className="theme-switcher" style={{ marginLeft: '0.5rem' }} >
+              <div className="theme-switcher__label">Language:</div>
+              <select
+                value={currentLocale}
+                onChange={(e) => setCurrentLocale(e.target.value as EditorLocale)}
                 style={{
-                  background: gradient,
-                  color: textColor,
-                  borderColor: isActive ? primaryColor : borderColor,
-                  borderWidth: isActive ? '2px' : '1px',
-                  boxShadow: isActive ? `0 0 0 3px ${primaryColor}40, 0 4px 6px -1px rgba(0, 0, 0, 0.1)` : 'none',
-                  textShadow: (themeName === 'dark' || themeName === 'violet' || themeName === 'rose' || themeName === 'sky')
-                    ? '0 0 4px rgba(0, 0, 0, 1), 0 0 8px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.9)'
-                    : 'none', // Very strong text shadow for dark themes
-                  fontWeight: (themeName === 'dark' || themeName === 'violet' || themeName === 'rose' || themeName === 'sky')
-                    ? '700'
-                    : themeName === 'image' ? '600' : '500', // Make dark theme text even bolder
+                  padding: '0.5rem 1rem',
+                  borderRadius: '8px',
+                  border: '1px solid #e5e7eb',
+                  backgroundColor: '#ffffff',
+                  color: '#1f2937',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  minWidth: '120px',
                 }}
-                onClick={() => setCurrentTheme(themeName)}
-                title={`Switch to ${themeName} theme`}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#3b82f6';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#e5e7eb';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
               >
-                {themeName}
-              </button>
-            );
-          })}
-          </div>
+                {locales.map((locale) => (
+                  <option key={locale.code} value={locale.code}>
+                    {locale.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* Locale Selector */}
-          <div className="theme-switcher" style={{ marginLeft: '0.5rem' }}>
-            <div className="theme-switcher__label">Language:</div>
-            <select
-              value={currentLocale}
-              onChange={(e) => setCurrentLocale(e.target.value as EditorLocale)}
+            {/* Preview Button */}
+            <button
+              onClick={() => setShowPreview(true)}
               style={{
-                padding: '0.5rem 1rem',
+                padding: '0.75rem 1.5rem',
+                backgroundColor: '#3b82f6',
+                color: '#ffffff',
+                border: 'none',
                 borderRadius: '8px',
-                border: '1px solid #e5e7eb',
-                backgroundColor: '#ffffff',
-                color: '#1f2937',
                 fontSize: '14px',
                 fontWeight: 500,
                 cursor: 'pointer',
-                outline: 'none',
-                transition: 'all 0.2s',
-                minWidth: '120px',
+                transition: 'background-color 0.2s',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                whiteSpace: 'nowrap',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#3b82f6';
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                e.currentTarget.style.backgroundColor = '#2563eb';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#e5e7eb';
-                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.backgroundColor = '#3b82f6';
               }}
             >
-              {locales.map((locale) => (
-                <option key={locale.code} value={locale.code}>
-                  {locale.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Preview Button */}
-          <button
-            onClick={() => setShowPreview(true)}
-            style={{
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#3b82f6',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'background-color 0.2s',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-              whiteSpace: 'nowrap',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#2563eb';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#3b82f6';
-            }}
-          >
-            Preview
-          </button>
+              Preview
+            </button>
           </div>
         </div>
       )}
 
-      <div style={{ width: '100%', maxWidth: '850px' }}>
+      <div style={{ width: '100%', maxWidth: '850px' }} data-theme={currentTheme === 'light' ? 'light' : 'dark'}>
         <PubwaveEditor
           key={currentLocale}
           content={typeof window !== 'undefined' && (window as any).__TESTING__ ? undefined : initialContent}

@@ -1,0 +1,215 @@
+/**
+ * Pubwave Editor Task List Styles
+ */
+
+/* Task list */
+.pubwave-editor__content ul[data-type='taskList'] {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+  padding: var(--pubwave-spacing-4, 16px) 0;
+}
+
+/* Task list items - unified rules with high specificity */
+/* Use very specific selectors to override Tailwind base styles and browser defaults */
+.pubwave-editor__content ul[data-type='taskList'] li,
+.pubwave-editor__content ul[data-type='taskList'] > li,
+.pubwave-editor__content ul[data-type='taskList'] li[data-type='taskItem'],
+.pubwave-editor__content ul[data-type='taskList'] li.pubwave-editor__task-item,
+.pubwave-editor__content .pubwave-editor__task-item,
+.pubwave-editor__content.ProseMirror ul[data-type='taskList'] li,
+.ProseMirror.pubwave-editor__content ul[data-type='taskList'] li {
+  display: flex !important;
+  align-items: flex-start !important;
+  flex-direction: row !important;
+  gap: 0.5em !important;
+  padding: 0.25em 0 !important;
+  border-radius: var(--pubwave-radius-sm, 4px) !important;
+  margin: 0 !important;
+  list-style: none !important;
+  list-style-type: none !important;
+  list-style-position: outside !important;
+  padding-left: 0 !important;
+  /* Override browser default list-item display */
+  list-style-image: none !important;
+  /* Force override any Tailwind base styles */
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+.pubwave-editor__task-item {
+  min-height: var(--pubwave-task-item-height, 30px);
+  height: auto !important;
+}
+
+.pubwave-editor__content ul[data-type='taskList'] li::marker,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li[data-type='taskItem']::marker,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li.pubwave-editor__task-item::marker {
+  display: none !important;
+  content: '' !important;
+  width: 0 !important;
+  font-size: 0 !important;
+}
+
+.pubwave-editor__content ul[data-type='taskList'] li::before,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li[data-type='taskItem']::before,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li.pubwave-editor__task-item::before {
+  display: none !important;
+  content: '' !important;
+  width: 0 !important;
+}
+
+.pubwave-editor__content ul[data-type='taskList'] li:hover {
+  background-color: var(--pubwave-hover-task);
+  outline: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color 0.15s ease;
+}
+
+.pubwave-editor__content ul[data-type='taskList'] li > label,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li[data-type='taskItem']
+  > label,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li.pubwave-editor__task-item
+  > label {
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  margin-right: 0 !important;
+  position: relative !important;
+  cursor: pointer !important;
+  width: var(--pubwave-checkbox-size, 20px) !important;
+  height: var(--pubwave-checkbox-size, 20px) !important;
+  min-height: var(--pubwave-checkbox-size, 20px) !important;
+  max-height: var(--pubwave-checkbox-size, 20px) !important;
+  display: block !important;
+  align-self: flex-start !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  margin-top: 0.125em !important;
+}
+
+.pubwave-editor__content input[type='checkbox'] {
+  background-color: initial;
+  cursor: default;
+  appearance: auto;
+  box-sizing: border-box;
+  margin: 3px 3px 3px 4px;
+  padding: initial;
+  border: initial;
+}
+
+.pubwave-editor__content ul[data-type='taskList'] li > label::before {
+  content: '';
+  display: block;
+  width: var(--pubwave-checkbox-size, 20px);
+  height: var(--pubwave-checkbox-size, 20px);
+  border: 1.5px solid var(--pubwave-text, #1a1a1a);
+  border-radius: var(--pubwave-radius-xs, 3px);
+  background-color: #ffffff;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li[data-checked='true']
+  > label::before {
+  background-color: var(--pubwave-primary-hover, #2563eb);
+  border-color: var(--pubwave-primary-hover, #2563eb);
+}
+
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li[data-checked='true']
+  > label::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid var(--pubwave-bg, #ffffff);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  box-sizing: border-box;
+  z-index: 1;
+}
+
+.pubwave-editor__content ul[data-type='taskList'] li > div,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li[data-type='taskItem']
+  > div,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li.pubwave-editor__task-item
+  > div {
+  flex: 1 !important;
+  min-width: 0 !important;
+  color: var(--pubwave-text, #1a1a1a) !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  /* Use padding to create height instead of min-height to avoid flex gaps */
+  padding-top: 0.1em !important;
+  padding-bottom: 0.1em !important;
+}
+
+.pubwave-editor__content ul[data-type='taskList'] li > div p,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li[data-type='taskItem']
+  > div
+  p,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li.pubwave-editor__task-item
+  > div
+  p,
+.pubwave-editor__content ul[data-type='taskList'] li > div > p,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li
+  > div
+  p.pubwave-editor__paragraph,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li[data-type='taskItem']
+  > div
+  p.pubwave-editor__paragraph {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.5 !important;
+  display: block !important;
+  width: 100% !important;
+  /* Ensure empty paragraphs have height */
+  min-height: 1.5em !important;
+}
+
+.pubwave-editor__content.ProseMirror
+  ul[data-type='taskList']
+  li[data-checked='true']
+  > div
+  p,
+.pubwave-editor__content
+  ul[data-type='taskList']
+  li[data-checked='true']
+  > div
+  p {
+  color: var(--pubwave-checked-text, #9ca3af) !important;
+  text-decoration: line-through !important;
+}

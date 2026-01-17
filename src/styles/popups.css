@@ -1,0 +1,78 @@
+/**
+ * Pubwave Editor Popup and Tooltip Styles
+ */
+
+/* Tippy.js popup styles for SlashMenu */
+.tippy-box {
+  z-index: var(--pubwave-z-dropdown, 60) !important;
+  /* Fix black block flash issue - make tippy-box transparent by default */
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Ensure tippy-box with slash menu is transparent */
+.tippy-box:has(.pubwave-slash-menu) {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Ensure slash menu border uses theme color */
+.pubwave-slash-menu {
+  border: 1px solid var(--pubwave-border, #e3e2e0) !important;
+}
+
+/* Style the "/" character when slash menu is active */
+/* Only apply styles when suggestion element exists (menu is active) */
+.pubwave-editor .ProseMirror .suggestion {
+  /* Use semi-transparent white background for visibility */
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid var(--pubwave-border, #e3e2e0) !important;
+  border-radius: var(--pubwave-radius-md, 6px) !important;
+  padding: 2px 4px !important;
+  display: inline-block !important;
+  /* Use dark text color for visibility */
+  /* This ensures readability regardless of theme */
+  color: #1f2937 !important;
+}
+
+/* Ensure all text inside suggestion uses dark color for visibility */
+.pubwave-editor .ProseMirror .suggestion,
+.pubwave-editor .ProseMirror .suggestion *,
+.pubwave-editor .ProseMirror .suggestion span,
+.pubwave-editor .ProseMirror .suggestion strong,
+.pubwave-editor .ProseMirror .suggestion em,
+.pubwave-editor .ProseMirror .suggestion code {
+  color: #1f2937 !important;
+}
+
+/* Tippy.js Popup Overrides */
+.tippy-box,
+.tippy-box[data-theme] {
+  z-index: 60 !important;
+}
+
+.tippy-box[data-theme~='pubwave'] {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+.tippy-box[data-theme~='pubwave'] .tippy-content {
+  padding: 0;
+}
+
+/* ColorPicker tooltip theme - always black background with white text */
+.tippy-box[data-theme~='light-border'] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: var(--pubwave-radius, 6px);
+  box-shadow: var(--pubwave-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+  font-size: 16px;
+  padding: 4px 8px;
+}
+
+/* Ensure tooltip content text is white */
+.tippy-box[data-theme~='light-border'] .tippy-content {
+  color: #ffffff !important;
+}

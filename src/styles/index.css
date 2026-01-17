@@ -12,5 +12,9 @@
  */
 
 /* Import all modular CSS files */
-@import './styles//index.css';
-
+@import './theme.css';
+@import './editor.css';
+@import './content.css';
+@import './task-list.css';
+@import './components.css';
+@import './popups.css';

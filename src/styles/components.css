@@ -1,0 +1,106 @@
+/**
+ * Pubwave Editor Component Styles
+ */
+
+.pubwave-block {
+  position: relative;
+  padding-left: 2.5em;
+}
+
+.pubwave-block-menu {
+  position: absolute;
+  left: 0.5em;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+/* Dragging state */
+.pubwave-block--dragging {
+  opacity: 0.4;
+}
+
+/* Specific styling for the drag image (ghost) */
+.pubwave-block--drag-preview {
+  color: var(--pubwave-text-muted, #9b9a97) !important;
+  opacity: 0.6 !important;
+}
+
+.pubwave-block--drag-preview div,
+.pubwave-block--drag-preview p,
+.pubwave-block--drag-preview label,
+.pubwave-block--drag-preview .pubwave-editor__task-item > div {
+  color: var(--pubwave-text-muted, #9b9a97) !important;
+}
+
+/* Hide the real input in the ghost to prevent layering */
+.pubwave-block--drag-preview label input {
+  display: none !important;
+}
+
+/* Force 16px checkbox in the ghost */
+.pubwave-block--drag-preview label::before {
+  border-color: var(--pubwave-text-muted, #9b9a97) !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.pubwave-block--drag-preview label::after {
+  border-color: var(--pubwave-bg, #ffffff) !important;
+  left: 4px !important;
+  top: 2px !important;
+}
+
+/* Gapcursor */
+.ProseMirror .ProseMirror-gapcursor {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+}
+
+.ProseMirror .ProseMirror-gapcursor:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: -2px;
+  width: 20px;
+  border-top: 1px solid var(--pubwave-text);
+  animation: pubwave-cursor-blink 1.1s steps(2, start) infinite;
+}
+
+@keyframes pubwave-cursor-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.ProseMirror-focused .ProseMirror-gapcursor {
+  display: block;
+}
+
+/* Drop cursor */
+.ProseMirror-dropcursor {
+  border-left: 2px solid var(--pubwave-primary);
+  pointer-events: none;
+}
+
+/* Drag handle icon styles - elegant and theme-aware */
+.pubwave-block-handle__drag,
+.pubwave-block-handle__add {
+  color: var(--pubwave-text-muted, #9b9a97) !important;
+}
+
+/* Toolbar button hover styles */
+.pubwave-toolbar__button:not(:disabled):hover {
+  background-color: var(--pubwave-hover) !important;
+}
+
+/* Turn Into dropdown button hover - only when not active */
+.pubwave-toolbar__turn-into-option:not(
+    .pubwave-toolbar__turn-into-option--active
+  ):hover {
+  background-color: var(--pubwave-hover) !important;
+}

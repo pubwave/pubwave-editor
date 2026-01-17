@@ -1,0 +1,190 @@
+/**
+ * Pubwave Editor Content Styles
+ */
+
+/* Paragraph */
+.pubwave-editor__content p {
+  margin: 0;
+  line-height: var(--pubwave-line-height);
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  unicode-bidi: isolate;
+}
+
+/* Headings */
+.pubwave-editor__content h1,
+.pubwave-editor__content h2,
+.pubwave-editor__content h3 {
+  line-height: var(--pubwave-line-height-heading);
+  font-weight: 600;
+}
+
+/* Lists */
+.pubwave-editor__content ul:not([data-type='taskList']),
+.pubwave-editor__content ol {
+  margin: 0;
+  padding-left: 1.5em;
+}
+
+.pubwave-editor__content .pubwave-editor__ordered-list {
+  margin: 0;
+  padding-left: 2em !important;
+  display: block;
+  list-style-type: decimal;
+  margin-block-start: 1em;
+  unicode-bidi: isolate;
+}
+
+.pubwave-editor__content .pubwave-editor__bullet-list {
+  display: block;
+  list-style-type: disc;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  padding-inline-start: 40px;
+  unicode-bidi: isolate;
+}
+
+.pubwave-editor__content .pubwave-editor__bullet-list,
+.pubwave-editor__content .pubwave-editor__ordered-list {
+  padding-left: 1.3em !important;
+}
+
+.pubwave-editor__content
+  li:not([data-type='taskItem']):not(.pubwave-editor__task-item) {
+  margin: 0.25em 0;
+}
+
+.pubwave-editor__content li > p {
+  margin: 0;
+}
+
+/* Blockquote */
+.pubwave-editor__content blockquote,
+.pubwave-editor__content.ProseMirror blockquote {
+  margin: 0;
+  padding-left: 1em;
+  border-left: 3px solid var(--pubwave-text, #1a1a1a) !important;
+  font-style: italic;
+  margin: 0.5em 0;
+}
+
+/* Code block */
+.pubwave-editor__content pre,
+.pubwave-editor__content pre {
+  margin: 0.5em 0;
+  padding: 0.5em 0.75em;
+  background: var(--pubwave-border-light, #f3f4f6) !important;
+  border-radius: var(--pubwave-radius-md, 6px) !important;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace !important;
+  font-size: var(--pubwave-font-size-sm, 13px) !important;
+  line-height: 1.5;
+  overflow-x: auto;
+  color: #1a1a1a !important;
+}
+
+.pubwave-editor__content pre code,
+.pubwave-editor__content pre code {
+  background: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: inherit !important;
+  color: inherit !important;
+  font-family: inherit !important;
+}
+
+/* Horizontal rule / Divider */
+.pubwave-editor__content hr,
+.pubwave-editor__content hr,
+.pubwave-editor__content .pubwave-editor__divider {
+  border: none;
+  border-top: 1px solid var(--pubwave-border, #e5e7eb) !important;
+  height: 0 !important;
+  background: none !important;
+}
+
+/* Image */
+.pubwave-editor__content img,
+.pubwave-editor__content img,
+.pubwave-editor__content .pubwave-editor__image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-top: 1em;
+  border-radius: var(--pubwave-radius-md, 6px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.pubwave-editor__content img:hover,
+.pubwave-editor__content img:hover,
+.pubwave-editor__content .pubwave-editor__image:hover {
+  opacity: 0.6;
+}
+
+.pubwave-editor__content img.ProseMirror-selectednode,
+.pubwave-editor__content img.ProseMirror-selectednode,
+.pubwave-editor__content .pubwave-editor__image.ProseMirror-selectednode {
+  outline: 2px solid var(--pubwave-primary, #2383e2);
+  outline-offset: 2px;
+}
+
+/* Inline marks */
+.pubwave-editor__content strong {
+  font-weight: 600;
+}
+
+.pubwave-editor__content em {
+  font-style: italic;
+}
+
+.pubwave-editor__content u {
+  text-decoration: underline;
+}
+
+.pubwave-editor__content s {
+  text-decoration: line-through;
+}
+
+.pubwave-editor__content code {
+  background: var(--pubwave-hover);
+  padding: 0.15em 0.35em;
+  border-radius: var(--pubwave-radius-sm);
+  font-family: var(--pubwave-font-mono);
+  font-size: 0.9em;
+}
+
+/* Links */
+.pubwave-editor__content a,
+.pubwave-editor .ProseMirror a {
+  color: var(--pubwave-link-color, #2383e2) !important;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pubwave-editor__content a:hover,
+.pubwave-editor .ProseMirror a:hover {
+  color: var(
+    --pubwave-link-hover-color,
+    var(--pubwave-link-color, #2383e2)
+  ) !important;
+  opacity: 0.8;
+}
+
+/* Selection highlight */
+.pubwave-editor__content ::selection {
+  background-color: var(--pubwave-selection-bg);
+}
+
+/* Read-only mode */
+.pubwave-editor--readonly {
+  cursor: default;
+}
+
+.pubwave-editor--readonly .pubwave-editor__content {
+  cursor: default;
+}

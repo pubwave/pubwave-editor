@@ -1,0 +1,91 @@
+/**
+ * Pubwave Editor Theme Variables
+ *
+ * CSS custom properties (theme tokens) with sensible defaults
+ */
+
+:root {
+  /* Colors - Light theme */
+  --pubwave-bg: #ffffff;
+  --pubwave-surface: #ffffff;
+  --pubwave-text: #37352f;
+  --pubwave-text-muted: #9b9a97;
+  --pubwave-border: #e3e2e0;
+  --pubwave-border-light: #f3f4f6;
+  --pubwave-hover: #f7f6f3;
+  --pubwave-focus: rgba(0, 0, 0, 0.05);
+  --pubwave-selection: #3b82f6;
+  --pubwave-selection-bg: rgba(35, 131, 226, 0.15);
+  --pubwave-primary: #2383e2;
+  --pubwave-primary-hover: #2563eb;
+  --pubwave-handle-color: #9b9a97;
+  --pubwave-primary-faded: rgba(59, 130, 246, 0.1);
+  --pubwave-drop-indicator: #3b82f6;
+  --pubwave-drop-target: rgba(59, 130, 246, 0.05);
+  --pubwave-error: #ef4444;
+  --pubwave-success: #10b981;
+  --pubwave-warning: #f59e0b;
+  --pubwave-text-secondary: #374151;
+  --pubwave-text-tertiary: #4b5563;
+  --pubwave-hover-bg: #f3f4f6;
+  --pubwave-hover-task: rgba(0, 0, 0, 0.05);
+  --pubwave-checked-text: #9ca3af;
+
+  /* Spacing */
+  --pubwave-spacing-xs: 0.25rem;
+  --pubwave-spacing-sm: 0.5rem;
+  --pubwave-spacing-md: 1rem;
+  --pubwave-spacing-lg: 1.5rem;
+  --pubwave-spacing-xl: 2rem;
+  --pubwave-spacing-1: 4px;
+  --pubwave-spacing-2: 8px;
+  --pubwave-spacing-3: 12px;
+  --pubwave-spacing-4: 16px;
+  --pubwave-spacing-7: 28px;
+
+  /* Typography */
+  --pubwave-font-family: inherit;
+  --pubwave-font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --pubwave-font-size-xs: 0.75rem;
+  --pubwave-font-size-sm: 0.875rem;
+  --pubwave-font-size-base: 1rem;
+  --pubwave-font-size-md: 1.125rem;
+  --pubwave-font-size-lg: 1.25rem;
+  --pubwave-font-size-xl: 1.4rem;
+  --pubwave-font-size-2xl: 1.775rem;
+  --pubwave-font-size-3xl: 2.1rem;
+  --pubwave-line-height: 1.625;
+  --pubwave-line-height-heading: 1.25;
+
+  /* Component sizes */
+  --pubwave-button-width: 28px;
+  --pubwave-button-height: 28px;
+  --pubwave-icon-size: 20px;
+  --pubwave-checkbox-size: 20px;
+  --pubwave-checkbox-input-size: 16px;
+  --pubwave-divider-width: 1px;
+  --pubwave-divider-height: 20px;
+  --pubwave-drop-indicator-width: 2px;
+  --pubwave-drop-indicator-height: 2px;
+  --pubwave-task-item-height: 30px;
+
+  /* Borders */
+  --pubwave-radius-xs: 3px;
+  --pubwave-radius-sm: 4px;
+  --pubwave-radius: 6px;
+  --pubwave-radius-md: 6px;
+  --pubwave-radius-lg: 8px;
+
+  /* Shadows */
+  --pubwave-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --pubwave-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --pubwave-shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark theme */
+[data-theme='dark'] {
+  --pubwave-hover-task: rgba(255, 255, 255, 0.12);
+}
