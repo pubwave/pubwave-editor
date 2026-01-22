@@ -42,6 +42,7 @@ export const SUPPORTED_BLOCKS: readonly BlockType[] = [
   'codeBlock',
   'horizontalRule',
   'image',
+  'chart',
 ] as const;
 
 /**

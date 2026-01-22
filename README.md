@@ -17,13 +17,16 @@ A Notion-level block editor built with React and Tiptap.
 - 🎨 **Text & Background Colors** - Rich color picker with recently used colors
 - 🔄 **Turn Into** - Convert blocks between different types (paragraph, headings, lists, etc.)
 - 📋 **Rich Formatting** - Bold, italic, underline, strikethrough, code, and links
-- 📝 **Multiple Block Types** - Paragraphs, headings, lists, quotes, code blocks, and more
+- 📝 **Multiple Block Types** - Paragraphs, headings, lists, quotes, code blocks, charts, and more
 - 🖼️ **Image Support** - Upload images via file picker or paste from clipboard, with base64 or custom upload service
+- 📊 **Chart Support** - Interactive charts powered by Chart.js with editable data
 - 🌐 **Internationalization** - Multi-language support with English as default
 
 ---
 
 ## 📦 Installation
+
+### Basic Installation (without Chart support)
 
 ```bash
 npm install @pubwave/editor
@@ -32,6 +35,20 @@ yarn add @pubwave/editor
 # or
 pnpm add @pubwave/editor
 ```
+
+### With Chart Support
+
+If you want to use Chart blocks, also install Chart.js:
+
+```bash
+npm install @pubwave/editor chart.js
+# or
+yarn add @pubwave/editor chart.js
+# or
+pnpm add @pubwave/editor chart.js
+```
+
+**Note:** `chart.js` is an optional peer dependency. Only install it if you plan to use Chart block functionality.
 
 ---
 
@@ -71,6 +88,12 @@ function MyEditor() {
 |---------------|--------|
 | 18.x          | ✅ Tested, Recommended |
 | 19.x          | ✅ Supported |
+
+### Peer Dependencies
+
+- `react`: ^18.0.0 || ^19.0.0 (required)
+- `react-dom`: ^18.0.0 || ^19.0.0 (required)
+- `chart.js`: ^4.0.0 || ^5.0.0 (optional, required only for Chart block support)
 
 ### Browser Support
 
@@ -442,6 +465,7 @@ The editor supports the following block types:
 - **Numbered List** - Ordered list with numbers
 - **Task List** - Checklist with checkboxes
 - **Image** - Image block (supports base64 or URL)
+- **Chart** - Interactive chart powered by Chart.js (bar, line, pie, doughnut, radar, polar area)
 - **Blockquote** - Quote block
 - **Code Block** - Code snippet with syntax highlighting
 - **Horizontal Rule** - Divider line
@@ -631,6 +655,123 @@ const customCommands: SlashCommand[] = [
 
 ---
 
+## 📊 Chart Support
+
+The editor includes support for interactive charts powered by Chart.js. Charts are fully editable and support multiple chart types.
+
+### Chart Types
+
+Supported chart types:
+- **Bar Chart** - Vertical/horizontal bars for comparisons
+- **Line Chart** - Data trends over time
+- **Pie Chart** - Proportional data representation
+- **Doughnut Chart** - Variation of pie chart with hollow center
+- **Radar Chart** - Multi-dimensional data comparison
+- **Polar Area Chart** - Circular data visualization
+
+### Adding Charts Programmatically
+
+```tsx
+import { PubwaveEditor } from '@pubwave/editor';
+import type { JSONContent } from '@tiptap/core';
+
+const contentWithChart: JSONContent = {
+  type: 'doc',
+  content: [
+    {
+      type: 'chart',
+      attrs: {
+        data: {
+          type: 'bar',
+          data: {
+            labels: ['January', 'February', 'March', 'April'],
+            datasets: [{
+              label: 'Sales',
+              data: [65, 59, 80, 81],
+              backgroundColor: 'rgba(59, 130, 246, 0.7)',
+              borderColor: 'rgba(59, 130, 246, 1)',
+              borderWidth: 2,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Monthly Sales',
+                color: 'var(--pubwave-text, #37352f)',
+              },
+              legend: {
+                display: true,
+                position: 'bottom',
+              },
+            },
+          },
+        },
+      },
+    },
+  ],
+};
+
+<PubwaveEditor content={contentWithChart} />
+```
+
+### Chart Features
+
+- **Interactive Editing** - Click edit button on hover to modify chart data
+- **Drag & Drop** - Charts can be reordered like other blocks
+- **Theme Support** - Charts use CSS variables for colors that adapt to theme changes
+- **Responsive** - Charts automatically adjust to container size
+- **Multiple Datasets** - Support for comparing multiple data series
+- **Customizable** - Edit title, labels, colors, and chart options
+
+### Chart Data Structure
+
+The chart node uses the following data structure:
+
+```typescript
+interface ChartNodeData {
+  type: 'bar' | 'line' | 'pie' | 'doughnut' | 'radar' | 'polarArea';
+  data: {
+    labels: string[];
+    datasets: Array<{
+      label?: string;
+      data: number[];
+      backgroundColor?: string | string[];
+      borderColor?: string | string[];
+      borderWidth?: number;
+    }>;
+  };
+  options?: {
+    responsive?: boolean;
+    maintainAspectRatio?: boolean;
+    plugins?: {
+      title?: {
+        display?: boolean;
+        text?: string;
+        color?: string;
+        font?: { size?: number; weight?: string };
+      };
+      legend?: {
+        display?: boolean;
+        position?: 'top' | 'bottom' | 'left' | 'right';
+      };
+    };
+  };
+}
+```
+
+### Chart Editing
+
+When in editable mode:
+1. Hover over a chart to reveal the edit button
+2. Click the edit button to open the chart editor modal
+3. Modify chart type, title, labels, datasets, and appearance options
+4. Save changes to update the chart
+
+---
+
 
 
 
@@ -661,6 +802,17 @@ const customCommands: SlashCommand[] = [
 - Verify file size is within `maxSize` limit
 - Check browser console for error messages
 - If custom upload fails, editor will automatically fall back to base64
+
+**Q: Charts don't render**
+- Ensure `chart.js` is installed: `npm install chart.js` (optional peer dependency)
+- Check that Chart.js is compatible (v4.x or v5.x)
+- Verify chart data structure is correct
+- Check browser console for errors
+
+**Q: Chart colors don't match theme**
+- Charts use CSS variables for colors that adapt to theme changes
+- Ensure CSS custom properties are defined: `--pubwave-text`, `--pubwave-text-muted`, `--pubwave-border`
+- Chart colors will automatically update when theme changes
 
 ---
 

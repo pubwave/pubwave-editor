@@ -1,0 +1,400 @@
+/**
+ * Chart Block Styles
+ *
+ * Styles for the Chart.js chart block component.
+ * Uses CSS custom properties for theme support.
+ */
+
+/* =====================================================
+   Chart Container
+   ===================================================== */
+
+.pubwave-editor__chart {
+  position: relative;
+  margin: var(--pubwave-spacing-md, 1rem) 0;
+  padding: var(--pubwave-spacing-sm, 0.5rem);
+  border-radius: var(--pubwave-radius-lg, 8px);
+  transition: background-color 0.15s ease;
+}
+
+.pubwave-editor__chart[data-selected='true'] {
+  background-color: var(--pubwave-focus, rgba(0, 0, 0, 0.05));
+}
+
+/* =====================================================
+   Chart Canvas Wrapper
+   ===================================================== */
+
+.pubwave-chart__container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.pubwave-chart__canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 300px;
+}
+
+.pubwave-chart__canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* =====================================================
+   Chart Placeholder (invalid data)
+   ===================================================== */
+
+.pubwave-chart__placeholder {
+  padding: var(--pubwave-spacing-md, 1rem);
+  color: var(--pubwave-text-muted, #9b9a97);
+  font-size: var(--pubwave-font-size-sm, 0.875rem);
+  text-align: center;
+  background-color: var(--pubwave-hover, #f7f6f3);
+  border-radius: var(--pubwave-radius, 6px);
+}
+
+/* =====================================================
+   Edit Button
+   ===================================================== */
+
+.pubwave-chart__edit-button {
+  position: absolute;
+  top: var(--pubwave-spacing-sm, 0.5rem);
+  right: var(--pubwave-spacing-sm, 0.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background-color: var(--pubwave-bg, #ffffff);
+  border: 1px solid var(--pubwave-border, #e3e2e0);
+  border-radius: var(--pubwave-radius, 6px);
+  color: var(--pubwave-text, #37352f);
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.15s ease;
+  box-shadow: var(--pubwave-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+}
+
+.pubwave-chart__edit-button:hover {
+  background-color: var(--pubwave-primary, #2383e2);
+  border-color: var(--pubwave-primary, #2383e2);
+  color: #ffffff;
+  transform: scale(1);
+  box-shadow: var(--pubwave-shadow, 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06));
+}
+
+.pubwave-chart__edit-button:active {
+  transform: scale(0.95);
+}
+
+/* Show edit button on hover or when chart is selected */
+.pubwave-chart__container:hover .pubwave-chart__edit-button,
+.pubwave-editor__chart[data-selected='true'] .pubwave-chart__edit-button {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* =====================================================
+   Modal Overlay
+   ===================================================== */
+
+.pubwave-modal__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  padding: var(--pubwave-spacing-md, 1rem);
+  animation: pubwave-fade-in 0.15s ease;
+}
+
+@keyframes pubwave-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* =====================================================
+   Modal Container
+   ===================================================== */
+
+.pubwave-modal__container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  background-color: var(--pubwave-bg, #ffffff);
+  border-radius: var(--pubwave-radius-lg, 8px);
+  box-shadow: var(--pubwave-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05));
+  animation: pubwave-slide-up 0.2s ease;
+}
+
+@keyframes pubwave-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =====================================================
+   Modal Header
+   ===================================================== */
+
+.pubwave-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--pubwave-spacing-md, 1rem);
+  border-bottom: 1px solid var(--pubwave-border, #e3e2e0);
+}
+
+.pubwave-modal__title {
+  margin: 0;
+  font-size: var(--pubwave-font-size-lg, 1.125rem);
+  font-weight: 600;
+  color: var(--pubwave-text, #37352f);
+}
+
+.pubwave-modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--pubwave-radius-sm, 4px);
+  color: var(--pubwave-text-muted, #9b9a97);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pubwave-modal__close:hover {
+  background-color: var(--pubwave-hover, #f7f6f3);
+  color: var(--pubwave-text, #37352f);
+}
+
+/* =====================================================
+   Modal Body
+   ===================================================== */
+
+.pubwave-modal__body {
+  padding: var(--pubwave-spacing-md, 1rem);
+  overflow-y: auto;
+}
+
+/* =====================================================
+   Modal Footer
+   ===================================================== */
+
+.pubwave-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--pubwave-spacing-sm, 0.5rem);
+  padding: var(--pubwave-spacing-md, 1rem);
+  border-top: 1px solid var(--pubwave-border, #e3e2e0);
+}
+
+/* =====================================================
+   Form Field
+   ===================================================== */
+
+.pubwave-form__field {
+  margin-bottom: var(--pubwave-spacing-md, 1rem);
+}
+
+.pubwave-form__row {
+  display: flex;
+  gap: var(--pubwave-spacing-md, 1rem);
+  margin-bottom: var(--pubwave-spacing-md, 1rem);
+}
+
+.pubwave-form__row .pubwave-form__field {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.pubwave-form__label {
+  display: block;
+  margin-bottom: var(--pubwave-spacing-xs, 0.25rem);
+  font-size: var(--pubwave-font-size-sm, 0.875rem);
+  font-weight: 500;
+  color: var(--pubwave-text, #37352f);
+}
+
+.pubwave-form__input,
+.pubwave-form__select {
+  width: 100%;
+  padding: var(--pubwave-spacing-sm, 0.5rem) var(--pubwave-spacing-md, 1rem);
+  font-size: var(--pubwave-font-size-base, 1rem);
+  color: var(--pubwave-text, #37352f);
+  background-color: var(--pubwave-surface, #ffffff);
+  border: 1px solid var(--pubwave-border, #e3e2e0);
+  border-radius: var(--pubwave-radius, 6px);
+  transition: all 0.15s ease;
+}
+
+.pubwave-form__input:focus,
+.pubwave-form__select:focus {
+  outline: none;
+  border-color: var(--pubwave-primary, #2383e2);
+  box-shadow: 0 0 0 3px var(--pubwave-primary-faded, rgba(59, 130, 246, 0.1));
+}
+
+.pubwave-form__input::placeholder {
+  color: var(--pubwave-text-muted, #9b9a97);
+}
+
+.pubwave-form__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--pubwave-spacing-sm, 0.5rem);
+  font-size: var(--pubwave-font-size-base, 1rem);
+  color: var(--pubwave-text, #37352f);
+  cursor: pointer;
+}
+
+.pubwave-form__checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--pubwave-primary, #2383e2);
+}
+
+/* =====================================================
+   Form Section
+   ===================================================== */
+
+.pubwave-form__section {
+  margin-top: var(--pubwave-spacing-lg, 1.5rem);
+}
+
+.pubwave-form__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--pubwave-spacing-md, 1rem);
+}
+
+.pubwave-form__section-title {
+  margin: 0;
+  font-size: var(--pubwave-font-size-base, 1rem);
+  font-weight: 600;
+  color: var(--pubwave-text, #37352f);
+}
+
+/* =====================================================
+   Dataset Item
+   ===================================================== */
+
+.pubwave-form__dataset {
+  padding: var(--pubwave-spacing-md, 1rem);
+  margin-bottom: var(--pubwave-spacing-md, 1rem);
+  background-color: var(--pubwave-hover, #f7f6f3);
+  border: 1px solid var(--pubwave-border, #e3e2e0);
+  border-radius: var(--pubwave-radius, 6px);
+}
+
+.pubwave-form__dataset-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--pubwave-spacing-md, 1rem);
+}
+
+.pubwave-form__dataset-title {
+  font-size: var(--pubwave-font-size-sm, 0.875rem);
+  font-weight: 600;
+  color: var(--pubwave-text, #37352f);
+}
+
+/* =====================================================
+   Buttons
+   ===================================================== */
+
+.pubwave-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--pubwave-spacing-sm, 0.5rem) var(--pubwave-spacing-md, 1rem);
+  font-size: var(--pubwave-font-size-base, 1rem);
+  font-weight: 500;
+  border: none;
+  border-radius: var(--pubwave-radius, 6px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pubwave-button--primary {
+  background-color: var(--pubwave-primary, #2383e2);
+  color: #ffffff;
+}
+
+.pubwave-button--primary:hover {
+  background-color: var(--pubwave-primary-hover, #1d6fd9);
+}
+
+.pubwave-button--secondary {
+  background-color: var(--pubwave-hover, #f7f6f3);
+  color: var(--pubwave-text, #37352f);
+  border: 1px solid var(--pubwave-border, #e3e2e0);
+}
+
+.pubwave-button--secondary:hover {
+  background-color: var(--pubwave-border-light, #f3f4f6);
+}
+
+.pubwave-button--danger {
+  background-color: var(--pubwave-error, #ef4444);
+  color: #ffffff;
+}
+
+.pubwave-button--danger:hover {
+  background-color: #dc2626;
+}
+
+.pubwave-button--small {
+  padding: var(--pubwave-spacing-xs, 0.25rem) var(--pubwave-spacing-sm, 0.5rem);
+  font-size: var(--pubwave-font-size-sm, 0.875rem);
+}
+
+/* =====================================================
+   Dark Theme Support
+   ===================================================== */
+
+[data-theme='dark'] .pubwave-chart__placeholder {
+  background-color: var(--pubwave-hover-task, rgba(255, 255, 255, 0.05));
+}
+
+[data-theme='dark'] .pubwave-modal__container {
+  background-color: var(--pubwave-surface, #1e293b);
+}
+
+[data-theme='dark'] .pubwave-form__input,
+[data-theme='dark'] .pubwave-form__select {
+  background-color: var(--pubwave-surface, #0f172a);
+}
+
+[data-theme='dark'] .pubwave-form__dataset {
+  background-color: var(--pubwave-hover-task, rgba(255, 255, 255, 0.05));
+}

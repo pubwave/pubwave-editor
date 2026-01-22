@@ -61,10 +61,48 @@ const initialContent = {
       ],
     },
     {
-      type: 'image',
+      type: 'chart',
       attrs: {
-        src: chartBar,
-        alt: 'AI Technology Adoption Statistics',
+        data: {
+          type: 'bar',
+          data: {
+            labels: ['ML Models', 'Neural Nets', 'NLP Apps', 'CV', 'Robotics', 'Automation'],
+            datasets: [{
+              label: 'Adoption Rate (%)',
+              data: [85, 78, 65, 72, 55, 48],
+              backgroundColor: [
+                'rgba(99, 102, 241, 0.7)',
+                'rgba(139, 92, 246, 0.7)',
+                'rgba(236, 72, 153, 0.7)',
+                'rgba(59, 130, 246, 0.7)',
+                'rgba(14, 165, 233, 0.7)',
+                'rgba(234, 179, 8, 0.7)',
+              ],
+              borderColor: [
+                'rgba(99, 102, 241, 1)',
+                'rgba(139, 92, 246, 1)',
+                'rgba(236, 72, 153, 1)',
+                'rgba(59, 130, 246, 1)',
+                'rgba(14, 165, 233, 1)',
+                'rgba(234, 179, 8, 1)',
+              ],
+              borderWidth: 2,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'AI Technology Adoption Statistics',
+                color: 'var(--pubwave-text, #37352f)',
+                font: { size: 16, weight: '600' },
+              },
+              legend: { display: true, position: 'top' },
+            },
+          },
+        },
       },
     },
     {
@@ -89,10 +127,36 @@ const initialContent = {
       ],
     },
     {
-      type: 'image',
+      type: 'chart',
       attrs: {
-        src: chartLine,
-        alt: 'AI Model Performance Growth 2020-2027',
+        data: {
+          type: 'line',
+          data: {
+            labels: ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027'],
+            datasets: [{
+              label: 'Performance Score',
+              data: [45, 58, 68, 75, 82, 88, 92, 95],
+              backgroundColor: 'rgba(99, 102, 241, 0.2)',
+              borderColor: 'rgba(99, 102, 241, 1)',
+              borderWidth: 3,
+              tension: 0.4,
+              fill: true,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'AI Model Performance Growth 2020-2027',
+                color: 'var(--pubwave-text, #37352f)',
+                font: { size: 16, weight: '600' },
+              },
+              legend: { display: true, position: 'top' },
+            },
+          },
+        },
       },
     },
     {
@@ -314,10 +378,46 @@ const initialContent = {
       ],
     },
     {
-      type: 'image',
+      type: 'chart',
       attrs: {
-        src: chartPie,
-        alt: 'AI Application Distribution',
+        data: {
+          type: 'pie',
+          data: {
+            labels: ['Neural Networks', 'NLP Apps', 'Computer Vision', 'Robotics', 'Automation'],
+            datasets: [{
+              label: 'Distribution',
+              data: [30, 25, 20, 15, 10],
+              backgroundColor: [
+                'rgba(99, 102, 241, 0.7)',
+                'rgba(236, 72, 153, 0.7)',
+                'rgba(59, 130, 246, 0.7)',
+                'rgba(56, 189, 248, 0.7)',
+                'rgba(245, 87, 108, 0.7)',
+              ],
+              borderColor: [
+                'rgba(99, 102, 241, 1)',
+                'rgba(236, 72, 153, 1)',
+                'rgba(59, 130, 246, 1)',
+                'rgba(56, 189, 248, 1)',
+                'rgba(245, 87, 108, 1)',
+              ],
+              borderWidth: 2,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'AI Application Distribution',
+                color: 'var(--pubwave-text, #37352f)',
+                font: { size: 16, weight: '600' },
+              },
+              legend: { display: true, position: 'top' },
+            },
+          },
+        },
       },
     },
     {
@@ -382,42 +482,6 @@ const initialContent = {
             { type: 'text', text: ', and improves over time—just like human intelligence, but at scale.' },
           ],
         },
-      ],
-    },
-    {
-      type: 'heading',
-      attrs: { level: 2 },
-      content: [{ type: 'text', text: '📈 AI System Performance Dashboard' }],
-    },
-    {
-      type: 'paragraph',
-      content: [
-        { type: 'text', text: 'Here\'s a comprehensive overview of AI system performance metrics:' },
-      ],
-    },
-    {
-      type: 'image',
-      attrs: {
-        src: chartDashboard,
-        alt: 'AI System Performance Dashboard',
-      },
-    },
-    {
-      type: 'paragraph',
-      content: [
-        { type: 'text', text: 'The dashboard shows impressive numbers: ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '100+ models' },
-        { type: 'text', text: ' in production, ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '10M+ predictions' },
-        { type: 'text', text: ' made daily, ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '99%+ accuracy' },
-        { type: 'text', text: ' across all systems, and ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '50+ datasets' },
-        { type: 'text', text: ' for training. The system has processed ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '1M+ API calls' },
-        { type: 'text', text: ' and processed ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '10M+ tokens' },
-        { type: 'text', text: ' with excellent performance.' },
       ],
     },
     {
@@ -507,6 +571,13 @@ const initialContent = {
         { type: 'text', text: ' to create a better future for all. ' },
         { type: 'text', marks: [{ type: 'bold' }], text: 'The AI revolution is just beginning! 🚀' },
       ],
+    },
+    {
+      type: 'image',
+      attrs: {
+        src: chartDashboard,
+        alt: 'AI System Performance Dashboard',
+      },
     },
   ],
 };

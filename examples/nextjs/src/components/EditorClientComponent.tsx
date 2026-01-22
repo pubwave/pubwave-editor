@@ -1,16 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { PubwaveEditor } from '@pubwave/editor';
+import { PubwaveEditor } from '../../../../src/index';
 import type { EditorTheme, EditorLocale } from '@pubwave/editor';
 import type { JSONContent } from '@tiptap/core';
 import { PreviewModal } from './PreviewModal';
-import '@pubwave/editor/style.css';
+import '../../../../src/index.css';
 
 // Chart images as base64 (SVG converted to data URLs) - AI themed
-const chartBar = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHlsZT0iYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgI2Y4ZmFmYyAwJSwgI2ZmZmZmZiAxMDAlKTsiPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM2MzY2ZjEiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjOGI1Y2Y2Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZmZmZiIvPgo8dGV4dCB4PSI0MCIgeT0iMzUiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzFmMjkzNyI+QUkgVGVjaG5vbG9neSBBZG9wdGlvbiBTdGF0aXN0aWNzPC90ZXh0Pgo8cmVjdCB4PSI4MCIgeT0iMjgwIiB3aWR0aD0iODAiIGhlaWdodD0iMTAwIiBmaWxsPSJ1cmwoI2dyYWQpIiByeD0iNCIvPgo8dGV4dCB4PSIxMjAiIHk9IjM5NSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMWYyOTM3IiBmb250LXdlaWdodD0iNTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5NTCBNb2RlbHM8L3RleHQ+CjxyZWN0IHg9IjIwMCIgeT0iMjQwIiB3aWR0aD0iODAiIGhlaWdodD0iMTQwIiBmaWxsPSJ1cmwoI2dyYWQpIiByeD0iNCIvPgo8dGV4dCB4PSIyNDAiIHk9IjM5NSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMWYyOTM3IiBmb250LXdlaWdodD0iNTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5OZXVyYWwgTmV0czwvdGV4dD4KPHJlY3QgeD0iMzIwIiB5PSIyMjAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxNjAiIGZpbGw9InVybCgjZ3JhZCkiIHJ4PSI0Ii8+Cjx0ZXh0IHg9IjM2MCIgeT0iMzk1IiBmb250LWZhbWlseT0iLWFwcGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzFmMjkzNyIgZm9udC13ZWlnaHQ9IjUwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TkxQIEFwcHM8L3RleHQ+CjxyZWN0IHg9IjQ0MCIgeT0iMjAwIiB3aWR0aD0iODAiIGhlaWdodD0iMTgwIiBmaWxsPSJ1cmwoI2dyYWQpIiByeD0iNCIvPgo8dGV4dCB4PSI0ODAiIHk9IjM5NSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMWYyOTM3IiBmb250LXdlaWdodD0iNTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5DVjwvdGV4dD4KPHJlY3QgeD0iNTYwIiB5PSIyNjAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxMjAiIGZpbGw9InVybCgjZ3JhZCkiIHJ4PSI0Ii8+Cjx0ZXh0IHg9IjYwMCIgeT0iMzk1IiBmb250LWZhbWlseT0iLWFwcGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzFmMjkzNyIgZm9udC13ZWlnaHQ9IjUwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Um9ib3RpY3M8L3RleHQ+CjxyZWN0IHg9IjY4MCIgeT0iMjQwIiB3aWR0aD0iODAiIGhlaWdodD0iMTQwIiBmaWxsPSJ1cmwoI2dyYWQpIiByeD0iNCIvPgo8dGV4dCB4PSI3MjAiIHk9IjM5NSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMWYyOTM3IiBmb250LXdlaWdodD0iNTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5BdXRvbWF0aW9uPC90ZXh0Pgo8L3N2Zz4=';
-const chartLine = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHlsZT0iYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgI2Y4ZmFmYyAwJSwgI2ZmZmZmZiAxMDAlKTsiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM2MzY2ZjEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM4YjVjZjYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZmZmZmIi8+PHRleHQgeD0iNDAiIHk9IjM1IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiMxZjI5MzciPkFJIE1vZGVsIFBlcmZvcm1hbmNlIEdyb3d0aCAyMDIwLTIwMjQ8L3RleHQ+PHBhdGggZD0iTTgwIDMyMCBMMTYwIDI4MCBMMjQwIDI0MCBMMzIwIDIwMCBMNDAwIDE2MCBMNTIwIDE0MCBMNjQwIDEyMCBMNzIwIDEwMCIgc3Ryb2tlPSJ1cmwoI2dyYWQpIiBzdHJva2Utd2lkdGg9IjQiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjgwIiBjeT0iMzIwIiByPSI2IiBmaWxsPSIjNjM2NmYxIi8+PGNpcmNsZSBjeD0iMTYwIiBjeT0iMjgwIiByPSI2IiBmaWxsPSIjNjM2NmYxIi8+PGNpcmNsZSBjeD0iMjQwIiBjeT0iMjQwIiByPSI2IiBmaWxsPSIjNjM2NmYxIi8+PGNpcmNsZSBjeD0iMzIwIiBjeT0iMjAwIiByPSI2IiBmaWxsPSIjNjM2NmYxIi8+PGNpcmNsZSBjeD0iNDAwIiBjeT0iMTYwIiByPSI2IiBmaWxsPSIjNjM2NmYxIi8+PGNpcmNsZSBjeD0iNTIwIiBjeT0iMTQwIiByPSI2IiBmaWxsPSIjNjM2NmYxIi8+PGNpcmNsZSBjeD0iNjQwIiBjeT0iMTIwIiByPSI2IiBmaWxsPSIjNjM2NmYxIi8+PGNpcmNsZSBjeD0iNzIwIiBjeT0iMTAwIiByPSI2IiBmaWxsPSIjNjM2NmYxIi8+PHRleHQgeD0iODAiIHk9IjM2MCIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMWYyOTM3IiBmb250LXdlaWdodD0iNTAwIj4yMDIwPC90ZXh0Pjx0ZXh0IHg9IjE2MCIgeT0iMzYwIiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMxZjI5MzciIGZvbnQtd2VpZ2h0PSI1MDAiPjIwMjE8L3RleHQ+PHRleHQgeD0iMjQwIiB5PSIzNjAiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzFmMjkzNyIgZm9udC13ZWlnaHQ9IjUwMCI+MjAyMjwvdGV4dD48dGV4dCB4PSIzMjAiIHk9IjM2MCIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMWYyOTM3IiBmb250LXdlaWdodD0iNTAwIj4yMDIzPC90ZXh0Pjx0ZXh0IHg9IjQwMCIgeT0iMzYwIiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMxZjI5MzciIGZvbnQtd2VpZ2h0PSI1MDAiPjIwMjQ8L3RleHQ+PHRleHQgeD0iNTIwIiB5PSIzNjAiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzFmMjkzNyIgZm9udC13ZWlnaHQ9IjUwMCI+MjAyNTwvdGV4dD48dGV4dCB4PSI2NDAiIHk9IjM2MCIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMWYyOTM3IiBmb250LXdlaWdodD0iNTAwIj4yMDI2PC90ZXh0Pjx0ZXh0IHg9IjcyMCIgeT0iMzYwIiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMxZjI5MzciIGZvbnQtd2VpZ2h0PSI1MDAiPjIwMjc8L3RleHQ+PC9zdmc+';
-const chartPie = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHlsZT0iYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgI2Y4ZmFmYyAwJSwgI2ZmZmZmZiAxMDAlKTsiPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJncmFkMSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM2MzY2ZjEiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjOGI1Y2Y2Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZmZmZiIvPgo8dGV4dCB4PSI0MCIgeT0iMzUiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzFmMjkzNyI+QUkgQXBwbGljYXRpb24gRGlzdHJpYnV0aW9uPC90ZXh0Pgo8IS0tIE5ldXJhbCBOZXR3b3JrcyAzMCUgKDEwOCBkZWdyZWVzKSAtLT4KPHBhdGggZD0iTTIwMCAyMDAgTDIwMC4wIDEwMC4wIEExMDAgMTAwIDAgMCAxIDI5NS4xIDIzMC45IFoiIGZpbGw9InVybCgjZ3JhZDEpIi8+Cjx0ZXh0IHg9IjI0OC41IiB5PSIxNjQuNyIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj4zMCU8L3RleHQ+CjwhLS0gTkxQIEFwcGxpY2F0aW9ucyAyNSUgKDkwIGRlZ3JlZXMpIC0tPgo8cGF0aCBkPSJNMjAwIDIwMCBMMjk1LjEgMjMwLjkgQTEwMCAxMDAgMCAwIDEgMTY5LjEgMjk1LjEgWiIgZmlsbD0iI2VjNDg5OSIvPgo8dGV4dCB4PSIyMjcuMiIgeT0iMjUzLjUiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+MjUlPC90ZXh0Pgo8IS0tIENvbXB1dGVyIFZpc2lvbiAyMCUgKDcyIGRlZ3JlZXMpIC0tPgo8cGF0aCBkPSJNMjAwIDIwMCBMMTY5LjEgMjk1LjEgQTEwMCAxMDAgMCAwIDEgMTAwLjAgMjAwLjAgWiIgZmlsbD0iIzNiODJmNiIvPgo8dGV4dCB4PSIxNTEuNSIgeT0iMjM1LjMiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+MjAlPC90ZXh0Pgo8IS0tIFJvYm90aWNzIDE1JSAoNTQgZGVncmVlcykgLS0+CjxwYXRoIGQ9Ik0yMDAgMjAwIEwxMDAuMCAyMDAuMCBBMTAwIDEwMCAwIDAgMSAxNDEuMiAxMTkuMSBaIiBmaWxsPSIjMzhiZGY4Ii8+Cjx0ZXh0IHg9IjE0Ni41IiB5PSIxNzIuOCIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj4xNSU8L3RleHQ+CjwhLS0gQXV0b21hdGlvbiAxMCUgKDM2IGRlZ3JlZXMpIC0tPgo8cGF0aCBkPSJNMjAwIDIwMCBMMTQxLjIgMTE5LjEgQTEwMCAxMDAgMCAwIDEgMjAwLjAgMTAwLjAgWiIgZmlsbD0iI2Y1NTc2YyIvPgo8dGV4dCB4PSIxODEuNSIgeT0iMTQyLjkiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+MTAlPC90ZXh0Pgo8IS0tIExlZ2VuZCAtLT4KPHJlY3QgeD0iNTAwIiB5PSIxMjAiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgZmlsbD0idXJsKCNncmFkMSkiIHJ4PSIyIi8+Cjx0ZXh0IHg9IjUyMCIgeT0iMTMwIiBmb250LWZhbWlseT0iLWFwcGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzFmMjkzNyI+TmV1cmFsIE5ldHdvcmtzPC90ZXh0Pgo8cmVjdCB4PSI1MDAiIHk9IjE1MCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiBmaWxsPSIjZWM0ODk5IiByeD0iMiIvPgo8dGV4dCB4PSI1MjAiIHk9IjE2MCIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMWYyOTM3Ij5OTFAgQXBwbGljYXRpb25zPC90ZXh0Pgo8cmVjdCB4PSI1MDAiIHk9IjE4MCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiBmaWxsPSIjM2I4MmY2IiByeD0iMiIvPgo8dGV4dCB4PSI1MjAiIHk9IjE5MCIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMWYyOTM3Ij5Db21wdXRlciBWaXNpb248L3RleHQ+CjxyZWN0IHg9IjUwMCIgeT0iMjEwIiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIGZpbGw9IiMzOGJkZjgiIHJ4PSIyIi8+Cjx0ZXh0IHg9IjUyMCIgeT0iMjIwIiBmb250LWZhbWlseT0iLWFwcGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzFmMjkzNyI+Um9ib3RpY3M8L3RleHQ+CjxyZWN0IHg9IjUwMCIgeT0iMjQwIiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIGZpbGw9IiNmNTU3NmMiIHJ4PSIyIi8+Cjx0ZXh0IHg9IjUyMCIgeT0iMjUwIiBmb250LWZhbWlseT0iLWFwcGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzFmMjkzNyI+QXV0b21hdGlvbjwvdGV4dD4KPC9zdmc+';
 const chartDashboard = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHlsZT0iYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgI2Y4ZmFmYyAwJSwgI2ZmZmZmZiAxMDAlKTsiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM2MzY2ZjEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM4YjVjZjYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZmZmZmIi8+PHRleHQgeD0iNDAiIHk9IjM1IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiMxZjI5MzciPkFJIFN5c3RlbSBQZXJmb3JtYW5jZSBEYXNoYm9hcmQ8L3RleHQ+PHJlY3QgeD0iNDAiIHk9IjgwIiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjEyMCIgZmlsbD0idXJsKCNncmFkKSIgcng9IjgiLz48dGV4dCB4PSI1MCIgeT0iMTEwIiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiNmZmZmZmYiPjEwMCs8L3RleHQ+PHRleHQgeD0iNTAiIHk9IjEzNSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjkiPk1vZGVsczwvdGV4dD48cmVjdCB4PSIyNjAiIHk9IjgwIiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iI2VjNDg5OSIgcng9IjgiLz48dGV4dCB4PSIyNzAiIHk9IjExMCIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmaWxsPSIjZmZmZmZmIj4xME0rPC90ZXh0Pjx0ZXh0IHg9IjI3MCIgeT0iMTM1IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOSI+UHJlZGljdGlvbnM8L3RleHQ+PHJlY3QgeD0iNDgwIiB5PSI4MCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxMjAiIGZpbGw9IiMzYjgyZjYiIHJ4PSI4Ii8+PHRleHQgeD0iNDkwIiB5PSIxMTAiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2ZmZmZmZiI+OTklKzwvdGV4dD48dGV4dCB4PSI0OTAiIHk9IjEzNSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjkiPkFjY3VyYWN5PC90ZXh0PjxyZWN0IHg9IjQwIiB5PSIyMjAiIHdpZHRoPSIxODAiIGhlaWdodD0iMTIwIiBmaWxsPSIjMzhiZGY4IiByeD0iOCIvPjx0ZXh0IHg9IjUwIiB5PSIyNTAiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2ZmZmZmZiI+NTArPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSIyNzUiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC45Ij5EYXRhc2V0czwvdGV4dD48cmVjdCB4PSIyNjAiIHk9IjIyMCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxMjAiIGZpbGw9IiNmNTU3NmMiIHJ4PSI4Ii8+PHRleHQgeD0iMjcwIiB5PSIyNTAiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2ZmZmZmZiI+MU0rPC90ZXh0Pjx0ZXh0IHg9IjI3MCIgeT0iMjc1IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOSI+QVBJIENhbGxzPC90ZXh0PjxyZWN0IHg9IjQ4MCIgeT0iMjIwIiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iI2Y1NTc2YyIgcng9IjgiLz48dGV4dCB4PSI0OTAiIHk9IjI1MCIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmaWxsPSIjZmZmZmZmIj4xME0rPC90ZXh0Pjx0ZXh0IHg9IjQ5MCIgeT0iMjc1IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOSI+VG9rZW5zPC90ZXh0Pjwvc3ZnPg==';
 
 // Initial content for the editor - AI themed showcase
@@ -62,10 +59,48 @@ const initialContent = {
       ],
     },
     {
-      type: 'image',
+      type: 'chart',
       attrs: {
-        src: chartBar,
-        alt: 'AI Technology Adoption Statistics',
+        data: {
+          type: 'bar',
+          data: {
+            labels: ['ML Models', 'Neural Nets', 'NLP Apps', 'CV', 'Robotics', 'Automation'],
+            datasets: [{
+              label: 'Adoption Rate (%)',
+              data: [85, 78, 65, 72, 55, 48],
+              backgroundColor: [
+                'rgba(99, 102, 241, 0.7)',
+                'rgba(139, 92, 246, 0.7)',
+                'rgba(236, 72, 153, 0.7)',
+                'rgba(59, 130, 246, 0.7)',
+                'rgba(14, 165, 233, 0.7)',
+                'rgba(234, 179, 8, 0.7)',
+              ],
+              borderColor: [
+                'rgba(99, 102, 241, 1)',
+                'rgba(139, 92, 246, 1)',
+                'rgba(236, 72, 153, 1)',
+                'rgba(59, 130, 246, 1)',
+                'rgba(14, 165, 233, 1)',
+                'rgba(234, 179, 8, 1)',
+              ],
+              borderWidth: 2,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'AI Technology Adoption Statistics',
+                color: 'var(--pubwave-text, #37352f)',
+                font: { size: 16, weight: '600' },
+              },
+              legend: { display: true, position: 'top' },
+            },
+          },
+        },
       },
     },
     {
@@ -90,10 +125,36 @@ const initialContent = {
       ],
     },
     {
-      type: 'image',
+      type: 'chart',
       attrs: {
-        src: chartLine,
-        alt: 'AI Model Performance Growth 2020-2027',
+        data: {
+          type: 'line',
+          data: {
+            labels: ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027'],
+            datasets: [{
+              label: 'Performance Score',
+              data: [45, 58, 68, 75, 82, 88, 92, 95],
+              backgroundColor: 'rgba(99, 102, 241, 0.2)',
+              borderColor: 'rgba(99, 102, 241, 1)',
+              borderWidth: 3,
+              tension: 0.4,
+              fill: true,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'AI Model Performance Growth 2020-2027',
+                color: 'var(--pubwave-text, #37352f)',
+                font: { size: 16, weight: '600' },
+              },
+              legend: { display: true, position: 'top' },
+            },
+          },
+        },
       },
     },
     {
@@ -315,10 +376,46 @@ const initialContent = {
       ],
     },
     {
-      type: 'image',
+      type: 'chart',
       attrs: {
-        src: chartPie,
-        alt: 'AI Application Distribution',
+        data: {
+          type: 'pie',
+          data: {
+            labels: ['Neural Networks', 'NLP Apps', 'Computer Vision', 'Robotics', 'Automation'],
+            datasets: [{
+              label: 'Distribution',
+              data: [30, 25, 20, 15, 10],
+              backgroundColor: [
+                'rgba(99, 102, 241, 0.7)',
+                'rgba(236, 72, 153, 0.7)',
+                'rgba(59, 130, 246, 0.7)',
+                'rgba(56, 189, 248, 0.7)',
+                'rgba(245, 87, 108, 0.7)',
+              ],
+              borderColor: [
+                'rgba(99, 102, 241, 1)',
+                'rgba(236, 72, 153, 1)',
+                'rgba(59, 130, 246, 1)',
+                'rgba(56, 189, 248, 1)',
+                'rgba(245, 87, 108, 1)',
+              ],
+              borderWidth: 2,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'AI Application Distribution',
+                color: 'var(--pubwave-text, #37352f)',
+                font: { size: 16, weight: '600' },
+              },
+              legend: { display: true, position: 'top' },
+            },
+          },
+        },
       },
     },
     {
@@ -383,42 +480,6 @@ const initialContent = {
             { type: 'text', text: ', and improves over time—just like human intelligence, but at scale.' },
           ],
         },
-      ],
-    },
-    {
-      type: 'heading',
-      attrs: { level: 2 },
-      content: [{ type: 'text', text: '📈 AI System Performance Dashboard' }],
-    },
-    {
-      type: 'paragraph',
-      content: [
-        { type: 'text', text: 'Here\'s a comprehensive overview of AI system performance metrics:' },
-      ],
-    },
-    {
-      type: 'image',
-      attrs: {
-        src: chartDashboard,
-        alt: 'AI System Performance Dashboard',
-      },
-    },
-    {
-      type: 'paragraph',
-      content: [
-        { type: 'text', text: 'The dashboard shows impressive numbers: ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '100+ models' },
-        { type: 'text', text: ' in production, ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '10M+ predictions' },
-        { type: 'text', text: ' made daily, ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '99%+ accuracy' },
-        { type: 'text', text: ' across all systems, and ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '50+ datasets' },
-        { type: 'text', text: ' for training. The system has processed ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '1M+ API calls' },
-        { type: 'text', text: ' and processed ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: '10M+ tokens' },
-        { type: 'text', text: ' with excellent performance.' },
       ],
     },
     {
@@ -508,6 +569,13 @@ const initialContent = {
         { type: 'text', text: ' to create a better future for all. ' },
         { type: 'text', marks: [{ type: 'bold' }], text: 'The AI revolution is just beginning! 🚀' },
       ],
+    },
+    {
+      type: 'image',
+      attrs: {
+        src: chartDashboard,
+        alt: 'AI System Performance Dashboard',
+      },
     },
   ],
 };

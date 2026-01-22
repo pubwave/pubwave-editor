@@ -11,16 +11,17 @@ import type { JSONContent } from '@tiptap/core';
 /**
  * Supported block types in the editor
  */
-export type BlockType = 
-  | 'paragraph' 
-  | 'heading' 
-  | 'bulletList' 
-  | 'orderedList' 
+export type BlockType =
+  | 'paragraph'
+  | 'heading'
+  | 'bulletList'
+  | 'orderedList'
   | 'taskList'
   | 'blockquote'
   | 'codeBlock'
   | 'horizontalRule'
-  | 'image';
+  | 'image'
+  | 'chart';
 
 /**
  * Supported mark types for inline formatting

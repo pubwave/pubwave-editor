@@ -23,6 +23,7 @@ import CodeBlock from '@tiptap/extension-code-block';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import HardBreak from '@tiptap/extension-hard-break';
 import Image from '@tiptap/extension-image';
+import { Chart } from './chart';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import type { ImageUploadConfig } from '../../types/editor';
 
@@ -221,6 +222,13 @@ export function createBlockExtensions(
         class: 'pubwave-editor__image',
       },
     }),
+
+    // Chart with Chart.js
+    Chart.configure({
+      HTMLAttributes: {
+        class: 'pubwave-editor__chart',
+      },
+    }),
   ] as Extension[];
 }
 
@@ -239,6 +247,7 @@ export const BLOCK_TYPES = {
   CODE_BLOCK: 'codeBlock',
   HORIZONTAL_RULE: 'horizontalRule',
   IMAGE: 'image',
+  CHART: 'chart',
   DOCUMENT: 'doc',
   TEXT: 'text',
 } as const;
