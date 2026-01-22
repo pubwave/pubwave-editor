@@ -4,7 +4,8 @@
       "basic": "Basic",
       "list": "Lists",
       "media": "Media",
-      "advanced": "Advanced"
+      "advanced": "Advanced",
+      "layout": "Layout"
     },
     "commands": {
       "paragraph": {
@@ -50,6 +51,14 @@
       "horizontalRule": {
         "title": "Divider",
         "description": "Create a horizontal line"
+      },
+      "layoutTwoColumn": {
+        "title": "Two Column Layout",
+        "description": "Split content into two side-by-side columns"
+      },
+      "layoutThreeColumn": {
+        "title": "Three Column Layout",
+        "description": "Split content into three side-by-side columns"
       }
     }
   },
@@ -110,6 +119,46 @@
     "linkClearButton": "Clear link input"
   },
   "placeholder": "Write, type \"/\" for commands...",
-  "linkPlaceholder": "Paste a link..."
+  "linkPlaceholder": "Paste a link...",
+  "chart": {
+    "modal": {
+      "title": "Edit Chart",
+      "close": "Close",
+      "save": "Save",
+      "cancel": "Cancel",
+      "fields": {
+        "chartType": "Chart Type",
+        "title": "Title",
+        "titlePlaceholder": "Chart title...",
+        "showLegend": "Show Legend",
+        "legendPosition": "Position",
+        "position": {
+          "top": "Top",
+          "bottom": "Bottom",
+          "left": "Left",
+          "right": "Right"
+        },
+        "labels": "Labels (comma-separated)",
+        "labelsPlaceholder": "Jan, Feb, Mar, Apr...",
+        "datasets": {
+          "title": "Datasets",
+          "add": "+ Add Dataset",
+          "remove": "Remove",
+          "datasetLabel": "Dataset",
+          "datasetLabelPlaceholder": "Dataset label...",
+          "data": "Data (comma-separated numbers)",
+          "dataPlaceholder": "10, 20, 30, 40..."
+        }
+      }
+    },
+    "chartTypes": {
+      "bar": "Bar Chart",
+      "line": "Line Chart",
+      "pie": "Pie Chart",
+      "doughnut": "Doughnut Chart",
+      "radar": "Radar Chart",
+      "polarArea": "Polar Area Chart"
+    }
+  }
 }
 

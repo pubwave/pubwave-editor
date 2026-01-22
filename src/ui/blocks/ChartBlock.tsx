@@ -15,6 +15,7 @@ import type { NodeViewProps } from '@tiptap/react';
 import type { Chart } from 'chart.js';
 import { ChartEditorModal } from './ChartEditorModal';
 import type { ChartNodeData, PubwaveChartType } from './chartTypes';
+import { useLocale } from '../LocaleContext';
 
 // Lazy load Chart.js to avoid requiring it as a hard dependency
 const loadChartJs = async (): Promise<typeof import('chart.js/auto')> => {
@@ -53,6 +54,7 @@ export function ChartBlock(props: NodeViewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const chartJsRef = useRef<typeof import('chart.js/auto').default | null>(null);
+  const locale = useLocale();
 
   // Determine if editor is editable
   const editable = editor?.options?.editable ?? true;
@@ -352,6 +354,7 @@ export function ChartBlock(props: NodeViewProps) {
           initialData={chartData}
           onSave={handleSave}
           onCancel={handleCancel}
+          locale={locale}
         />
       )}
     </NodeViewWrapper>

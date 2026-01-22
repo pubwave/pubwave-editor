@@ -4,7 +4,8 @@
       "basic": "기본",
       "list": "목록",
       "media": "미디어",
-      "advanced": "고급"
+      "advanced": "고급",
+      "layout": "레이아웃"
     },
     "commands": {
       "paragraph": {
@@ -50,6 +51,14 @@
       "horizontalRule": {
         "title": "구분선",
         "description": "수평선 만들기"
+      },
+      "layoutTwoColumn": {
+        "title": "2열 레이아웃",
+        "description": "콘텐츠를 두 개의 나란히 있는 열로 분할"
+      },
+      "layoutThreeColumn": {
+        "title": "3열 레이아웃",
+        "description": "콘텐츠를 세 개의 나란히 있는 열로 분할"
       }
     }
   },
@@ -110,6 +119,46 @@
     "linkClearButton": "링크 입력 지우기"
   },
   "placeholder": "작성 시작, 명령을 표시하려면 \"/\" 입력...",
-  "linkPlaceholder": "링크 붙여넣기..."
+  "linkPlaceholder": "링크 붙여넣기...",
+  "chart": {
+    "modal": {
+      "title": "차트 편집",
+      "close": "닫기",
+      "save": "저장",
+      "cancel": "취소",
+      "fields": {
+        "chartType": "차트 유형",
+        "title": "제목",
+        "titlePlaceholder": "차트 제목...",
+        "showLegend": "범례 표시",
+        "legendPosition": "위치",
+        "position": {
+          "top": "위",
+          "bottom": "아래",
+          "left": "왼쪽",
+          "right": "오른쪽"
+        },
+        "labels": "레이블(쉼표로 구분)",
+        "labelsPlaceholder": "1월, 2월, 3월, 4월...",
+        "datasets": {
+          "title": "데이터 세트",
+          "add": "+ 데이터 세트 추가",
+          "remove": "제거",
+          "datasetLabel": "레이블",
+          "datasetLabelPlaceholder": "데이터 세트 레이블...",
+          "data": "데이터(쉼표로 구분된 숫자)",
+          "dataPlaceholder": "10, 20, 30, 40..."
+        }
+      }
+    },
+    "chartTypes": {
+      "bar": "막대형 차트",
+      "line": "선형 차트",
+      "pie": "원형 차트",
+      "doughnut": "도넛형 차트",
+      "radar": "레이더 차트",
+      "polarArea": "극좌표형 차트"
+    }
+  }
 }
 

@@ -4,7 +4,8 @@
       "basic": "Basis",
       "list": "Listen",
       "media": "Medien",
-      "advanced": "Erweitert"
+      "advanced": "Erweitert",
+      "layout": "Layout"
     },
     "commands": {
       "paragraph": {
@@ -50,6 +51,14 @@
       "horizontalRule": {
         "title": "Trennlinie",
         "description": "Horizontale Linie erstellen"
+      },
+      "layoutTwoColumn": {
+        "title": "Zweispaltiges Layout",
+        "description": "Inhalt in zwei nebeneinander liegende Spalten aufteilen"
+      },
+      "layoutThreeColumn": {
+        "title": "Dreispaltiges Layout",
+        "description": "Inhalt in drei nebeneinander liegende Spalten aufteilen"
       }
     }
   },
@@ -110,6 +119,46 @@
     "linkClearButton": "Link-Eingabe löschen"
   },
   "placeholder": "Schreiben, tippen Sie \"/\" für Befehle...",
-  "linkPlaceholder": "Link einfügen..."
+  "linkPlaceholder": "Link einfügen...",
+  "chart": {
+    "modal": {
+      "title": "Chart bearbeiten",
+      "close": "Schließen",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "fields": {
+        "chartType": "Chart-Typ",
+        "title": "Titel",
+        "titlePlaceholder": "Chart-Titel...",
+        "showLegend": "Legende anzeigen",
+        "legendPosition": "Position",
+        "position": {
+          "top": "Oben",
+          "bottom": "Unten",
+          "left": "Links",
+          "right": "Rechts"
+        },
+        "labels": "Beschriftungen (kommagetrennt)",
+        "labelsPlaceholder": "Jan, Feb, Mär, Apr...",
+        "datasets": {
+          "title": "Datensätze",
+          "add": "+ Datensatz hinzufügen",
+          "remove": "Entfernen",
+          "datasetLabel": "Datensatz",
+          "datasetLabelPlaceholder": "Datensatz-Beschriftung...",
+          "data": "Daten (kommagetrennte Zahlen)",
+          "dataPlaceholder": "10, 20, 30, 40..."
+        }
+      }
+    },
+    "chartTypes": {
+      "bar": "Balkendiagramm",
+      "line": "Liniendiagramm",
+      "pie": "Kreisdiagramm",
+      "doughnut": "Ringdiagramm",
+      "radar": "Netzdiagramm",
+      "polarArea": "Polärfächen-Diagramm"
+    }
+  }
 }
 

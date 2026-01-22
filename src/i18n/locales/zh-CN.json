@@ -4,7 +4,8 @@
       "basic": "基础",
       "list": "列表",
       "media": "媒体",
-      "advanced": "高级"
+      "advanced": "高级",
+      "layout": "版面布局"
     },
     "commands": {
       "paragraph": {
@@ -50,6 +51,14 @@
       "horizontalRule": {
         "title": "分割线",
         "description": "创建水平分割线"
+      },
+      "layoutTwoColumn": {
+        "title": "两栏布局",
+        "description": "将内容分成两个并排的栏"
+      },
+      "layoutThreeColumn": {
+        "title": "三栏布局",
+        "description": "将内容分成三个并排的栏"
       }
     }
   },
@@ -110,6 +119,46 @@
     "linkClearButton": "清空链接输入"
   },
   "placeholder": "开始写作，输入 \"/\" 显示命令...",
-  "linkPlaceholder": "粘贴链接..."
+  "linkPlaceholder": "粘贴链接...",
+  "chart": {
+    "modal": {
+      "title": "编辑图表",
+      "close": "关闭",
+      "save": "保存",
+      "cancel": "取消",
+      "fields": {
+        "chartType": "图表类型",
+        "title": "标题",
+        "titlePlaceholder": "图表标题...",
+        "showLegend": "显示图例",
+        "legendPosition": "位置",
+        "position": {
+          "top": "顶部",
+          "bottom": "底部",
+          "left": "左侧",
+          "right": "右侧"
+        },
+        "labels": "标签（逗号分隔）",
+        "labelsPlaceholder": "一月, 二月, 三月, 四月...",
+        "datasets": {
+          "title": "数据集",
+          "add": "+ 添加数据集",
+          "remove": "移除",
+          "datasetLabel": "标签",
+          "datasetLabelPlaceholder": "数据集标签...",
+          "data": "数据（逗号分隔的数字）",
+          "dataPlaceholder": "10, 20, 30, 40..."
+        }
+      }
+    },
+    "chartTypes": {
+      "bar": "柱状图",
+      "line": "折线图",
+      "pie": "饼图",
+      "doughnut": "环形图",
+      "radar": "雷达图",
+      "polarArea": "极地图"
+    }
+  }
 }
 

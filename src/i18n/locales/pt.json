@@ -4,7 +4,8 @@
       "basic": "Básico",
       "list": "Listas",
       "media": "Mídia",
-      "advanced": "Avançado"
+      "advanced": "Avançado",
+      "layout": "Layout"
     },
     "commands": {
       "paragraph": {
@@ -50,6 +51,14 @@
       "horizontalRule": {
         "title": "Divisor",
         "description": "Criar uma linha horizontal"
+      },
+      "layoutTwoColumn": {
+        "title": "Layout de duas colunas",
+        "description": "Dividir o conteúdo em duas colunas lado a lado"
+      },
+      "layoutThreeColumn": {
+        "title": "Layout de três colunas",
+        "description": "Dividir o conteúdo em três colunas lado a lado"
       }
     }
   },
@@ -110,6 +119,46 @@
     "linkClearButton": "Limpar entrada de link"
   },
   "placeholder": "Escreva, digite \"/\" para comandos...",
-  "linkPlaceholder": "Cole um link..."
+  "linkPlaceholder": "Cole um link...",
+  "chart": {
+    "modal": {
+      "title": "Editar gráfico",
+      "close": "Fechar",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "fields": {
+        "chartType": "Tipo de gráfico",
+        "title": "Título",
+        "titlePlaceholder": "Título do gráfico...",
+        "showLegend": "Mostrar legenda",
+        "legendPosition": "Posição",
+        "position": {
+          "top": "Superior",
+          "bottom": "Inferior",
+          "left": "Esquerda",
+          "right": "Direita"
+        },
+        "labels": "Rótulos (separados por vírgula)",
+        "labelsPlaceholder": "Jan, Fev, Mar, Abr...",
+        "datasets": {
+          "title": "Conjuntos de dados",
+          "add": "+ Adicionar conjunto de dados",
+          "remove": "Remover",
+          "datasetLabel": "Rótulo",
+          "datasetLabelPlaceholder": "Rótulo do conjunto de dados...",
+          "data": "Dados (números separados por vírgula)",
+          "dataPlaceholder": "10, 20, 30, 40..."
+        }
+      }
+    },
+    "chartTypes": {
+      "bar": "Gráfico de barras",
+      "line": "Gráfico de linhas",
+      "pie": "Gráfico de pizza",
+      "doughnut": "Gráfico de rosca",
+      "radar": "Gráfico de radar",
+      "polarArea": "Gráfico de área polar"
+    }
+  }
 }
 

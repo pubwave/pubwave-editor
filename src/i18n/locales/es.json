@@ -4,7 +4,8 @@
       "basic": "Básico",
       "list": "Listas",
       "media": "Medios",
-      "advanced": "Avanzado"
+      "advanced": "Avanzado",
+      "layout": "Diseño"
     },
     "commands": {
       "paragraph": {
@@ -50,6 +51,14 @@
       "horizontalRule": {
         "title": "Divisor",
         "description": "Crear una línea horizontal"
+      },
+      "layoutTwoColumn": {
+        "title": "Diseño de dos columnas",
+        "description": "Dividir el contenido en dos columnas una al lado de la otra"
+      },
+      "layoutThreeColumn": {
+        "title": "Diseño de tres columnas",
+        "description": "Dividir el contenido en tres columnas una al lado de la otra"
       }
     }
   },
@@ -110,6 +119,46 @@
     "linkClearButton": "Limpiar entrada de enlace"
   },
   "placeholder": "Escribe, escribe \"/\" para comandos...",
-  "linkPlaceholder": "Pegue un enlace..."
+  "linkPlaceholder": "Pegue un enlace...",
+  "chart": {
+    "modal": {
+      "title": "Editar gráfico",
+      "close": "Cerrar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "fields": {
+        "chartType": "Tipo de gráfico",
+        "title": "Título",
+        "titlePlaceholder": "Título del gráfico...",
+        "showLegend": "Mostrar leyenda",
+        "legendPosition": "Posición",
+        "position": {
+          "top": "Arriba",
+          "bottom": "Abajo",
+          "left": "Izquierda",
+          "right": "Derecha"
+        },
+        "labels": "Etiquetas (separadas por comas)",
+        "labelsPlaceholder": "Ene, Feb, Mar, Abr...",
+        "datasets": {
+          "title": "Conjuntos de datos",
+          "add": "+ Añadir conjunto de datos",
+          "remove": "Eliminar",
+          "datasetLabel": "Etiqueta",
+          "datasetLabelPlaceholder": "Etiqueta del conjunto de datos...",
+          "data": "Datos (números separados por comas)",
+          "dataPlaceholder": "10, 20, 30, 40..."
+        }
+      }
+    },
+    "chartTypes": {
+      "bar": "Gráfico de barras",
+      "line": "Gráfico de líneas",
+      "pie": "Gráfico circular",
+      "doughnut": "Gráfico de anillo",
+      "radar": "Gráfico radar",
+      "polarArea": "Gráfico de área polar"
+    }
+  }
 }
 

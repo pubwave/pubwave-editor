@@ -35,6 +35,7 @@ export function createSlashCommandsExtension(
     list: 'Lists',
     media: 'Media',
     advanced: 'Advanced',
+    layout: 'Layout',
   };
 
   return Extension.create({
@@ -89,7 +90,24 @@ export function createSlashCommandsExtension(
               return true;
             }
           },
-          items: ({ query }: { query: string }) => filterCommands(finalCommands, query),
+          items: ({ query, state }: { query: string; state: any }) => {
+            // Filter out layout commands if we're inside a layoutColumn
+            let filteredCommands = finalCommands;
+            try {
+              const $pos = state.doc.resolve(state.selection.from);
+              for (let d = $pos.depth; d >= 0; d--) {
+                const node = $pos.node(d);
+                if (node.type.name === 'layoutColumn') {
+                  // We're inside a layout column, filter out layout commands
+                  filteredCommands = finalCommands.filter(cmd => cmd.group !== 'layout');
+                  break;
+                }
+              }
+            } catch (e) {
+              // If resolution fails, use all commands
+            }
+            return filterCommands(filteredCommands, query);
+          },
           render: () => {
             let component: ReactRenderer<
               { onKeyDown: (props: SuggestionKeyDownProps) => boolean },

@@ -4,7 +4,8 @@
       "basic": "De base",
       "list": "Listes",
       "media": "Médias",
-      "advanced": "Avancé"
+      "advanced": "Avancé",
+      "layout": "Mise en page"
     },
     "commands": {
       "paragraph": {
@@ -50,6 +51,14 @@
       "horizontalRule": {
         "title": "Séparateur",
         "description": "Créer une ligne horizontale"
+      },
+      "layoutTwoColumn": {
+        "title": "Mise en page à deux colonnes",
+        "description": "Diviser le contenu en deux colonnes côte à côte"
+      },
+      "layoutThreeColumn": {
+        "title": "Mise en page à trois colonnes",
+        "description": "Diviser le contenu en trois colonnes côte à côte"
       }
     }
   },
@@ -110,6 +119,46 @@
     "linkClearButton": "Effacer la saisie du lien"
   },
   "placeholder": "Écrivez, tapez \"/\" pour afficher les commandes...",
-  "linkPlaceholder": "Collez un lien..."
+  "linkPlaceholder": "Collez un lien...",
+  "chart": {
+    "modal": {
+      "title": "Modifier le graphique",
+      "close": "Fermer",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "fields": {
+        "chartType": "Type de graphique",
+        "title": "Titre",
+        "titlePlaceholder": "Titre du graphique...",
+        "showLegend": "Afficher la légende",
+        "legendPosition": "Position",
+        "position": {
+          "top": "Haut",
+          "bottom": "Bas",
+          "left": "Gauche",
+          "right": "Droite"
+        },
+        "labels": "Étiquettes (séparées par des virgules)",
+        "labelsPlaceholder": "Jan, Fév, Mar, Avr...",
+        "datasets": {
+          "title": "Jeux de données",
+          "add": "+ Ajouter un jeu de données",
+          "remove": "Supprimer",
+          "datasetLabel": "Étiquette",
+          "datasetLabelPlaceholder": "Étiquette du jeu de données...",
+          "data": "Données (nombres séparés par des virgules)",
+          "dataPlaceholder": "10, 20, 30, 40..."
+        }
+      }
+    },
+    "chartTypes": {
+      "bar": "Graphique à barres",
+      "line": "Graphique linéaire",
+      "pie": "Graphique circulaire",
+      "doughnut": "Graphique en anneau",
+      "radar": "Graphique radar",
+      "polarArea": "Graphique en coordonnées polaires"
+    }
+  }
 }
 

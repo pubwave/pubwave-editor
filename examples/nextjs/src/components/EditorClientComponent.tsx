@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { PubwaveEditor } from '../../../../src/index';
+import { PubwaveEditor } from '@pubwave/editor';
 import type { EditorTheme, EditorLocale } from '@pubwave/editor';
 import type { JSONContent } from '@tiptap/core';
 import { PreviewModal } from './PreviewModal';
-import '../../../../src/index.css';
+import '@pubwave/editor/style.css';
 
 // Chart images as base64 (SVG converted to data URLs) - AI themed
 const chartDashboard = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHlsZT0iYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgI2Y4ZmFmYyAwJSwgI2ZmZmZmZiAxMDAlKTsiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM2MzY2ZjEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM4YjVjZjYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZmZmZmIi8+PHRleHQgeD0iNDAiIHk9IjM1IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiMxZjI5MzciPkFJIFN5c3RlbSBQZXJmb3JtYW5jZSBEYXNoYm9hcmQ8L3RleHQ+PHJlY3QgeD0iNDAiIHk9IjgwIiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjEyMCIgZmlsbD0idXJsKCNncmFkKSIgcng9IjgiLz48dGV4dCB4PSI1MCIgeT0iMTEwIiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiNmZmZmZmYiPjEwMCs8L3RleHQ+PHRleHQgeD0iNTAiIHk9IjEzNSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjkiPk1vZGVsczwvdGV4dD48cmVjdCB4PSIyNjAiIHk9IjgwIiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iI2VjNDg5OSIgcng9IjgiLz48dGV4dCB4PSIyNzAiIHk9IjExMCIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmaWxsPSIjZmZmZmZmIj4xME0rPC90ZXh0Pjx0ZXh0IHg9IjI3MCIgeT0iMTM1IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOSI+UHJlZGljdGlvbnM8L3RleHQ+PHJlY3QgeD0iNDgwIiB5PSI4MCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxMjAiIGZpbGw9IiMzYjgyZjYiIHJ4PSI4Ii8+PHRleHQgeD0iNDkwIiB5PSIxMTAiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2ZmZmZmZiI+OTklKzwvdGV4dD48dGV4dCB4PSI0OTAiIHk9IjEzNSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjkiPkFjY3VyYWN5PC90ZXh0PjxyZWN0IHg9IjQwIiB5PSIyMjAiIHdpZHRoPSIxODAiIGhlaWdodD0iMTIwIiBmaWxsPSIjMzhiZGY4IiByeD0iOCIvPjx0ZXh0IHg9IjUwIiB5PSIyNTAiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2ZmZmZmZiI+NTArPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSIyNzUiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC45Ij5EYXRhc2V0czwvdGV4dD48cmVjdCB4PSIyNjAiIHk9IjIyMCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxMjAiIGZpbGw9IiNmNTU3NmMiIHJ4PSI4Ii8+PHRleHQgeD0iMjcwIiB5PSIyNTAiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2ZmZmZmZiI+MU0rPC90ZXh0Pjx0ZXh0IHg9IjI3MCIgeT0iMjc1IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOSI+QVBJIENhbGxzPC90ZXh0PjxyZWN0IHg9IjQ4MCIgeT0iMjIwIiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iI2Y1NTc2YyIgcng9IjgiLz48dGV4dCB4PSI0OTAiIHk9IjI1MCIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBPeHlnZW4sIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmaWxsPSIjZmZmZmZmIj4xME0rPC90ZXh0Pjx0ZXh0IHg9IjQ5MCIgeT0iMjc1IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbiwgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOSI+VG9rZW5zPC90ZXh0Pjwvc3ZnPg==';
@@ -50,119 +50,131 @@ const initialContent = {
     {
       type: 'heading',
       attrs: { level: 2 },
-      content: [{ type: 'text', text: '📊 AI Technology Adoption Statistics' }],
+      content: [{ type: 'text', text: '📊 AI Analytics Dashboard' }],
     },
     {
       type: 'paragraph',
       content: [
-        { type: 'text', text: 'The chart below shows the adoption rates of different AI technologies across industries:' },
+        { type: 'text', text: 'The charts below show AI technology adoption rates and model performance growth:' },
       ],
     },
     {
-      type: 'chart',
-      attrs: {
-        data: {
-          type: 'bar',
-          data: {
-            labels: ['ML Models', 'Neural Nets', 'NLP Apps', 'CV', 'Robotics', 'Automation'],
-            datasets: [{
-              label: 'Adoption Rate (%)',
-              data: [85, 78, 65, 72, 55, 48],
-              backgroundColor: [
-                'rgba(99, 102, 241, 0.7)',
-                'rgba(139, 92, 246, 0.7)',
-                'rgba(236, 72, 153, 0.7)',
-                'rgba(59, 130, 246, 0.7)',
-                'rgba(14, 165, 233, 0.7)',
-                'rgba(234, 179, 8, 0.7)',
-              ],
-              borderColor: [
-                'rgba(99, 102, 241, 1)',
-                'rgba(139, 92, 246, 1)',
-                'rgba(236, 72, 153, 1)',
-                'rgba(59, 130, 246, 1)',
-                'rgba(14, 165, 233, 1)',
-                'rgba(234, 179, 8, 1)',
-              ],
-              borderWidth: 2,
-            }],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              title: {
-                display: true,
-                text: 'AI Technology Adoption Statistics',
-                color: 'var(--pubwave-text, #37352f)',
-                font: { size: 16, weight: '600' },
+      type: 'layout',
+      attrs: { columns: 2 },
+      content: [
+        {
+          type: 'layoutColumn',
+          content: [
+            {
+              type: 'chart',
+              attrs: {
+                data: {
+                  type: 'bar',
+                  data: {
+                    labels: ['ML Models', 'Neural Nets', 'NLP Apps', 'CV', 'Robotics', 'Automation'],
+                    datasets: [{
+                      label: 'Adoption Rate (%)',
+                      data: [85, 78, 65, 72, 55, 48],
+                      backgroundColor: [
+                        'rgba(99, 102, 241, 0.7)',
+                        'rgba(139, 92, 246, 0.7)',
+                        'rgba(236, 72, 153, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(14, 165, 233, 0.7)',
+                        'rgba(234, 179, 8, 0.7)',
+                      ],
+                      borderColor: [
+                        'rgba(99, 102, 241, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(236, 72, 153, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(14, 165, 233, 1)',
+                        'rgba(234, 179, 8, 1)',
+                      ],
+                      borderWidth: 2,
+                    }],
+                  },
+                  options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      title: {
+                        display: true,
+                        text: 'AI Technology Adoption',
+                        color: 'var(--pubwave-text, #37352f)',
+                        font: { size: 14, weight: '600' },
+                      },
+                      legend: { display: true, position: 'bottom' },
+                    },
+                  },
+                },
               },
-              legend: { display: true, position: 'top' },
             },
-          },
+            {
+              type: 'paragraph',
+              content: [
+                { type: 'text', marks: [{ type: 'bold' }], text: 'Computer Vision' },
+                { type: 'text', text: ' and ' },
+                { type: 'text', marks: [{ type: 'bold' }], text: 'NLP' },
+                { type: 'text', text: ' lead adoption at ' },
+                { type: 'text', marks: [{ type: 'bold' }], text: '72%' },
+                { type: 'text', text: ' and ' },
+                { type: 'text', marks: [{ type: 'bold' }], text: '65%' },
+                { type: 'text', text: ' respectively.' },
+              ],
+            },
+          ],
         },
-      },
-    },
-    {
-      type: 'paragraph',
-      content: [
-        { type: 'text', text: 'As you can see, ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: 'Computer Vision' },
-        { type: 'text', text: ' and ' },
-        { type: 'text', marks: [{ type: 'bold' }], text: 'NLP applications' },
-        { type: 'text', text: ' are leading the adoption curve, with neural networks and machine learning models following closely behind.' },
-      ],
-    },
-    {
-      type: 'heading',
-      attrs: { level: 2 },
-      content: [{ type: 'text', text: '📈 AI Model Performance Growth' }],
-    },
-    {
-      type: 'paragraph',
-      content: [
-        { type: 'text', text: 'The performance of AI models has been improving exponentially over the past few years:' },
-      ],
-    },
-    {
-      type: 'chart',
-      attrs: {
-        data: {
-          type: 'line',
-          data: {
-            labels: ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027'],
-            datasets: [{
-              label: 'Performance Score',
-              data: [45, 58, 68, 75, 82, 88, 92, 95],
-              backgroundColor: 'rgba(99, 102, 241, 0.2)',
-              borderColor: 'rgba(99, 102, 241, 1)',
-              borderWidth: 3,
-              tension: 0.4,
-              fill: true,
-            }],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              title: {
-                display: true,
-                text: 'AI Model Performance Growth 2020-2027',
-                color: 'var(--pubwave-text, #37352f)',
-                font: { size: 16, weight: '600' },
+        {
+          type: 'layoutColumn',
+          content: [
+            {
+              type: 'chart',
+              attrs: {
+                data: {
+                  type: 'line',
+                  data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027'],
+                    datasets: [{
+                      label: 'Performance Score',
+                      data: [45, 58, 68, 75, 82, 88, 92, 95],
+                      backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                      borderColor: 'rgba(99, 102, 241, 1)',
+                      borderWidth: 3,
+                      tension: 0.4,
+                      fill: true,
+                    }],
+                  },
+                  options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      title: {
+                        display: true,
+                        text: 'Model Performance Growth',
+                        color: 'var(--pubwave-text, #37352f)',
+                        font: { size: 14, weight: '600' },
+                      },
+                      legend: { display: true, position: 'bottom' },
+                    },
+                  },
+                },
               },
-              legend: { display: true, position: 'top' },
             },
-          },
+            {
+              type: 'paragraph',
+              content: [
+                { type: 'text', text: 'Model performance shows ' },
+                { type: 'text', marks: [{ type: 'bold' }, { type: 'italic' }], text: 'remarkable acceleration' },
+                { type: 'text', text: ', growing from ' },
+                { type: 'text', marks: [{ type: 'bold' }], text: '45' },
+                { type: 'text', text: ' to ' },
+                { type: 'text', marks: [{ type: 'bold' }], text: '95' },
+                { type: 'text', text: ' points in 7 years.' },
+              ],
+            },
+          ],
         },
-      },
-    },
-    {
-      type: 'paragraph',
-      content: [
-        { type: 'text', text: 'The growth trajectory shows a ' },
-        { type: 'text', marks: [{ type: 'bold' }, { type: 'italic' }], text: 'remarkable acceleration' },
-        { type: 'text', text: ', with model accuracy and efficiency improving by orders of magnitude each year.' },
       ],
     },
     {
@@ -488,61 +500,157 @@ const initialContent = {
     {
       type: 'heading',
       attrs: { level: 2 },
-      content: [{ type: 'text', text: 'AI Impact Across Industries' }],
+      content: [{ type: 'text', text: 'AI Applications Across Industries' }],
     },
     {
-      type: 'paragraph',
+      type: 'layout',
+      attrs: { columns: 3 },
       content: [
-        { type: 'text', text: 'AI is revolutionizing multiple sectors:' },
+        {
+          type: 'layoutColumn',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', marks: [{ type: 'bold' }], text: 'Healthcare' }],
+            },
+            {
+              type: 'bulletList',
+              content: [
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Medical diagnosis' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Drug discovery' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Personalized treatment' }] }],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'layoutColumn',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', marks: [{ type: 'bold' }], text: 'Finance' }],
+            },
+            {
+              type: 'bulletList',
+              content: [
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Fraud detection' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Algorithmic trading' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Risk assessment' }] }],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'layoutColumn',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', marks: [{ type: 'bold' }], text: 'Education' }],
+            },
+            {
+              type: 'bulletList',
+              content: [
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Personalized learning' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Intelligent tutoring' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Automated grading' }] }],
+                },
+              ],
+            },
+          ],
+        },
       ],
     },
     {
-      type: 'bulletList',
+      type: 'heading',
+      attrs: { level: 2 },
+      content: [{ type: 'text', text: 'AI Development Tools & Frameworks' }],
+    },
+    {
+      type: 'layout',
+      attrs: { columns: 2 },
       content: [
         {
-          type: 'listItem',
+          type: 'layoutColumn',
           content: [
             {
               type: 'paragraph',
+              content: [{ type: 'text', marks: [{ type: 'bold' }], text: 'Popular ML Frameworks' }],
+            },
+            {
+              type: 'bulletList',
               content: [
-                { type: 'text', marks: [{ type: 'bold' }], text: 'Healthcare' },
-                { type: 'text', text: ': Medical diagnosis, drug discovery, and personalized treatment plans' },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'TensorFlow' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'PyTorch' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'scikit-learn' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Keras' }] }],
+                },
               ],
             },
           ],
         },
         {
-          type: 'listItem',
+          type: 'layoutColumn',
           content: [
             {
               type: 'paragraph',
-              content: [
-                { type: 'text', marks: [{ type: 'bold' }], text: 'Finance' },
-                { type: 'text', text: ': Fraud detection, algorithmic trading, and risk assessment' },
-              ],
+              content: [{ type: 'text', marks: [{ type: 'bold' }], text: 'ML Tools & Platforms' }],
             },
-          ],
-        },
-        {
-          type: 'listItem',
-          content: [
             {
-              type: 'paragraph',
+              type: 'bulletList',
               content: [
-                { type: 'text', marks: [{ type: 'bold' }], text: 'Transportation' },
-                { type: 'text', text: ': Autonomous vehicles, traffic optimization, and route planning' },
-              ],
-            },
-          ],
-        },
-        {
-          type: 'listItem',
-          content: [
-            {
-              type: 'paragraph',
-              content: [
-                { type: 'text', marks: [{ type: 'bold' }], text: 'Education' },
-                { type: 'text', text: ': Personalized learning, intelligent tutoring, and content generation' },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Jupyter Notebooks' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Google Colab' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Weights & Biases' }] }],
+                },
+                {
+                  type: 'listItem',
+                  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'MLflow' }] }],
+                },
               ],
             },
           ],
