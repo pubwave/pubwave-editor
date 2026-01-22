@@ -29,6 +29,7 @@ export interface EditorLocale {
       list: string;
       media: string;
       advanced: string;
+      layout?: string;
     };
     // Commands
     commands: {
@@ -43,6 +44,8 @@ export interface EditorLocale {
       blockquote: { title: string; description: string };
       codeBlock: { title: string; description: string };
       horizontalRule: { title: string; description: string };
+      layoutTwoColumn?: { title: string; description: string };
+      layoutThreeColumn?: { title: string; description: string };
     };
   };
 
@@ -110,6 +113,51 @@ export interface EditorLocale {
   // Placeholders
   placeholder: string;
   linkPlaceholder: string;
+
+  // Chart editor
+  chart?: {
+    modal: {
+      title: string;
+      close: string;
+      save: string;
+      cancel: string;
+      fields: {
+        chartType: string;
+        title: string;
+        titlePlaceholder: string;
+        showLegend: string;
+        legendPosition: string;
+        position: {
+          top: string;
+          bottom: string;
+          left: string;
+          right: string;
+        };
+        labels: string;
+        labelsPlaceholder: string;
+        datasets: {
+          title: string;
+          add: string;
+          remove: string;
+          datasetLabel: string;
+          datasetLabelPlaceholder: string;
+          data: string;
+          dataPlaceholder: string;
+        };
+      };
+    };
+    chartTypes: {
+      bar: string;
+      line: string;
+      pie: string;
+      doughnut: string;
+      radar: string;
+      polarArea: string;
+    };
+    errors?: {
+      invalidData: string;
+    };
+  };
 }
 
 /**

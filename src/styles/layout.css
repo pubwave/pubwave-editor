@@ -1,0 +1,115 @@
+/**
+ * Layout Component Styles
+ *
+ * Multi-column layout styles for the pubwave editor.
+ * Supports 2-column and 3-column layouts with responsive design.
+ */
+
+/* Layout container - uses CSS Grid */
+.pubwave-editor__layout {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0;
+  width: 100%;
+}
+
+/* 2-column layout */
+.pubwave-layout--2-cols {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* 3-column layout */
+.pubwave-layout--3-cols {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Responsive - single column on mobile */
+@media (max-width: 768px) {
+  .pubwave-layout--2-cols,
+  .pubwave-layout--3-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Layout column - plain, no card styling */
+.pubwave-layout__column {
+  min-height: 60px;
+  padding: 0.5rem;
+}
+
+/* Column focus state */
+.pubwave-layout__column:focus-within {
+  outline: 2px solid var(--pubwave-primary, #0f7ccd);
+  outline-offset: -2px;
+}
+
+/* Selected layout state */
+.pubwave-editor__layout[data-selected="true"] {
+  outline: 2px solid var(--pubwave-primary, #0f7ccd);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Layout column content area */
+.pubwave-layout__column-content {
+  min-height: 40px;
+}
+
+/* Empty column placeholder */
+.pubwave-layout__column-content > p:first-child:only-child::before {
+  content: "Type '/' for commands";
+  color: var(--pubwave-text-muted, #9b9a97);
+  font-style: italic;
+  pointer-events: none;
+}
+
+/* Paragraph inside layout column */
+.pubwave-layout__column-content .pubwave-editor__paragraph {
+  margin: 0.25rem 0;
+}
+
+/* Headings inside layout column */
+.pubwave-layout__column-content .pubwave-editor__heading {
+  margin: 0.5rem 0;
+}
+
+/* Lists inside layout column */
+.pubwave-layout__column-content .pubwave-editor__bullet-list,
+.pubwave-layout__column-content .pubwave-editor__ordered-list,
+.pubwave-layout__column-content .pubwave-editor__task-list {
+  margin: 0.25rem 0;
+  padding-left: 1.5rem;
+}
+
+/* Blockquote inside layout column */
+.pubwave-layout__column-content .pubwave-editor__blockquote {
+  margin: 0.5rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--pubwave-border, #e3e2e0);
+}
+
+/* Code block inside layout column */
+.pubwave-layout__column-content .pubwave-editor__code-block {
+  margin: 0.5rem 0;
+}
+
+/* Image inside layout column */
+.pubwave-layout__column-content .pubwave-editor__image {
+  margin: 0.5rem 0;
+  max-width: 100%;
+}
+
+/* Chart inside layout column */
+.pubwave-layout__column-content .pubwave-editor__chart {
+  margin: 0.5rem 0;
+}
+
+/* Drag handle styling compatibility */
+.pubwave-layout__column .drag-handle {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.pubwave-layout__column:hover .drag-handle {
+  opacity: 1;
+}

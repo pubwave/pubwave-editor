@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { PubwaveEditor } from '../../../../src/index';
+import { PubwaveEditor } from '@pubwave/editor';
 import type { EditorTheme, EditorAPI } from '@pubwave/editor';
 import type { JSONContent } from '@tiptap/core';
-import '../../../../src/index.css';
+import '@pubwave/editor/style.css';
 
 interface PreviewModalProps {
   content: JSONContent;
@@ -31,14 +31,14 @@ export function PreviewModal({ content, theme, onClose }: PreviewModalProps) {
 
   const exportAsImage = async () => {
     if (!editorContainerRef.current || isExporting) return;
-    
+
     setIsExporting(true);
     setShowExportMenu(false);
 
     try {
       // Dynamically import html2canvas
       const html2canvas = (await import('html2canvas')).default;
-      
+
       const editorElement = editorContainerRef.current.querySelector('.pubwave-editor') as HTMLElement;
       if (!editorElement) {
         console.error('Editor element not found');
@@ -77,7 +77,7 @@ export function PreviewModal({ content, theme, onClose }: PreviewModalProps) {
 
   const exportAsPDF = async () => {
     if (!editorContainerRef.current || isExporting) return;
-    
+
     setIsExporting(true);
     setShowExportMenu(false);
 
@@ -85,7 +85,7 @@ export function PreviewModal({ content, theme, onClose }: PreviewModalProps) {
       // Dynamically import libraries
       const html2canvas = (await import('html2canvas')).default;
       const jsPDF = (await import('jspdf')).jsPDF;
-      
+
       const editorElement = editorContainerRef.current.querySelector('.pubwave-editor') as HTMLElement;
       if (!editorElement) {
         console.error('Editor element not found');
@@ -104,20 +104,20 @@ export function PreviewModal({ content, theme, onClose }: PreviewModalProps) {
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
-      
+
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      
+
       // Convert pixels to mm (assuming 96 DPI: 1px = 0.264583mm)
       const pxToMm = 0.264583;
       const imgWidthMm = canvas.width * pxToMm;
       const imgHeightMm = canvas.height * pxToMm;
-      
+
       // Calculate scaling to fit width
       const widthRatio = pdfWidth / imgWidthMm;
       const scaledWidth = pdfWidth;
       const scaledHeight = imgHeightMm * widthRatio;
-      
+
       // If content fits in one page
       if (scaledHeight <= pdfHeight) {
         pdf.addImage(imgData, 'PNG', 0, 0, scaledWidth, scaledHeight);
@@ -126,18 +126,18 @@ export function PreviewModal({ content, theme, onClose }: PreviewModalProps) {
         let yPosition = 0;
         let sourceY = 0;
         const sourceHeight = pdfHeight / widthRatio / pxToMm;
-        
+
         while (yPosition < scaledHeight) {
           if (yPosition > 0) {
             pdf.addPage();
           }
-          
+
           // Create a temporary canvas for this page slice
           const tempCanvas = document.createElement('canvas');
           tempCanvas.width = canvas.width;
           tempCanvas.height = Math.min(sourceHeight, canvas.height - sourceY);
           const tempCtx = tempCanvas.getContext('2d');
-          
+
           if (tempCtx) {
             tempCtx.drawImage(
               canvas,
@@ -148,7 +148,7 @@ export function PreviewModal({ content, theme, onClose }: PreviewModalProps) {
             const pageHeight = Math.min(pdfHeight, scaledHeight - yPosition);
             pdf.addImage(pageImgData, 'PNG', 0, 0, scaledWidth, pageHeight);
           }
-          
+
           sourceY += sourceHeight;
           yPosition += pdfHeight;
         }
@@ -164,7 +164,7 @@ export function PreviewModal({ content, theme, onClose }: PreviewModalProps) {
   };
 
   return (
-    <div 
+    <div
       className="preview-modal-overlay"
       style={{
         position: 'fixed',
@@ -228,10 +228,10 @@ export function PreviewModal({ content, theme, onClose }: PreviewModalProps) {
                 borderRadius: '2px',
               }}
             />
-            <h2 style={{ 
-              margin: 0, 
-              fontSize: '18px', 
-              fontWeight: 600, 
+            <h2 style={{
+              margin: 0,
+              fontSize: '18px',
+              fontWeight: 600,
               color: '#111827',
               letterSpacing: '-0.01em',
             }}>
@@ -339,9 +339,9 @@ export function PreviewModal({ content, theme, onClose }: PreviewModalProps) {
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2 4C2 2.89543 2.89543 2 4 2H12C13.1046 2 14 2.89543 14 4V12C14 13.1046 13.1046 14 12 14H4C2.89543 14 2 13.1046 2 12V4Z" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M6 6.5C6.27614 6.5 6.5 6.27614 6.5 6C6.5 5.72386 6.27614 5.5 6 5.5C5.72386 5.5 5.5 5.72386 5.5 6C5.5 6.27614 5.72386 6.5 6 6.5Z" fill="currentColor"/>
-                    <path d="M2 10L5 7L8 10L11 7L14 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 4C2 2.89543 2.89543 2 4 2H12C13.1046 2 14 2.89543 14 4V12C14 13.1046 13.1046 14 12 14H4C2.89543 14 2 13.1046 2 12V4Z" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M6 6.5C6.27614 6.5 6.5 6.27614 6.5 6C6.5 5.72386 6.27614 5.5 6 5.5C5.72386 5.5 5.5 5.72386 5.5 6C5.5 6.27614 5.72386 6.5 6 6.5Z" fill="currentColor" />
+                    <path d="M2 10L5 7L8 10L11 7L14 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   Export as Image
                 </button>
@@ -376,9 +376,9 @@ export function PreviewModal({ content, theme, onClose }: PreviewModalProps) {
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 2C2.89543 2 2 2.89543 2 4V12C2 13.1046 2.89543 14 4 14H12C13.1046 14 14 13.1046 14 12V6.41421C14 6.01639 13.842 5.63486 13.5607 5.35355L10.6464 2.43934C10.3651 2.15804 9.98361 2 9.58579 2H4Z" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M9.5 2V5.5C9.5 6.05228 9.94772 6.5 10.5 6.5H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M5 9H11M5 11H11M5 13H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M4 2C2.89543 2 2 2.89543 2 4V12C2 13.1046 2.89543 14 4 14H12C13.1046 14 14 13.1046 14 12V6.41421C14 6.01639 13.842 5.63486 13.5607 5.35355L10.6464 2.43934C10.3651 2.15804 9.98361 2 9.58579 2H4Z" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M9.5 2V5.5C9.5 6.05228 9.94772 6.5 10.5 6.5H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    <path d="M5 9H11M5 11H11M5 13H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                   </svg>
                   Export as PDF
                 </button>
@@ -413,14 +413,14 @@ export function PreviewModal({ content, theme, onClose }: PreviewModalProps) {
               title="Close"
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </div>
         </div>
 
         {/* Editor Content */}
-        <div 
+        <div
           ref={editorContainerRef}
           style={{
             flex: 1,

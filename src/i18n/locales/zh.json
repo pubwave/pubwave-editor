@@ -4,7 +4,8 @@
       "basic": "基礎",
       "list": "列表",
       "media": "媒體",
-      "advanced": "高級"
+      "advanced": "高級",
+      "layout": "版面配置"
     },
     "commands": {
       "paragraph": {
@@ -50,6 +51,14 @@
       "horizontalRule": {
         "title": "分割線",
         "description": "創建水平分割線"
+      },
+      "layoutTwoColumn": {
+        "title": "兩欄版面配置",
+        "description": "將內容分成兩個並排的欄"
+      },
+      "layoutThreeColumn": {
+        "title": "三欄版面配置",
+        "description": "將內容分成三個並排的欄"
       }
     }
   },
@@ -110,5 +119,45 @@
     "linkClearButton": "清空鏈接輸入"
   },
   "placeholder": "開始寫作，輸入 \"/\" 顯示命令...",
-  "linkPlaceholder": "粘貼鏈接..."
+  "linkPlaceholder": "粘貼鏈接...",
+  "chart": {
+    "modal": {
+      "title": "編輯圖表",
+      "close": "關閉",
+      "save": "保存",
+      "cancel": "取消",
+      "fields": {
+        "chartType": "圖表類型",
+        "title": "標題",
+        "titlePlaceholder": "圖表標題...",
+        "showLegend": "顯示圖例",
+        "legendPosition": "位置",
+        "position": {
+          "top": "頂部",
+          "bottom": "底部",
+          "left": "左側",
+          "right": "右側"
+        },
+        "labels": "標籤（逗號分隔）",
+        "labelsPlaceholder": "一月, 二月, 三月, 四月...",
+        "datasets": {
+          "title": "數據集",
+          "add": "+ 添加數據集",
+          "remove": "移除",
+          "datasetLabel": "標籤",
+          "datasetLabelPlaceholder": "數據集標籤...",
+          "data": "數據（逗號分隔的數字）",
+          "dataPlaceholder": "10, 20, 30, 40..."
+        }
+      }
+    },
+    "chartTypes": {
+      "bar": "柱狀圖",
+      "line": "折線圖",
+      "pie": "餅圖",
+      "doughnut": "環形圖",
+      "radar": "雷達圖",
+      "polarArea": "極地圖"
+    }
+  }
 }

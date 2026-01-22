@@ -7,6 +7,7 @@
  * - Add/remove datasets
  * - Uses createPortal for proper z-index layering
  * - Responsive design
+ * - Internationalization support
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -17,17 +18,18 @@ import type {
   PubwaveChartType,
   ChartDataset,
 } from './chartTypes';
+import type { EditorLocale } from '../../i18n';
 
 /**
  * All supported chart types for the dropdown
  */
 const CHART_TYPES: Array<{ value: PubwaveChartType; label: string }> = [
-  { value: 'bar', label: 'Bar Chart' },
-  { value: 'line', label: 'Line Chart' },
-  { value: 'pie', label: 'Pie Chart' },
-  { value: 'doughnut', label: 'Doughnut Chart' },
-  { value: 'radar', label: 'Radar Chart' },
-  { value: 'polarArea', label: 'Polar Area Chart' },
+  { value: 'bar', label: 'bar' },
+  { value: 'line', label: 'line' },
+  { value: 'pie', label: 'pie' },
+  { value: 'doughnut', label: 'doughnut' },
+  { value: 'radar', label: 'radar' },
+  { value: 'polarArea', label: 'polarArea' },
 ];
 
 /**
@@ -45,7 +47,12 @@ function getDefaultColor(index: number): { backgroundColor: string; borderColor:
  *
  * Renders a modal dialog for editing chart data.
  */
-export function ChartEditorModal({ initialData, onSave, onCancel }: ChartEditorModalProps) {
+export function ChartEditorModal({
+  initialData,
+  onSave,
+  onCancel,
+  locale
+}: ChartEditorModalProps & { locale?: EditorLocale }) {
   // Local state for form data
   const [chartType, setChartType] = useState<PubwaveChartType>(initialData.type);
   const [chartTitle, setChartTitle] = useState(initialData.options?.plugins?.title?.text ?? '');
@@ -58,6 +65,48 @@ export function ChartEditorModal({ initialData, onSave, onCancel }: ChartEditorM
 
   // Modal ref for click-outside detection
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Get translations
+  const t = locale?.chart || {
+    modal: {
+      title: 'Edit Chart',
+      close: 'Close',
+      save: 'Save',
+      cancel: 'Cancel',
+      fields: {
+        chartType: 'Chart Type',
+        title: 'Title',
+        titlePlaceholder: 'Chart title...',
+        showLegend: 'Show Legend',
+        legendPosition: 'Position',
+        position: {
+          top: 'Top',
+          bottom: 'Bottom',
+          left: 'Left',
+          right: 'Right',
+        },
+        labels: 'Labels',
+        labelsPlaceholder: 'Jan, Feb, Mar, Apr...',
+        datasets: {
+          title: 'Datasets',
+          add: '+ Add Dataset',
+          remove: 'Remove',
+          datasetLabel: 'Label',
+          datasetLabelPlaceholder: 'Dataset label...',
+          data: 'Data',
+          dataPlaceholder: '10, 20, 30, 40...',
+        },
+      },
+    },
+    chartTypes: {
+      bar: 'Bar Chart',
+      line: 'Line Chart',
+      pie: 'Pie Chart',
+      doughnut: 'Doughnut Chart',
+      radar: 'Radar Chart',
+      polarArea: 'Polar Area Chart',
+    },
+  };
 
   /**
    * Handle ESC key to close modal
@@ -125,14 +174,14 @@ export function ChartEditorModal({ initialData, onSave, onCancel }: ChartEditorM
     setDatasets((prev) => [
       ...prev,
       {
-        label: `Dataset ${prev.length + 1}`,
+        label: `${t.modal.fields.datasets.title} ${prev.length + 1}`,
         data: labels.map(() => Math.floor(Math.random() * 100)),
         backgroundColor: colors.backgroundColor,
         borderColor: colors.borderColor,
         borderWidth: 2,
       },
     ]);
-  }, [datasets.length, labels]);
+  }, [datasets.length, labels, t]);
 
   /**
    * Remove a dataset
@@ -196,12 +245,12 @@ export function ChartEditorModal({ initialData, onSave, onCancel }: ChartEditorM
     <div className="pubwave-modal__overlay" onClick={handleOverlayClick}>
       <div ref={modalRef} className="pubwave-modal__container" role="dialog" aria-modal="true" aria-labelledby="chart-modal-title">
         <div className="pubwave-modal__header">
-          <h2 id="chart-modal-title" className="pubwave-modal__title">Edit Chart</h2>
+          <h2 id="chart-modal-title" className="pubwave-modal__title">{t.modal.title}</h2>
           <button
             type="button"
             className="pubwave-modal__close"
             onClick={onCancel}
-            aria-label="Close modal"
+            aria-label={t.modal.close}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -213,7 +262,7 @@ export function ChartEditorModal({ initialData, onSave, onCancel }: ChartEditorM
         <div className="pubwave-modal__body">
           {/* Chart Type */}
           <div className="pubwave-form__field">
-            <label htmlFor="chart-type" className="pubwave-form__label">Chart Type</label>
+            <label htmlFor="chart-type" className="pubwave-form__label">{t.modal.fields.chartType}</label>
             <select
               id="chart-type"
               className="pubwave-form__select"
@@ -222,7 +271,7 @@ export function ChartEditorModal({ initialData, onSave, onCancel }: ChartEditorM
             >
               {CHART_TYPES.map((type) => (
                 <option key={type.value} value={type.value}>
-                  {type.label}
+                  {t.chartTypes[type.value]}
                 </option>
               ))}
             </select>
@@ -230,14 +279,14 @@ export function ChartEditorModal({ initialData, onSave, onCancel }: ChartEditorM
 
           {/* Chart Title */}
           <div className="pubwave-form__field">
-            <label htmlFor="chart-title" className="pubwave-form__label">Title</label>
+            <label htmlFor="chart-title" className="pubwave-form__label">{t.modal.fields.title}</label>
             <input
               id="chart-title"
               type="text"
               className="pubwave-form__input"
               value={chartTitle}
               onChange={(e) => setChartTitle(e.target.value)}
-              placeholder="Chart title..."
+              placeholder={t.modal.fields.titlePlaceholder}
             />
           </div>
 
@@ -251,22 +300,22 @@ export function ChartEditorModal({ initialData, onSave, onCancel }: ChartEditorM
                   checked={showLegend}
                   onChange={(e) => setShowLegend(e.target.checked)}
                 />
-                Show Legend
+                {t.modal.fields.showLegend}
               </label>
             </div>
             {showLegend && (
               <div className="pubwave-form__field">
-                <label htmlFor="legend-position" className="pubwave-form__label">Position</label>
+                <label htmlFor="legend-position" className="pubwave-form__label">{t.modal.fields.legendPosition}</label>
                 <select
                   id="legend-position"
                   className="pubwave-form__select"
                   value={legendPosition}
                   onChange={(e) => setLegendPosition(e.target.value as 'top' | 'bottom' | 'left' | 'right')}
                 >
-                  <option value="top">Top</option>
-                  <option value="bottom">Bottom</option>
-                  <option value="left">Left</option>
-                  <option value="right">Right</option>
+                  <option value="top">{t.modal.fields.position.top}</option>
+                  <option value="bottom">{t.modal.fields.position.bottom}</option>
+                  <option value="left">{t.modal.fields.position.left}</option>
+                  <option value="right">{t.modal.fields.position.right}</option>
                 </select>
               </div>
             )}
@@ -274,67 +323,67 @@ export function ChartEditorModal({ initialData, onSave, onCancel }: ChartEditorM
 
           {/* Labels */}
           <div className="pubwave-form__field">
-            <label htmlFor="chart-labels" className="pubwave-form__label">Labels (comma-separated)</label>
+            <label htmlFor="chart-labels" className="pubwave-form__label">{t.modal.fields.labels}</label>
             <input
               id="chart-labels"
               type="text"
               className="pubwave-form__input"
               value={labels.join(', ')}
               onChange={(e) => updateLabels(e.target.value)}
-              placeholder="Jan, Feb, Mar, Apr..."
+              placeholder={t.modal.fields.labelsPlaceholder}
             />
           </div>
 
           {/* Datasets */}
           <div className="pubwave-form__section">
             <div className="pubwave-form__section-header">
-              <h3 className="pubwave-form__section-title">Datasets</h3>
+              <h3 className="pubwave-form__section-title">{t.modal.fields.datasets.title}</h3>
               <button
                 type="button"
                 className="pubwave-button pubwave-button--secondary pubwave-button--small"
                 onClick={addDataset}
               >
-                + Add Dataset
+                {t.modal.fields.datasets.add}
               </button>
             </div>
 
             {datasets.map((dataset, index) => (
               <div key={index} className="pubwave-form__dataset">
                 <div className="pubwave-form__dataset-header">
-                  <span className="pubwave-form__dataset-title">Dataset {index + 1}</span>
+                  <span className="pubwave-form__dataset-title">{t.modal.fields.datasets.datasetLabel} {index + 1}</span>
                   {datasets.length > 1 && (
                     <button
                       type="button"
                       className="pubwave-button pubwave-button--danger pubwave-button--small"
                       onClick={() => removeDataset(index)}
-                      aria-label={`Remove dataset ${index + 1}`}
+                      aria-label={`${t.modal.fields.datasets.remove} ${index + 1}`}
                     >
-                      Remove
+                      {t.modal.fields.datasets.remove}
                     </button>
                   )}
                 </div>
 
                 <div className="pubwave-form__field">
-                  <label htmlFor={`dataset-label-${index}`} className="pubwave-form__label">Label</label>
+                  <label htmlFor={`dataset-label-${index}`} className="pubwave-form__label">{t.modal.fields.datasets.datasetLabel}</label>
                   <input
                     id={`dataset-label-${index}`}
                     type="text"
                     className="pubwave-form__input"
                     value={dataset.label ?? ''}
                     onChange={(e) => updateDatasetLabel(index, e.target.value)}
-                    placeholder="Dataset label..."
+                    placeholder={t.modal.fields.datasets.datasetLabelPlaceholder}
                   />
                 </div>
 
                 <div className="pubwave-form__field">
-                  <label htmlFor={`dataset-data-${index}`} className="pubwave-form__label">Data (comma-separated numbers)</label>
+                  <label htmlFor={`dataset-data-${index}`} className="pubwave-form__label">{t.modal.fields.datasets.data}</label>
                   <input
                     id={`dataset-data-${index}`}
                     type="text"
                     className="pubwave-form__input"
                     value={dataset.data.join(', ')}
                     onChange={(e) => updateDatasetData(index, e.target.value)}
-                    placeholder="10, 20, 30, 40..."
+                    placeholder={t.modal.fields.datasets.dataPlaceholder}
                   />
                 </div>
               </div>
@@ -348,14 +397,14 @@ export function ChartEditorModal({ initialData, onSave, onCancel }: ChartEditorM
             className="pubwave-button pubwave-button--secondary"
             onClick={onCancel}
           >
-            Cancel
+            {t.modal.cancel}
           </button>
           <button
             type="button"
             className="pubwave-button pubwave-button--primary"
             onClick={handleSave}
           >
-            Save
+            {t.modal.save}
           </button>
         </div>
       </div>

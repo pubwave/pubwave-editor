@@ -4,7 +4,8 @@
       "basic": "基本",
       "list": "リスト",
       "media": "メディア",
-      "advanced": "高度"
+      "advanced": "高度",
+      "layout": "レイアウト"
     },
     "commands": {
       "paragraph": {
@@ -50,6 +51,14 @@
       "horizontalRule": {
         "title": "区切り線",
         "description": "水平線を作成"
+      },
+      "layoutTwoColumn": {
+        "title": "2カラムレイアウト",
+        "description": "コンテンツを2つの横並びカラムに分割"
+      },
+      "layoutThreeColumn": {
+        "title": "3カラムレイアウト",
+        "description": "コンテンツを3つの横並びカラムに分割"
       }
     }
   },
@@ -110,6 +119,46 @@
     "linkClearButton": "リンク入力をクリア"
   },
   "placeholder": "書き始めましょう、コマンドを表示するには \"/\" を入力...",
-  "linkPlaceholder": "リンクを貼り付け..."
+  "linkPlaceholder": "リンクを貼り付け...",
+  "chart": {
+    "modal": {
+      "title": "チャート編集",
+      "close": "閉じる",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "fields": {
+        "chartType": "チャートタイプ",
+        "title": "タイトル",
+        "titlePlaceholder": "チャートタイトル...",
+        "showLegend": "凡例を表示",
+        "legendPosition": "位置",
+        "position": {
+          "top": "上",
+          "bottom": "下",
+          "left": "左",
+          "right": "右"
+        },
+        "labels": "ラベル（カンマ区切り）",
+        "labelsPlaceholder": "1月, 2月, 3月, 4月...",
+        "datasets": {
+          "title": "データセット",
+          "add": "+ データセットを追加",
+          "remove": "削除",
+          "datasetLabel": "ラベル",
+          "datasetLabelPlaceholder": "データセットラベル...",
+          "data": "データ（カンマ区切りの数値）",
+          "dataPlaceholder": "10, 20, 30, 40..."
+        }
+      }
+    },
+    "chartTypes": {
+      "bar": "棒グラフ",
+      "line": "折れ線グラフ",
+      "pie": "円グラフ",
+      "doughnut": "ドーナツグラフ",
+      "radar": "レーダーチャート",
+      "polarArea": "極座標グラフ"
+    }
+  }
 }
 

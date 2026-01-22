@@ -5,6 +5,8 @@
  * Charts are stored as node attributes in the ProseMirror document.
  */
 
+import type { EditorLocale } from '../../i18n';
+
 /**
  * Supported chart types in pubwave-editor
  */
@@ -99,14 +101,14 @@ export interface ChartNodeData {
  * These colors work well on both light and dark backgrounds
  */
 export const DEFAULT_CHART_COLORS = [
-  'rgba(59, 130, 246, 0.7)',   // blue
-  'rgba(236, 72, 153, 0.7)',   // pink
-  'rgba(34, 197, 94, 0.7)',    // green
-  'rgba(251, 146, 60, 0.7)',   // orange
-  'rgba(139, 92, 246, 0.7)',   // purple
-  'rgba(14, 165, 233, 0.7)',   // sky
-  'rgba(244, 63, 94, 0.7)',    // rose
-  'rgba(234, 179, 8, 0.7)',    // yellow
+  'rgba(59, 130, 246, 0.7)', // blue
+  'rgba(236, 72, 153, 0.7)', // pink
+  'rgba(34, 197, 94, 0.7)', // green
+  'rgba(251, 146, 60, 0.7)', // orange
+  'rgba(139, 92, 246, 0.7)', // purple
+  'rgba(14, 165, 233, 0.7)', // sky
+  'rgba(244, 63, 94, 0.7)', // rose
+  'rgba(234, 179, 8, 0.7)', // yellow
 ] as const;
 
 /**
@@ -147,6 +149,8 @@ export interface ChartEditorModalProps {
   onSave: (data: ChartNodeData) => void;
   /** Callback to close the modal without saving */
   onCancel: () => void;
+  /** Locale for internationalization */
+  locale?: EditorLocale;
 }
 
 /**
@@ -175,7 +179,11 @@ export const DEFAULT_CHART_OPTIONS: ChartOptions = {
 /**
  * Create a default chart dataset
  */
-export function createDefaultDataset(label: string, data: number[], index: number): ChartDataset {
+export function createDefaultDataset(
+  label: string,
+  data: number[],
+  index: number
+): ChartDataset {
   const colorIndex = index % DEFAULT_CHART_COLORS.length;
   return {
     label,
@@ -194,9 +202,7 @@ export function createDefaultChartData(type: PubwaveChartType): ChartNodeData {
     type,
     data: {
       labels: ['Category 1', 'Category 2', 'Category 3', 'Category 4'],
-      datasets: [
-        createDefaultDataset('Dataset 1', [12, 19, 3, 5], 0),
-      ],
+      datasets: [createDefaultDataset('Dataset 1', [12, 19, 3, 5], 0)],
     },
     options: { ...DEFAULT_CHART_OPTIONS },
   };

@@ -24,6 +24,7 @@ import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import HardBreak from '@tiptap/extension-hard-break';
 import Image from '@tiptap/extension-image';
 import { Chart } from './chart';
+import { Layout, LayoutColumn } from './layout';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import type { ImageUploadConfig } from '../../types/editor';
 
@@ -229,6 +230,20 @@ export function createBlockExtensions(
         class: 'pubwave-editor__chart',
       },
     }),
+
+    // Layout (2-column and 3-column)
+    Layout.configure({
+      HTMLAttributes: {
+        class: 'pubwave-editor__layout',
+      },
+    }),
+
+    // LayoutColumn (individual column within layout)
+    LayoutColumn.configure({
+      HTMLAttributes: {
+        class: 'pubwave-editor__layout-column',
+      },
+    }),
   ] as Extension[];
 }
 
@@ -248,6 +263,8 @@ export const BLOCK_TYPES = {
   HORIZONTAL_RULE: 'horizontalRule',
   IMAGE: 'image',
   CHART: 'chart',
+  LAYOUT: 'layout',
+  LAYOUT_COLUMN: 'layoutColumn',
   DOCUMENT: 'doc',
   TEXT: 'text',
 } as const;

@@ -22,7 +22,49 @@ import {
   DividerIcon,
   ImageIcon,
 } from '../toolbar/icons';
+import { LayoutTwoIcon, LayoutThreeIcon } from '../blocks/LayoutIcons';
 import { handleImageUpload } from './imageUpload';
+
+/**
+ * Helper function to insert a layout node
+ */
+function insertLayout(editor: Editor, columns: 2 | 3) {
+  const { state, dispatch } = editor.view;
+
+  // Create the layout node with empty columns
+  const layoutType = state.schema.nodes.layout;
+  const layoutColumnNodeType = state.schema.nodes.layoutColumn;
+
+  if (!layoutType || !layoutColumnNodeType) {
+    console.warn('Layout node type not found in schema');
+    return;
+  }
+
+  // Create empty paragraph nodes for each column
+  const paragraphNodeType = state.schema.nodes.paragraph;
+  if (!paragraphNodeType) {
+    console.warn('Paragraph node type not found in schema');
+    return;
+  }
+  const columnsContent = Array.from({ length: columns }, () =>
+    layoutColumnNodeType.create(null, paragraphNodeType.create())
+  );
+
+  // Create the layout node
+  const layoutNode = layoutType.create({ columns }, columnsContent);
+
+  // Insert the layout node
+  const transaction = state.tr.replaceSelectionWith(layoutNode);
+  dispatch(transaction);
+
+  // Focus the first column
+  const layoutPos = transaction.selection.$from.before();
+  editor
+    .chain()
+    .focus()
+    .setTextSelection(layoutPos + 2)
+    .run();
+}
 
 /**
  * Command item definition
@@ -33,7 +75,7 @@ export interface SlashCommand {
   description: string;
   icon: React.ReactNode;
   aliases?: string[];
-  group: 'basic' | 'list' | 'media' | 'advanced';
+  group: 'basic' | 'list' | 'media' | 'advanced' | 'layout';
   action: (editor: Editor) => void;
 }
 
@@ -46,19 +88,48 @@ export function createDefaultSlashCommands(
 ): SlashCommand[] {
   const localeData = locale || {
     slashMenu: {
-      groups: { basic: 'Basic', list: 'Lists', media: 'Media', advanced: 'Advanced' },
+      groups: {
+        basic: 'Basic',
+        list: 'Lists',
+        media: 'Media',
+        advanced: 'Advanced',
+        layout: 'Layout',
+      },
       commands: {
         paragraph: { title: 'Text', description: 'Plain text block' },
         heading1: { title: 'Heading 1', description: 'Large section heading' },
         heading2: { title: 'Heading 2', description: 'Medium section heading' },
         heading3: { title: 'Heading 3', description: 'Small section heading' },
-        bulletList: { title: 'Bullet List', description: 'Create a bulleted list' },
-        orderedList: { title: 'Numbered List', description: 'Create a numbered list' },
-        taskList: { title: 'To-do list', description: 'Create a todo list with checkboxes' },
+        bulletList: {
+          title: 'Bullet List',
+          description: 'Create a bulleted list',
+        },
+        orderedList: {
+          title: 'Numbered List',
+          description: 'Create a numbered list',
+        },
+        taskList: {
+          title: 'To-do list',
+          description: 'Create a todo list with checkboxes',
+        },
         image: { title: 'Image', description: 'Upload or paste an image' },
-        blockquote: { title: 'Blockquote', description: 'Create a quote block' },
+        blockquote: {
+          title: 'Blockquote',
+          description: 'Create a quote block',
+        },
         codeBlock: { title: 'Code', description: 'Create a code snippet' },
-        horizontalRule: { title: 'Divider', description: 'Create a horizontal line' },
+        horizontalRule: {
+          title: 'Divider',
+          description: 'Create a horizontal line',
+        },
+        layoutTwoColumn: {
+          title: 'Two Column Layout',
+          description: 'Split content into two side-by-side columns',
+        },
+        layoutThreeColumn: {
+          title: 'Three Column Layout',
+          description: 'Split content into three side-by-side columns',
+        },
       },
     },
     toolbar: {} as any,
@@ -86,7 +157,8 @@ export function createDefaultSlashCommands(
       icon: <H1Icon />,
       aliases: ['h1', 'title'],
       group: 'basic',
-      action: (editor) => editor.chain().focus().toggleHeading({ level: 1 }).run(),
+      action: (editor) =>
+        editor.chain().focus().toggleHeading({ level: 1 }).run(),
     },
     {
       id: 'heading2',
@@ -95,7 +167,8 @@ export function createDefaultSlashCommands(
       icon: <H2Icon />,
       aliases: ['h2', 'subtitle'],
       group: 'basic',
-      action: (editor) => editor.chain().focus().toggleHeading({ level: 2 }).run(),
+      action: (editor) =>
+        editor.chain().focus().toggleHeading({ level: 2 }).run(),
     },
     {
       id: 'heading3',
@@ -104,7 +177,8 @@ export function createDefaultSlashCommands(
       icon: <H3Icon />,
       aliases: ['h3'],
       group: 'basic',
-      action: (editor) => editor.chain().focus().toggleHeading({ level: 3 }).run(),
+      action: (editor) =>
+        editor.chain().focus().toggleHeading({ level: 3 }).run(),
     },
     // Lists
     {
@@ -236,6 +310,29 @@ export function createDefaultSlashCommands(
         });
       },
     },
+    // Layout
+    {
+      id: 'layoutTwoColumn',
+      title: cmd.layoutTwoColumn?.title ?? 'Two Column Layout',
+      description:
+        cmd.layoutTwoColumn?.description ??
+        'Split content into two side-by-side columns',
+      icon: <LayoutTwoIcon />,
+      aliases: ['layout2', 'two columns', '2 col', 'columns'],
+      group: 'layout',
+      action: (editor) => insertLayout(editor, 2),
+    },
+    {
+      id: 'layoutThreeColumn',
+      title: cmd.layoutThreeColumn?.title ?? 'Three Column Layout',
+      description:
+        cmd.layoutThreeColumn?.description ??
+        'Split content into three side-by-side columns',
+      icon: <LayoutThreeIcon />,
+      aliases: ['layout3', 'three columns', '3 col'],
+      group: 'layout',
+      action: (editor) => insertLayout(editor, 3),
+    },
   ];
 }
 
@@ -243,26 +340,32 @@ export function createDefaultSlashCommands(
  * Default slash commands (without image upload config, uses base64)
  * Note: This is deprecated, use createDefaultSlashCommands with locale instead
  */
-export const defaultSlashCommands: SlashCommand[] = createDefaultSlashCommands();
+export const defaultSlashCommands: SlashCommand[] =
+  createDefaultSlashCommands();
 
 /**
  * Filter commands by query
  * Only matches title and aliases, not description
  */
-export function filterCommands(commands: SlashCommand[], query: string): SlashCommand[] {
+export function filterCommands(
+  commands: SlashCommand[],
+  query: string
+): SlashCommand[] {
   if (!query) return commands;
 
   const lowerQuery = query.toLowerCase();
   return commands.filter((cmd) => {
     // Match title (must start with query or contain as word)
     const titleLower = cmd.title.toLowerCase();
-    const matchTitle = titleLower.startsWith(lowerQuery) || titleLower.includes(` ${lowerQuery}`);
+    const matchTitle =
+      titleLower.startsWith(lowerQuery) ||
+      titleLower.includes(` ${lowerQuery}`);
 
     // Match aliases (must start with query)
-    const matchAlias = cmd.aliases?.some((a) => a.toLowerCase().startsWith(lowerQuery)) ?? false;
+    const matchAlias =
+      cmd.aliases?.some((a) => a.toLowerCase().startsWith(lowerQuery)) ?? false;
 
     // Only match title or aliases, not description
     return matchTitle || matchAlias;
   });
 }
-

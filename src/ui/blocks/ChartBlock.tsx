@@ -15,6 +15,7 @@ import type { NodeViewProps } from '@tiptap/react';
 import type { Chart } from 'chart.js';
 import { ChartEditorModal } from './ChartEditorModal';
 import type { ChartNodeData, PubwaveChartType } from './chartTypes';
+import { useLocale } from '../LocaleContext';
 
 // Lazy load Chart.js to avoid requiring it as a hard dependency
 const loadChartJs = async (): Promise<typeof import('chart.js/auto')> => {
@@ -52,10 +53,15 @@ export function ChartBlock(props: NodeViewProps) {
   const [chartInstance, setChartInstance] = useState<Chart | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const chartJsRef = useRef<typeof import('chart.js/auto').default | null>(null);
+  const chartJsRef = useRef<typeof import('chart.js/auto').default | null>(
+    null
+  );
+  const locale = useLocale();
 
   // Determine if editor is editable
   const editable = editor?.options?.editable ?? true;
+  // In read-only mode, chart should not show selected state
+  const isSelected = editable ? selected : false;
 
   /**
    * Update chart colors from CSS variables
@@ -66,9 +72,21 @@ export function ChartBlock(props: NodeViewProps) {
     }
 
     const container = containerRef.current;
-    const textColor = getCSSVariableColor(container, '--pubwave-text', '#37352f');
-    const textMutedColor = getCSSVariableColor(container, '--pubwave-text-muted', '#9b9a97');
-    const borderColor = getCSSVariableColor(container, '--pubwave-border', '#e3e2e0');
+    const textColor = getCSSVariableColor(
+      container,
+      '--pubwave-text',
+      '#37352f'
+    );
+    const textMutedColor = getCSSVariableColor(
+      container,
+      '--pubwave-text-muted',
+      '#9b9a97'
+    );
+    const borderColor = getCSSVariableColor(
+      container,
+      '--pubwave-border',
+      '#e3e2e0'
+    );
 
     const plugins = chartInstance.options.plugins || {};
     const scales = chartInstance.options.scales as any;
@@ -120,7 +138,7 @@ export function ChartBlock(props: NodeViewProps) {
    * Load Chart.js and render the chart
    */
   useEffect(() => {
-    if (!canvasRef.current || !chartData || !editable) {
+    if (!canvasRef.current || !chartData) {
       return;
     }
 
@@ -151,9 +169,15 @@ export function ChartBlock(props: NodeViewProps) {
 
         // Get actual color values from CSS variables
         const container = containerRef.current;
-        const textColor = container ? getCSSVariableColor(container, '--pubwave-text', '#37352f') : '#37352f';
-        const textMutedColor = container ? getCSSVariableColor(container, '--pubwave-text-muted', '#9b9a97') : '#9b9a97';
-        const borderColor = container ? getCSSVariableColor(container, '--pubwave-border', '#e3e2e0') : '#e3e2e0';
+        const textColor = container
+          ? getCSSVariableColor(container, '--pubwave-text', '#37352f')
+          : '#37352f';
+        const textMutedColor = container
+          ? getCSSVariableColor(container, '--pubwave-text-muted', '#9b9a97')
+          : '#9b9a97';
+        const borderColor = container
+          ? getCSSVariableColor(container, '--pubwave-border', '#e3e2e0')
+          : '#e3e2e0';
 
         // Merge chart options with theme colors
         const chartOptions = {
@@ -165,7 +189,14 @@ export function ChartBlock(props: NodeViewProps) {
             legend: {
               display: chartData.options?.plugins?.legend?.display ?? true,
               position: chartData.options?.plugins?.legend?.position ?? 'top',
-              ...(chartData.options?.plugins?.legend?.labels ? { labels: { ...chartData.options.plugins.legend.labels, color: textColor } } : { labels: { color: textColor } }),
+              ...(chartData.options?.plugins?.legend?.labels
+                ? {
+                    labels: {
+                      ...chartData.options.plugins.legend.labels,
+                      color: textColor,
+                    },
+                  }
+                : { labels: { color: textColor } }),
               onHover: () => {
                 const canvas = canvasRef.current;
                 if (canvas) {
@@ -179,11 +210,15 @@ export function ChartBlock(props: NodeViewProps) {
                 }
               },
             } as any,
-            title: chartData.options?.plugins?.title ? {
-              ...chartData.options.plugins.title,
-              color: textColor,
-              ...(chartData.options.plugins.title.font ? { font: { ...chartData.options.plugins.title.font } } : {}),
-            } : undefined,
+            title: chartData.options?.plugins?.title
+              ? {
+                  ...chartData.options.plugins.title,
+                  color: textColor,
+                  ...(chartData.options.plugins.title.font
+                    ? { font: { ...chartData.options.plugins.title.font } }
+                    : {}),
+                }
+              : undefined,
           },
           scales: shouldShowAxes(chartData.type)
             ? {
@@ -241,7 +276,10 @@ export function ChartBlock(props: NodeViewProps) {
     // Use MutationObserver to detect style attribute changes (where CSS variables are set)
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
+        if (
+          mutation.attributeName === 'style' ||
+          mutation.attributeName === 'class'
+        ) {
           handleThemeChange();
         }
       });
@@ -252,14 +290,20 @@ export function ChartBlock(props: NodeViewProps) {
     while (element) {
       observer.observe(element, { attributes: true });
       // Stop if we reach a known editor container or body
-      if (element.classList.contains('pubwave-editor') || element === document.body) {
+      if (
+        element.classList.contains('pubwave-editor') ||
+        element === document.body
+      ) {
         break;
       }
       element = element.parentElement;
     }
 
     // Also observe document.body for class changes
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
 
     return () => {
       observer.disconnect();
@@ -310,7 +354,7 @@ export function ChartBlock(props: NodeViewProps) {
     <NodeViewWrapper
       ref={containerRef}
       className="pubwave-editor__chart"
-      data-selected={selected}
+      data-selected={isSelected}
       data-chart-type={chartData.type}
     >
       <div
@@ -322,7 +366,7 @@ export function ChartBlock(props: NodeViewProps) {
           <canvas ref={canvasRef} className="pubwave-chart__canvas" />
         </div>
 
-        {editable && (isHovered || selected) && (
+        {editable && (isHovered || isSelected) && (
           <button
             type="button"
             className="pubwave-chart__edit-button"
@@ -352,6 +396,7 @@ export function ChartBlock(props: NodeViewProps) {
           initialData={chartData}
           onSave={handleSave}
           onCancel={handleCancel}
+          locale={locale}
         />
       )}
     </NodeViewWrapper>
