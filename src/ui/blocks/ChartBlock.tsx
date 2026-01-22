@@ -53,9 +53,9 @@ export function ChartBlock(props: NodeViewProps) {
   const [chartInstance, setChartInstance] = useState<Chart | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const chartJsRef = useRef<typeof import('chart.js/auto').default | null>(
-    null
-  );
+
+  const chartJsRef = useRef<typeof import('chart.js/auto').default | null>(null);
+
   const locale = useLocale();
 
   // Determine if editor is editable
@@ -191,11 +191,11 @@ export function ChartBlock(props: NodeViewProps) {
               position: chartData.options?.plugins?.legend?.position ?? 'top',
               ...(chartData.options?.plugins?.legend?.labels
                 ? {
-                    labels: {
-                      ...chartData.options.plugins.legend.labels,
-                      color: textColor,
-                    },
-                  }
+                  labels: {
+                    ...chartData.options.plugins.legend.labels,
+                    color: textColor,
+                  },
+                }
                 : { labels: { color: textColor } }),
               onHover: () => {
                 const canvas = canvasRef.current;
@@ -212,25 +212,25 @@ export function ChartBlock(props: NodeViewProps) {
             } as any,
             title: chartData.options?.plugins?.title
               ? {
-                  ...chartData.options.plugins.title,
-                  color: textColor,
-                  ...(chartData.options.plugins.title.font
-                    ? { font: { ...chartData.options.plugins.title.font } }
-                    : {}),
-                }
+                ...chartData.options.plugins.title,
+                color: textColor,
+                ...(chartData.options.plugins.title.font
+                  ? { font: { ...chartData.options.plugins.title.font } }
+                  : {}),
+              }
               : undefined,
           },
           scales: shouldShowAxes(chartData.type)
             ? {
-                x: {
-                  ticks: { color: textMutedColor },
-                  grid: { color: borderColor },
-                },
-                y: {
-                  ticks: { color: textMutedColor },
-                  grid: { color: borderColor },
-                },
-              }
+              x: {
+                ticks: { color: textMutedColor },
+                grid: { color: borderColor },
+              },
+              y: {
+                ticks: { color: textMutedColor },
+                grid: { color: borderColor },
+              },
+            }
             : undefined,
         };
 
