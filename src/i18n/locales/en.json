@@ -52,6 +52,10 @@
         "title": "Divider",
         "description": "Create a horizontal line"
       },
+      "table": {
+        "title": "Table",
+        "description": "Insert a table"
+      },
       "layoutTwoColumn": {
         "title": "Two Column Layout",
         "description": "Split content into two side-by-side columns"
@@ -161,4 +165,3 @@
     }
   }
 }
-

@@ -52,6 +52,10 @@
         "title": "구분선",
         "description": "수평선 만들기"
       },
+      "table": {
+        "title": "표",
+        "description": "표를 삽입"
+      },
       "layoutTwoColumn": {
         "title": "2열 레이아웃",
         "description": "콘텐츠를 두 개의 나란히 있는 열로 분할"
@@ -161,4 +165,3 @@
     }
   }
 }
-

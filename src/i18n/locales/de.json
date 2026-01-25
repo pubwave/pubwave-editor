@@ -52,6 +52,10 @@
         "title": "Trennlinie",
         "description": "Horizontale Linie erstellen"
       },
+      "table": {
+        "title": "Tabelle",
+        "description": "Eine Tabelle einfügen"
+      },
       "layoutTwoColumn": {
         "title": "Zweispaltiges Layout",
         "description": "Inhalt in zwei nebeneinander liegende Spalten aufteilen"
@@ -161,4 +165,3 @@
     }
   }
 }
-

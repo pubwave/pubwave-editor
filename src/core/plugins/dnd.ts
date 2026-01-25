@@ -53,7 +53,11 @@ const initialDndState: DndState = {
  */
 type DndAction =
   | { type: 'START_DRAG'; blockId: string; pos: number }
-  | { type: 'UPDATE_DROP_TARGET'; pos: number | null; position: 'before' | 'after' | null }
+  | {
+      type: 'UPDATE_DROP_TARGET';
+      pos: number | null;
+      position: 'before' | 'after' | null;
+    }
   | { type: 'CANCEL_DRAG' }
   | { type: 'COMPLETE_DRAG' }
   | { type: 'RESET' };
@@ -121,7 +125,13 @@ export function findBlockAtPos(
     // If so, return the container itself as the draggable unit
     if ($pos.depth >= 1) {
       const topNode = $pos.node(1);
-      const containerTypes = ['taskList', 'bulletList', 'orderedList', 'blockquote'];
+      const containerTypes = [
+        'taskList',
+        'bulletList',
+        'orderedList',
+        'blockquote',
+        'table',
+      ];
       if (containerTypes.includes(topNode.type.name)) {
         return { node: topNode, pos: $pos.before(1) };
       }
@@ -145,7 +155,10 @@ export function findBlockAtPos(
         }
         offset += child.nodeSize;
       }
-      return { node: doc.lastChild!, pos: doc.content.size - doc.lastChild!.nodeSize };
+      return {
+        node: doc.lastChild!,
+        pos: doc.content.size - doc.lastChild!.nodeSize,
+      };
     }
 
     return null;
@@ -323,7 +336,7 @@ function resolveDropTarget(
         const midpoint = rect.top + rect.height / 2;
         return {
           pos: block.pos,
-          position: clientY < midpoint ? 'before' : 'after'
+          position: clientY < midpoint ? 'before' : 'after',
         };
       }
     }
@@ -373,7 +386,9 @@ export function createDndPlugin(editor?: Editor): Plugin<DndState> {
       handleDOMEvents: {
         dragover(view: EditorView, event: DragEvent): boolean {
           // Only handle our drag operations
-          if (!event.dataTransfer?.types.includes('application/x-pubwave-block')) {
+          if (
+            !event.dataTransfer?.types.includes('application/x-pubwave-block')
+          ) {
             return false;
           }
 
@@ -381,7 +396,9 @@ export function createDndPlugin(editor?: Editor): Plugin<DndState> {
           event.dataTransfer.dropEffect = 'move';
 
           // Get current state from plugin
-          const pluginState = dndPluginKey.getState(view.state) as DndState | null;
+          const pluginState = dndPluginKey.getState(
+            view.state
+          ) as DndState | null;
           currentState = pluginState ?? currentState;
 
           const target = resolveDropTarget(view, event);
@@ -410,7 +427,9 @@ export function createDndPlugin(editor?: Editor): Plugin<DndState> {
 
         drop(view: EditorView, event: DragEvent): boolean {
           // Only handle our drag operations
-          const blockId = event.dataTransfer?.getData('application/x-pubwave-block');
+          const blockId = event.dataTransfer?.getData(
+            'application/x-pubwave-block'
+          );
           if (!blockId) {
             return false;
           }
@@ -419,7 +438,9 @@ export function createDndPlugin(editor?: Editor): Plugin<DndState> {
           event.stopPropagation();
 
           // Get current state from plugin
-          const pluginState = dndPluginKey.getState(view.state) as DndState | null;
+          const pluginState = dndPluginKey.getState(
+            view.state
+          ) as DndState | null;
           const state = pluginState ?? currentState;
 
           // If we don't have draggingBlockPos from state, try to extract from blockId
@@ -456,7 +477,12 @@ export function createDndPlugin(editor?: Editor): Plugin<DndState> {
             return false;
           }
 
-          const success = moveBlock(editor, draggingBlockPos, dropTargetPos, dropPosition);
+          const success = moveBlock(
+            editor,
+            draggingBlockPos,
+            dropTargetPos,
+            dropPosition
+          );
 
           // Complete the drag
           currentState = dndReducer(currentState, { type: 'COMPLETE_DRAG' });
@@ -487,7 +513,9 @@ export function createDndPlugin(editor?: Editor): Plugin<DndState> {
  * Get the current DnD state from an editor
  */
 export function getDndState(editor: Editor): DndState {
-  const pluginState = dndPluginKey.getState(editor.state) as DndState | undefined;
+  const pluginState = dndPluginKey.getState(editor.state) as
+    | DndState
+    | undefined;
   return pluginState ?? initialDndState;
 }
 

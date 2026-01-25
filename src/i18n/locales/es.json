@@ -52,6 +52,10 @@
         "title": "Divisor",
         "description": "Crear una línea horizontal"
       },
+      "table": {
+        "title": "Tabla",
+        "description": "Insertar una tabla"
+      },
       "layoutTwoColumn": {
         "title": "Diseño de dos columnas",
         "description": "Dividir el contenido en dos columnas una al lado de la otra"
@@ -161,4 +165,3 @@
     }
   }
 }
-

@@ -11,7 +11,11 @@ import History from '@tiptap/extension-history';
 import Dropcursor from '@tiptap/extension-dropcursor';
 import Gapcursor from '@tiptap/extension-gapcursor';
 
-import type { BlockType, MarkType, EditorLocale as EditorLocaleCode } from '../types/editor';
+import type {
+  BlockType,
+  MarkType,
+  EditorLocale as EditorLocaleCode,
+} from '../types/editor';
 import {
   createBlockExtensions,
   type BlockExtensionsConfig,
@@ -38,6 +42,7 @@ export const SUPPORTED_BLOCKS: readonly BlockType[] = [
   'bulletList',
   'orderedList',
   'taskList',
+  'table',
   'blockquote',
   'codeBlock',
   'horizontalRule',
@@ -61,8 +66,7 @@ export const SUPPORTED_MARKS: readonly MarkType[] = [
  * Configuration for creating the extension set
  */
 export interface ExtensionConfig
-  extends BlockExtensionsConfig,
-  MarkExtensionsConfig {
+  extends BlockExtensionsConfig, MarkExtensionsConfig {
   /**
    * Placeholder text for empty editor
    */
@@ -116,7 +120,10 @@ export function createExtensions(config: ExtensionConfig = {}): Extension[] {
 
   // Get placeholder from prop or locale data
   const localeData = locale ? getLocale(locale) : null;
-  const placeholder = placeholderProp ?? localeData?.placeholder ?? 'Write,type "/" for commands...';
+  const placeholder =
+    placeholderProp ??
+    localeData?.placeholder ??
+    'Write,type "/" for commands...';
 
   const extensions: Extension[] = [
     // Block extensions (document structure + block types)
@@ -156,7 +163,9 @@ export function createExtensions(config: ExtensionConfig = {}): Extension[] {
     const commands = slashCommands
       ? [...defaultSlashCommands, ...slashCommands]
       : defaultSlashCommands;
-    extensions.push(createSlashCommandsExtension(commands, imageUpload, localeData));
+    extensions.push(
+      createSlashCommandsExtension(commands, imageUpload, localeData)
+    );
   }
 
   return extensions as Extension[];

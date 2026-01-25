@@ -17,7 +17,7 @@ A Notion-level block editor built with React and Tiptap.
 - 🎨 **Text & Background Colors** - Rich color picker with recently used colors
 - 🔄 **Turn Into** - Convert blocks between different types (paragraph, headings, lists, etc.)
 - 📋 **Rich Formatting** - Bold, italic, underline, strikethrough, code, and links
-- 📝 **Multiple Block Types** - Paragraphs, headings, lists, quotes, code blocks, charts, and more
+- 📝 **Multiple Block Types** - Paragraphs, headings, lists, quotes, code blocks, tables, charts, and more
 - 🖼️ **Image Support** - Upload images via file picker or paste from clipboard, with base64 or custom upload service
 - 📊 **Chart Support** - Interactive charts powered by Chart.js with editable data
 - 🌐 **Internationalization** - Multi-language support with English as default
@@ -84,10 +84,10 @@ function MyEditor() {
 
 ### React Versions
 
-| React Version | Status |
-|---------------|--------|
+| React Version | Status                 |
+| ------------- | ---------------------- |
 | 18.x          | ✅ Tested, Recommended |
-| 19.x          | ✅ Supported |
+| 19.x          | ✅ Supported           |
 
 ### Peer Dependencies
 
@@ -112,26 +112,27 @@ The main React component for rendering the editor.
 
 #### Component Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `content` | `JSONContent` | `undefined` | Initial content in Tiptap JSON format |
-| `editable` | `boolean` | `true` | Whether the editor is in read-only mode |
-| `placeholder` | `string` | `'Start writing...'` | Placeholder text shown when the editor is empty |
-| `theme` | `EditorTheme` | `undefined` | Theme configuration object (see [Theming](#-theming)) |
-| `autofocus` | `boolean \| 'start' \| 'end'` | `false` | Enable autofocus on mount. `true` or `'end'` focuses at the end, `'start'` focuses at the beginning |
-| `imageUpload` | `ImageUploadConfig` | `undefined` | Image upload configuration (see [Image Upload](#-image-upload)) |
-| `width` | `string` | `'100%'` | Editor container width. Can be a CSS value like `'100%'`, `'1200px'`, `'90vw'`, etc. Defaults to `'100%'` (full width of parent container) |
-| `height` | `string` | `undefined` | Editor container height. Can be a CSS value like `'500px'`, `'80vh'`, `'auto'`, etc. When set, the editor becomes a fixed-height scrollable container |
-| `minHeight` | `string` | `undefined` | Editor container minimum height. Can be a CSS value like `'200px'`, `'50vh'`, etc. The editor will expand with content but maintain at least this height |
-| `onChange` | `(content: JSONContent) => void` | `undefined` | Callback fired when the editor content changes |
-| `onSelectionChange` | `() => void` | `undefined` | Callback fired when the selection changes |
-| `onFocus` | `() => void` | `undefined` | Callback fired when the editor gains focus |
-| `onBlur` | `() => void` | `undefined` | Callback fired when the editor loses focus |
-| `onReady` | `(api: EditorAPI) => void` | `undefined` | Callback fired when the editor is ready with API access |
-| `className` | `string` | `undefined` | Additional CSS class for the container |
-| `data-testid` | `string` | `'pubwave-editor'` | Test ID for testing purposes |
+| Prop                | Type                             | Default              | Description                                                                                                                                              |
+| ------------------- | -------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `content`           | `JSONContent`                    | `undefined`          | Initial content in Tiptap JSON format                                                                                                                    |
+| `editable`          | `boolean`                        | `true`               | Whether the editor is in read-only mode                                                                                                                  |
+| `placeholder`       | `string`                         | `'Start writing...'` | Placeholder text shown when the editor is empty                                                                                                          |
+| `theme`             | `EditorTheme`                    | `undefined`          | Theme configuration object (see [Theming](#-theming))                                                                                                    |
+| `autofocus`         | `boolean \| 'start' \| 'end'`    | `false`              | Enable autofocus on mount. `true` or `'end'` focuses at the end, `'start'` focuses at the beginning                                                      |
+| `imageUpload`       | `ImageUploadConfig`              | `undefined`          | Image upload configuration (see [Image Upload](#-image-upload))                                                                                          |
+| `width`             | `string`                         | `'100%'`             | Editor container width. Can be a CSS value like `'100%'`, `'1200px'`, `'90vw'`, etc. Defaults to `'100%'` (full width of parent container)               |
+| `height`            | `string`                         | `undefined`          | Editor container height. Can be a CSS value like `'500px'`, `'80vh'`, `'auto'`, etc. When set, the editor becomes a fixed-height scrollable container    |
+| `minHeight`         | `string`                         | `undefined`          | Editor container minimum height. Can be a CSS value like `'200px'`, `'50vh'`, etc. The editor will expand with content but maintain at least this height |
+| `onChange`          | `(content: JSONContent) => void` | `undefined`          | Callback fired when the editor content changes                                                                                                           |
+| `onSelectionChange` | `() => void`                     | `undefined`          | Callback fired when the selection changes                                                                                                                |
+| `onFocus`           | `() => void`                     | `undefined`          | Callback fired when the editor gains focus                                                                                                               |
+| `onBlur`            | `() => void`                     | `undefined`          | Callback fired when the editor loses focus                                                                                                               |
+| `onReady`           | `(api: EditorAPI) => void`       | `undefined`          | Callback fired when the editor is ready with API access                                                                                                  |
+| `className`         | `string`                         | `undefined`          | Additional CSS class for the container                                                                                                                   |
+| `data-testid`       | `string`                         | `'pubwave-editor'`   | Test ID for testing purposes                                                                                                                             |
 
 For complete TypeScript type definitions, see the exported types from `@pubwave/editor`:
+
 - `EditorTheme` - Theme configuration
 - `EditorAPI` - Editor API interface
 - `EditorLocale` - Supported locale codes: `'en' | 'zh' | 'zh-CN' | 'ja' | 'ko' | 'fr' | 'de' | 'es' | 'pt'`
@@ -152,7 +153,7 @@ const editorRef = useRef<EditorAPI | null>(null);
   onReady={(api) => {
     editorRef.current = api;
   }}
-/>
+/>;
 
 // Later, use the API
 editorRef.current?.setContent(newContent);
@@ -162,22 +163,21 @@ editorRef.current?.toggleBold();
 
 #### Available Methods
 
-| Method | Description | Parameters | Returns |
-|--------|-------------|------------|---------|
-| `getState()` | Get current editor state | - | `EditorState` |
-| `getJSON()` | Get content as JSON | - | `JSONContent` |
-| `getHTML()` | Get content as HTML | - | `string` |
-| `getText()` | Get content as plain text | - | `string` |
-| `setContent(content)` | Set new content | `content: JSONContent` | `void` |
-| `clearContent()` | Clear all content | - | `void` |
-| `setEditable(editable)` | Toggle read-only mode | `editable: boolean` | `void` |
-| `focus(position?)` | Focus the editor | `position?: 'start' \| 'end'` | `void` |
-| `blur()` | Blur the editor | - | `void` |
-| `toggleBold()` | Toggle bold formatting | - | `void` |
-| `toggleItalic()` | Toggle italic formatting | - | `void` |
-| `setLink(href)` | Set or remove a link | `href: string \| null` | `void` |
-| `destroy()` | Destroy the editor instance | - | `void` |
-
+| Method                  | Description                 | Parameters                    | Returns       |
+| ----------------------- | --------------------------- | ----------------------------- | ------------- |
+| `getState()`            | Get current editor state    | -                             | `EditorState` |
+| `getJSON()`             | Get content as JSON         | -                             | `JSONContent` |
+| `getHTML()`             | Get content as HTML         | -                             | `string`      |
+| `getText()`             | Get content as plain text   | -                             | `string`      |
+| `setContent(content)`   | Set new content             | `content: JSONContent`        | `void`        |
+| `clearContent()`        | Clear all content           | -                             | `void`        |
+| `setEditable(editable)` | Toggle read-only mode       | `editable: boolean`           | `void`        |
+| `focus(position?)`      | Focus the editor            | `position?: 'start' \| 'end'` | `void`        |
+| `blur()`                | Blur the editor             | -                             | `void`        |
+| `toggleBold()`          | Toggle bold formatting      | -                             | `void`        |
+| `toggleItalic()`        | Toggle italic formatting    | -                             | `void`        |
+| `setLink(href)`         | Set or remove a link        | `href: string \| null`        | `void`        |
+| `destroy()`             | Destroy the editor instance | -                             | `void`        |
 
 ---
 
@@ -206,12 +206,12 @@ Configure a custom upload handler to upload images to your server:
     handler: async (file: File) => {
       const formData = new FormData();
       formData.append('image', file);
-      
+
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
-      
+
       const data = await response.json();
       return data.url; // Return the image URL
     },
@@ -220,7 +220,6 @@ Configure a custom upload handler to upload images to your server:
   }}
 />
 ```
-
 
 ### Image Upload Features
 
@@ -241,12 +240,12 @@ The `handler` function receives a `File` object and should return a Promise that
       // Upload to your server (Cloudinary, AWS S3, etc.)
       const formData = new FormData();
       formData.append('image', file);
-      
+
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
-      
+
       const data = await response.json();
       return data.url; // Return the image URL
     },
@@ -278,10 +277,11 @@ const theme: EditorTheme = {
   },
 };
 
-<PubwaveEditor theme={theme} />
+<PubwaveEditor theme={theme} />;
 ```
 
 For complete `EditorTheme` interface definition, see TypeScript definitions. Key properties:
+
 - `colors` - Color configuration (background, text, border, primary, linkColor)
 - `locale` - Locale code for internationalization
 - `backgroundImage` - Optional background image URL
@@ -292,6 +292,7 @@ For complete `EditorTheme` interface definition, see TypeScript definitions. Key
 The editor includes several predefined themes:
 
 #### Light Theme
+
 ```tsx
 const lightTheme: EditorTheme = {
   colors: {
@@ -305,6 +306,7 @@ const lightTheme: EditorTheme = {
 ```
 
 #### Dark Theme
+
 ```tsx
 const darkTheme: EditorTheme = {
   colors: {
@@ -343,6 +345,7 @@ You can add a background image to the editor container:
 ```
 
 **Background Image Options:**
+
 - `size`: `'cover'` (default) | `'contain'` | custom CSS value (e.g., `'100% 100%'`)
 - `position`: CSS position value (default: `'center'`)
 - `repeat`: `'no-repeat'` (default) | `'repeat'` | `'repeat-x'` | `'repeat-y'`
@@ -357,6 +360,7 @@ Pubwave Editor supports multiple languages through the `locale` option in the th
 #### Supported Locales
 
 The following locale codes are supported:
+
 - `'en'` - English (default)
 - `'zh'` - Chinese
 - `'zh-CN'` - Simplified Chinese
@@ -384,10 +388,11 @@ const theme: EditorTheme = {
   },
 };
 
-<PubwaveEditor theme={theme} />
+<PubwaveEditor theme={theme} />;
 ```
 
 The locale affects all user-facing text in the editor, including:
+
 - Slash command menu items and descriptions
 - Toolbar button labels and tooltips
 - Accessibility labels (ARIA)
@@ -419,21 +424,23 @@ Type `/` anywhere in the editor to open the command menu. Filter commands by typ
 
 **Available Commands:**
 
-| Command | Aliases | Description |
-|---------|---------|-------------|
-| `/text` or `/paragraph` | `/p`, `/text` | Plain text block |
-| `/heading1` | `/h1`, `/title` | Large section heading |
-| `/heading2` | `/h2`, `/subtitle` | Medium section heading |
-| `/heading3` | `/h3` | Small section heading |
-| `/bullet` | `/ul`, `/bullet`, `/-` | Bulleted list |
-| `/numbered` | `/ol`, `/numbered`, `/1.` | Numbered list |
-| `/todo` | `/task`, `/checkbox`, `/[]` | To-do list with checkboxes |
-| `/image` | `/img`, `/picture`, `/photo`, `/pic` | Upload or paste an image |
-| `/quote` | `/blockquote`, `/>` | Quote block |
-| `/code` | `/pre`, `/snippet`, `/``` | Code block |
-| `/divider` | `/hr`, `/line`, `/---` | Horizontal divider |
+| Command                 | Aliases                              | Description                |
+| ----------------------- | ------------------------------------ | -------------------------- |
+| `/text` or `/paragraph` | `/p`, `/text`                        | Plain text block           |
+| `/heading1`             | `/h1`, `/title`                      | Large section heading      |
+| `/heading2`             | `/h2`, `/subtitle`                   | Medium section heading     |
+| `/heading3`             | `/h3`                                | Small section heading      |
+| `/bullet`               | `/ul`, `/bullet`, `/-`               | Bulleted list              |
+| `/numbered`             | `/ol`, `/numbered`, `/1.`            | Numbered list              |
+| `/todo`                 | `/task`, `/checkbox`, `/[]`          | To-do list with checkboxes |
+| `/image`                | `/img`, `/picture`, `/photo`, `/pic` | Upload or paste an image   |
+| `/quote`                | `/blockquote`, `/>`                  | Quote block                |
+| `/code`                 | `/pre`, `/snippet`, `/```            | Code block                 |
+| `/divider`              | `/hr`, `/line`, `/---`               | Horizontal divider         |
+| `/table`                | `/grid`, `/tbl`                      | Insert a table             |
 
 **Usage:**
+
 1. Type `/` to open the menu
 2. Type to filter (e.g., `/h1` for heading 1, `/img` for image)
 3. Press `Enter` or click to select
@@ -445,6 +452,7 @@ Type `/` anywhere in the editor to open the command menu. Filter commands by typ
 The toolbar appears automatically when you select text, providing quick access to formatting options.
 
 **Available Actions:**
+
 - **Turn Into** - Convert block type (Paragraph, Heading 1-3, Bulleted List, Numbered List)
 - **Bold** (`Cmd/Ctrl+B`) - Make text bold
 - **Italic** (`Cmd/Ctrl+I`) - Make text italic
@@ -464,6 +472,7 @@ The editor supports the following block types:
 - **Bulleted List** - Unordered list with bullets
 - **Numbered List** - Ordered list with numbers
 - **Task List** - Checklist with checkboxes
+- **Table** - Table block (rows/columns with header)
 - **Image** - Image block (supports base64 or URL)
 - **Chart** - Interactive chart powered by Chart.js (bar, line, pie, doughnut, radar, polar area)
 - **Blockquote** - Quote block
@@ -472,18 +481,18 @@ The editor supports the following block types:
 
 ### Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Cmd/Ctrl+B` | Toggle bold |
-| `Cmd/Ctrl+I` | Toggle italic |
-| `Cmd/Ctrl+Z` | Undo |
-| `Cmd/Ctrl+Shift+Z` | Redo |
-| `Cmd/Ctrl+A` | Select all |
-| `Enter` | Create new block |
-| `Arrow Up/Down` | Navigate between blocks |
-| `Shift+Arrow` | Select text |
-| `/` | Open slash command menu |
-| `Escape` | Close menus/cancel drag |
+| Shortcut           | Action                  |
+| ------------------ | ----------------------- |
+| `Cmd/Ctrl+B`       | Toggle bold             |
+| `Cmd/Ctrl+I`       | Toggle italic           |
+| `Cmd/Ctrl+Z`       | Undo                    |
+| `Cmd/Ctrl+Shift+Z` | Redo                    |
+| `Cmd/Ctrl+A`       | Select all              |
+| `Enter`            | Create new block        |
+| `Arrow Up/Down`    | Navigate between blocks |
+| `Shift+Arrow`      | Select text             |
+| `/`                | Open slash command menu |
+| `Escape`           | Close menus/cancel drag |
 
 ### Drag & Drop
 
@@ -495,6 +504,7 @@ The editor supports the following block types:
 ### Color Picker
 
 The color picker provides:
+
 - **Text Colors** - 10 predefined text colors
 - **Background Colors** - 10 predefined background colors
 - **Recently Used** - Global history of recently used colors (persists across sessions)
@@ -536,9 +546,9 @@ You can control the editor's height using the `height` and `minHeight` props:
 <PubwaveEditor minHeight="300px" />
 
 // Combined: fixed height with minimum fallback
-<PubwaveEditor 
-  height="600px" 
-  minHeight="400px" 
+<PubwaveEditor
+  height="600px"
+  minHeight="400px"
 />
 
 // Using viewport units
@@ -546,6 +556,7 @@ You can control the editor's height using the `height` and `minHeight` props:
 ```
 
 **Important Notes:**
+
 - The editor has default padding of **96px top and bottom** (192px total). Your `height` value should account for this padding to ensure content is visible.
 - For example, `height="100px"` would leave no space for content (100px - 192px padding = negative space).
 - **Recommended minimum height:** At least `300px` for desktop to accommodate padding and content.
@@ -563,7 +574,7 @@ const editorRef = useRef<EditorAPI | null>(null);
   onReady={(api) => {
     editorRef.current = api;
   }}
-/>
+/>;
 
 // Set content programmatically
 editorRef.current?.setContent({
@@ -614,13 +625,11 @@ editorRef.current?.setLink('https://example.com');
 ### Read-only Mode
 
 ```tsx
-<PubwaveEditor
-  editable={false}
-  content={readOnlyContent}
-/>
+<PubwaveEditor editable={false} content={readOnlyContent} />
 ```
 
 In read-only mode:
+
 - All editing affordances are hidden
 - Toolbar does not appear
 - Slash commands are disabled
@@ -662,6 +671,7 @@ The editor includes support for interactive charts powered by Chart.js. Charts a
 ### Chart Types
 
 Supported chart types:
+
 - **Bar Chart** - Vertical/horizontal bars for comparisons
 - **Line Chart** - Data trends over time
 - **Pie Chart** - Proportional data representation
@@ -685,13 +695,15 @@ const contentWithChart: JSONContent = {
           type: 'bar',
           data: {
             labels: ['January', 'February', 'March', 'April'],
-            datasets: [{
-              label: 'Sales',
-              data: [65, 59, 80, 81],
-              backgroundColor: 'rgba(59, 130, 246, 0.7)',
-              borderColor: 'rgba(59, 130, 246, 1)',
-              borderWidth: 2,
-            }],
+            datasets: [
+              {
+                label: 'Sales',
+                data: [65, 59, 80, 81],
+                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 2,
+              },
+            ],
           },
           options: {
             responsive: true,
@@ -714,7 +726,7 @@ const contentWithChart: JSONContent = {
   ],
 };
 
-<PubwaveEditor content={contentWithChart} />
+<PubwaveEditor content={contentWithChart} />;
 ```
 
 ### Chart Features
@@ -765,6 +777,7 @@ interface ChartNodeData {
 ### Chart Editing
 
 When in editable mode:
+
 1. Hover over a chart to reveal the edit button
 2. Click the edit button to open the chart editor modal
 3. Modify chart type, title, labels, datasets, and appearance options
@@ -772,50 +785,51 @@ When in editable mode:
 
 ---
 
-
-
-
-
-
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
 **Q: Styles are not applied**
+
 - Ensure you've imported the CSS: `import '@pubwave/editor/style.css'`
 - Check that CSS custom properties are defined
 
 **Q: Slash commands don't work**
+
 - Ensure the editor is in editable mode
 - Check that you're typing `/` in a text block (not in code blocks)
 
 **Q: Toolbar doesn't appear**
+
 - Toolbar only appears when text is selected
 - Make sure you have a non-empty selection
 
 **Q: Colors don't persist**
+
 - Text and background colors are stored as marks in the content
 - Ensure you're saving the full JSON content, not just HTML
 
 **Q: Image upload doesn't work**
+
 - Check that `imageUpload.handler` returns a valid URL string
 - Verify file size is within `maxSize` limit
 - Check browser console for error messages
 - If custom upload fails, editor will automatically fall back to base64
 
 **Q: Charts don't render**
+
 - Ensure `chart.js` is installed: `npm install chart.js` (optional peer dependency)
 - Check that Chart.js is compatible (v4.x or v5.x)
 - Verify chart data structure is correct
 - Check browser console for errors
 
 **Q: Chart colors don't match theme**
+
 - Charts use CSS variables for colors that adapt to theme changes
 - Ensure CSS custom properties are defined: `--pubwave-text`, `--pubwave-text-muted`, `--pubwave-border`
 - Chart colors will automatically update when theme changes
 
 ---
-
 
 ## 📄 License
 

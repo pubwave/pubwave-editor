@@ -52,6 +52,10 @@
         "title": "Séparateur",
         "description": "Créer une ligne horizontale"
       },
+      "table": {
+        "title": "Tableau",
+        "description": "Insérer un tableau"
+      },
       "layoutTwoColumn": {
         "title": "Mise en page à deux colonnes",
         "description": "Diviser le contenu en deux colonnes côte à côte"
@@ -161,4 +165,3 @@
     }
   }
 }
-

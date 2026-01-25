@@ -20,6 +20,7 @@ import {
   QuoteIcon,
   CodeBlockIcon,
   DividerIcon,
+  TableIcon,
   ImageIcon,
 } from '../toolbar/icons';
 import { LayoutTwoIcon, LayoutThreeIcon } from '../blocks/LayoutIcons';
@@ -121,6 +122,10 @@ export function createDefaultSlashCommands(
         horizontalRule: {
           title: 'Divider',
           description: 'Create a horizontal line',
+        },
+        table: {
+          title: 'Table',
+          description: 'Insert a table',
         },
         layoutTwoColumn: {
           title: 'Two Column Layout',
@@ -309,6 +314,20 @@ export function createDefaultSlashCommands(
           }
         });
       },
+    },
+    {
+      id: 'table',
+      title: cmd.table?.title ?? 'Table',
+      description: cmd.table?.description ?? 'Insert a table',
+      icon: <TableIcon />,
+      aliases: ['table', 'grid', 'tbl'],
+      group: 'advanced',
+      action: (editor) =>
+        editor
+          .chain()
+          .focus()
+          .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+          .run(),
     },
     // Layout
     {

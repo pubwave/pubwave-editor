@@ -1,6 +1,6 @@
 /**
  * Internationalization (i18n) Support
- * 
+ *
  * Provides multi-language support for the editor.
  * Each language has its own JSON file in the locales directory.
  * Default locale is English ('en').
@@ -44,6 +44,7 @@ export interface EditorLocale {
       blockquote: { title: string; description: string };
       codeBlock: { title: string; description: string };
       horizontalRule: { title: string; description: string };
+      table?: { title: string; description: string };
       layoutTwoColumn?: { title: string; description: string };
       layoutThreeColumn?: { title: string; description: string };
     };
@@ -172,14 +173,14 @@ export const enLocale: EditorLocale = enLocaleData as EditorLocale;
  */
 const locales: Record<Locale, EditorLocale> = {
   en: enLocaleData as EditorLocale,
-  'zh': zhLocaleData as EditorLocale, // Traditional Chinese
+  zh: zhLocaleData as EditorLocale, // Traditional Chinese
   'zh-CN': zhCNLocaleData as EditorLocale, // Simplified Chinese
-  'ja': jaLocaleData as EditorLocale,
-  'ko': koLocaleData as EditorLocale,
-  'fr': frLocaleData as EditorLocale,
-  'de': deLocaleData as EditorLocale,
-  'es': esLocaleData as EditorLocale,
-  'pt': ptLocaleData as EditorLocale,
+  ja: jaLocaleData as EditorLocale,
+  ko: koLocaleData as EditorLocale,
+  fr: frLocaleData as EditorLocale,
+  de: deLocaleData as EditorLocale,
+  es: esLocaleData as EditorLocale,
+  pt: ptLocaleData as EditorLocale,
 };
 
 /**
@@ -193,7 +194,7 @@ export function getLocale(locale?: Locale | string): EditorLocale {
 
   // Normalize locale (e.g., 'zh-CN' -> 'zh-CN', 'zh' -> 'zh')
   const normalized = locale as Locale;
-  
+
   return locales[normalized] || enLocale;
 }
 

@@ -18,6 +18,10 @@ import OrderedList from '@tiptap/extension-ordered-list';
 import ListItem from '@tiptap/extension-list-item';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
+import Table from '@tiptap/extension-table';
+import TableRow from '@tiptap/extension-table-row';
+import TableHeader from '@tiptap/extension-table-header';
+import TableCell from '@tiptap/extension-table-cell';
 import Blockquote from '@tiptap/extension-blockquote';
 import CodeBlock from '@tiptap/extension-code-block';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
@@ -64,7 +68,9 @@ async function uploadImage(
 ): Promise<string> {
   const maxSize = config?.maxSize ?? 10 * 1024 * 1024; // 10MB default
   if (file.size > maxSize) {
-    throw new Error(`Image file is too large. Maximum size is ${maxSize / 1024 / 1024}MB`);
+    throw new Error(
+      `Image file is too large. Maximum size is ${maxSize / 1024 / 1024}MB`
+    );
   }
 
   // If custom handler is provided, use it
@@ -72,7 +78,10 @@ async function uploadImage(
     try {
       return await config.handler(file);
     } catch (error) {
-      console.warn('Custom image upload failed, falling back to base64:', error);
+      console.warn(
+        'Custom image upload failed, falling back to base64:',
+        error
+      );
       // Fall through to base64 conversion
     }
   }
@@ -149,6 +158,29 @@ export function createBlockExtensions(
       },
     }),
 
+    // Table
+    Table.configure({
+      resizable: true,
+      HTMLAttributes: {
+        class: 'pubwave-editor__table',
+      },
+    }),
+    TableRow.configure({
+      HTMLAttributes: {
+        class: 'pubwave-editor__table-row',
+      },
+    }),
+    TableHeader.configure({
+      HTMLAttributes: {
+        class: 'pubwave-editor__table-header',
+      },
+    }),
+    TableCell.configure({
+      HTMLAttributes: {
+        class: 'pubwave-editor__table-cell',
+      },
+    }),
+
     // Quote
     Blockquote.configure({
       HTMLAttributes: {
@@ -179,11 +211,11 @@ export function createBlockExtensions(
             props: {
               handlePaste: (view, event) => {
                 const items = Array.from(event.clipboardData?.items || []);
-                
+
                 for (const item of items) {
                   if (item.type.indexOf('image') === 0) {
                     event.preventDefault();
-                    
+
                     const file = item.getAsFile();
                     if (file) {
                       // Upload image (uses custom handler or base64)
@@ -191,25 +223,26 @@ export function createBlockExtensions(
                         .then((src) => {
                           const { state, dispatch } = view;
                           const imageNodeType = state.schema.nodes.image;
-                          
+
                           if (imageNodeType) {
                             const imageNode = imageNodeType.create({
                               src,
                             });
-                            
-                            const transaction = state.tr.replaceSelectionWith(imageNode);
+
+                            const transaction =
+                              state.tr.replaceSelectionWith(imageNode);
                             dispatch(transaction);
                           }
                         })
                         .catch((error) => {
                           console.error('Failed to upload image:', error);
                         });
-                      
+
                       return true;
                     }
                   }
                 }
-                
+
                 return false;
               },
             },
@@ -258,6 +291,10 @@ export const BLOCK_TYPES = {
   TASK_LIST: 'taskList',
   TASK_ITEM: 'taskItem',
   LIST_ITEM: 'listItem',
+  TABLE: 'table',
+  TABLE_ROW: 'tableRow',
+  TABLE_HEADER: 'tableHeader',
+  TABLE_CELL: 'tableCell',
   BLOCKQUOTE: 'blockquote',
   CODE_BLOCK: 'codeBlock',
   HORIZONTAL_RULE: 'horizontalRule',

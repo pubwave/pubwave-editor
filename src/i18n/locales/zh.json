@@ -52,6 +52,10 @@
         "title": "分割線",
         "description": "創建水平分割線"
       },
+      "table": {
+        "title": "表格",
+        "description": "插入表格"
+      },
       "layoutTwoColumn": {
         "title": "兩欄版面配置",
         "description": "將內容分成兩個並排的欄"

@@ -52,6 +52,10 @@
         "title": "区切り線",
         "description": "水平線を作成"
       },
+      "table": {
+        "title": "テーブル",
+        "description": "テーブルを挿入"
+      },
       "layoutTwoColumn": {
         "title": "2カラムレイアウト",
         "description": "コンテンツを2つの横並びカラムに分割"
@@ -161,4 +165,3 @@
     }
   }
 }
-

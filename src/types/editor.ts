@@ -17,6 +17,7 @@ export type BlockType =
   | 'bulletList'
   | 'orderedList'
   | 'taskList'
+  | 'table'
   | 'blockquote'
   | 'codeBlock'
   | 'horizontalRule'
@@ -26,7 +27,13 @@ export type BlockType =
 /**
  * Supported mark types for inline formatting
  */
-export type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'code' | 'link';
+export type MarkType =
+  | 'bold'
+  | 'italic'
+  | 'underline'
+  | 'strike'
+  | 'code'
+  | 'link';
 
 /**
  * Theme configuration using CSS custom property tokens
@@ -36,7 +43,16 @@ export type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'code' | 'li
  * Locale for internationalization
  * @default 'en'
  */
-export type EditorLocale = 'en' | 'zh' | 'zh-CN' | 'ja' | 'ko' | 'fr' | 'de' | 'es' | 'pt';
+export type EditorLocale =
+  | 'en'
+  | 'zh'
+  | 'zh-CN'
+  | 'ja'
+  | 'ko'
+  | 'fr'
+  | 'de'
+  | 'es'
+  | 'pt';
 
 export interface EditorTheme {
   /**
