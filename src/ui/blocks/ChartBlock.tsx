@@ -180,6 +180,22 @@ export function ChartBlock(props: NodeViewProps) {
           : '#e3e2e0';
 
         // Merge chart options with theme colors
+        const baseScales = (chartData.options?.scales as any) ?? {};
+        const themedScales = shouldShowAxes(chartData.type)
+          ? {
+            x: {
+              ...(baseScales.x ?? {}),
+              ticks: { ...(baseScales.x?.ticks ?? {}), color: textMutedColor },
+              grid: { ...(baseScales.x?.grid ?? {}), color: borderColor },
+            },
+            y: {
+              ...(baseScales.y ?? {}),
+              ticks: { ...(baseScales.y?.ticks ?? {}), color: textMutedColor },
+              grid: { ...(baseScales.y?.grid ?? {}), color: borderColor },
+            },
+          }
+          : undefined;
+
         const chartOptions = {
           ...chartData.options,
           responsive: true,
@@ -220,18 +236,7 @@ export function ChartBlock(props: NodeViewProps) {
               }
               : undefined,
           },
-          scales: shouldShowAxes(chartData.type)
-            ? {
-              x: {
-                ticks: { color: textMutedColor },
-                grid: { color: borderColor },
-              },
-              y: {
-                ticks: { color: textMutedColor },
-                grid: { color: borderColor },
-              },
-            }
-            : undefined,
+          scales: themedScales,
         };
 
         // Create new chart
@@ -350,6 +355,16 @@ export function ChartBlock(props: NodeViewProps) {
     );
   }
 
+  const chartHeight = (chartData.options as any)?.height;
+  const chartMinHeight = (chartData.options as any)?.minHeight;
+  const wrapperStyle =
+    chartHeight || chartMinHeight
+      ? {
+          height: chartHeight ? `${chartHeight}px` : undefined,
+          minHeight: chartMinHeight ? `${chartMinHeight}px` : undefined,
+        }
+      : undefined;
+
   return (
     <NodeViewWrapper
       ref={containerRef}
@@ -362,7 +377,7 @@ export function ChartBlock(props: NodeViewProps) {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="pubwave-chart__canvas-wrapper">
+        <div className="pubwave-chart__canvas-wrapper" style={wrapperStyle}>
           <canvas ref={canvasRef} className="pubwave-chart__canvas" />
         </div>
 

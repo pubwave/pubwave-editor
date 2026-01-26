@@ -80,7 +80,7 @@
 .pubwave-editor__content .pubwave-editor__table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 .pubwave-editor__content th,
