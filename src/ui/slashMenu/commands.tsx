@@ -6,6 +6,7 @@
 
 import React from 'react';
 import type { Editor } from '@tiptap/core';
+import { TextSelection } from '@tiptap/pm/state';
 import { safeRequestAnimationFrame } from '../../core/util';
 import type { ImageUploadConfig } from '../../types/editor';
 import type { EditorLocale } from '../../i18n';
@@ -22,8 +23,10 @@ import {
   DividerIcon,
   TableIcon,
   ImageIcon,
+  ChartIcon,
 } from '../toolbar/icons';
 import { LayoutTwoIcon, LayoutThreeIcon } from '../blocks/LayoutIcons';
+import { createDefaultChartData } from '../blocks/chartTypes';
 import { handleImageUpload } from './imageUpload';
 
 /**
@@ -55,16 +58,29 @@ function insertLayout(editor: Editor, columns: 2 | 3) {
   const layoutNode = layoutType.create({ columns }, columnsContent);
 
   // Insert the layout node
+  const { from } = state.selection;
   const transaction = state.tr.replaceSelectionWith(layoutNode);
-  dispatch(transaction);
 
-  // Focus the first column
-  const layoutPos = transaction.selection.$from.before();
-  editor
-    .chain()
-    .focus()
-    .setTextSelection(layoutPos + 2)
-    .run();
+  // Focus the first column's text position
+  const layoutPos = transaction.mapping.map(from, -1);
+  const layoutAtPos = transaction.doc.nodeAt(layoutPos);
+  if (layoutAtPos) {
+    let cursorPos = layoutPos;
+    let node = layoutAtPos;
+    while (node.childCount > 0) {
+      const child = node.child(0);
+      cursorPos += 1;
+      node = child;
+      if (node.isTextblock) {
+        cursorPos += 1;
+        break;
+      }
+    }
+    transaction.setSelection(TextSelection.create(transaction.doc, cursorPos));
+  }
+
+  dispatch(transaction);
+  editor.view.focus();
 }
 
 /**
@@ -126,6 +142,10 @@ export function createDefaultSlashCommands(
         table: {
           title: 'Table',
           description: 'Insert a table',
+        },
+        chart: {
+          title: 'Chart',
+          description: 'Insert a chart',
         },
         layoutTwoColumn: {
           title: 'Two Column Layout',
@@ -328,6 +348,28 @@ export function createDefaultSlashCommands(
           .focus()
           .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
           .run(),
+    },
+    {
+      id: 'chart',
+      title: cmd.chart?.title ?? 'Chart',
+      description: cmd.chart?.description ?? 'Insert a chart',
+      icon: <ChartIcon />,
+      aliases: ['chart', 'graph', 'plot'],
+      group: 'advanced',
+      action: (editor) => {
+        if (!editor.schema.nodes.chart) {
+          console.warn('Chart node type not found in schema');
+          return;
+        }
+        editor
+          .chain()
+          .focus()
+          .insertContent({
+            type: 'chart',
+            attrs: { data: createDefaultChartData('bar') },
+          })
+          .run();
+      },
     },
     // Layout
     {

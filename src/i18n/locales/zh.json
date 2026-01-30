@@ -56,6 +56,10 @@
         "title": "表格",
         "description": "插入表格"
       },
+      "chart": {
+        "title": "圖表",
+        "description": "插入圖表"
+      },
       "layoutTwoColumn": {
         "title": "兩欄版面配置",
         "description": "將內容分成兩個並排的欄"

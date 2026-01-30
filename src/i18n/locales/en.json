@@ -56,6 +56,10 @@
         "title": "Table",
         "description": "Insert a table"
       },
+      "chart": {
+        "title": "Chart",
+        "description": "Insert a chart"
+      },
       "layoutTwoColumn": {
         "title": "Two Column Layout",
         "description": "Split content into two side-by-side columns"

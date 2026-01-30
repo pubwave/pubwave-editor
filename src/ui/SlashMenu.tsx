@@ -140,6 +140,7 @@ export const SlashMenuList = React.forwardRef<
     list: 'Lists',
     media: 'Media',
     advanced: 'Advanced',
+    layout: 'Layout',
   };
 
   // Don't render if no items
@@ -152,7 +153,7 @@ export const SlashMenuList = React.forwardRef<
       <div style={{ padding: 'var(--pubwave-spacing-1, 4px) 0' }}>
         {(() => {
           let globalIndex = 0;
-          const groupOrder = ['basic', 'list', 'media', 'advanced'];
+          const groupOrder = ['basic', 'list', 'media', 'advanced', 'layout'];
 
           return groupOrder.map((group) => {
             const groupItems = groupedItems[group];

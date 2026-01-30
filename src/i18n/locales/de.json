@@ -56,6 +56,10 @@
         "title": "Tabelle",
         "description": "Eine Tabelle einfügen"
       },
+      "chart": {
+        "title": "Diagramm",
+        "description": "Diagramm einfügen"
+      },
       "layoutTwoColumn": {
         "title": "Zweispaltiges Layout",
         "description": "Inhalt in zwei nebeneinander liegende Spalten aufteilen"

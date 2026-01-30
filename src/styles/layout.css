@@ -55,12 +55,14 @@
   min-height: 40px;
 }
 
-/* Empty column placeholder */
-.pubwave-layout__column-content > p:first-child:only-child::before {
-  content: "Type '/' for commands";
+/* Empty column placeholder (inside the input line) */
+.pubwave-layout__column-content
+  p.pubwave-editor__paragraph:only-child:has(> br.ProseMirror-trailingBreak)::before {
+  content: "Write, type \"/\" for commands...";
+  float: left;
   color: var(--pubwave-text-muted, #9b9a97);
-  font-style: italic;
   pointer-events: none;
+  height: 0;
 }
 
 /* Paragraph inside layout column */
@@ -106,10 +108,5 @@
 
 /* Drag handle styling compatibility */
 .pubwave-layout__column .drag-handle {
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
-.pubwave-layout__column:hover .drag-handle {
   opacity: 1;
 }

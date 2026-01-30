@@ -45,6 +45,7 @@ export interface EditorLocale {
       codeBlock: { title: string; description: string };
       horizontalRule: { title: string; description: string };
       table?: { title: string; description: string };
+      chart?: { title: string; description: string };
       layoutTwoColumn?: { title: string; description: string };
       layoutThreeColumn?: { title: string; description: string };
     };

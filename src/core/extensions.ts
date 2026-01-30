@@ -179,6 +179,9 @@ export function createExtensions(config: ExtensionConfig = {}): AnyExtension[] {
     let commands = slashCommands
       ? [...baseCommands, ...slashCommands]
       : baseCommands;
+    if (enableChart === false) {
+      commands = commands.filter((command) => command.id !== 'chart');
+    }
     if (enableLayout === false) {
       commands = commands.filter((command) => command.group !== 'layout');
     }

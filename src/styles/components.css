@@ -23,6 +23,7 @@
   opacity: 0.4;
 }
 
+
 /* Specific styling for the drag image (ghost) */
 .pubwave-block--drag-preview {
   color: var(--pubwave-text-muted, #9b9a97) !important;
