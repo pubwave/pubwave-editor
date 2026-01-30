@@ -22,7 +22,8 @@ export type BlockType =
   | 'codeBlock'
   | 'horizontalRule'
   | 'image'
-  | 'chart';
+  | 'chart'
+  | 'layout';
 
 /**
  * Supported mark types for inline formatting
@@ -226,6 +227,18 @@ export interface EditorConfig {
    * If not provided, images will be converted to base64 by default
    */
   imageUpload?: ImageUploadConfig;
+
+  /**
+   * Enable chart block support
+   * @default true
+   */
+  enableChart?: boolean;
+
+  /**
+   * Enable multi-column layout blocks
+   * @default true
+   */
+  enableLayout?: boolean;
 
   /**
    * Callback fired when the editor content changes

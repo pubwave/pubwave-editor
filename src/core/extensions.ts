@@ -5,7 +5,7 @@
  * This provides a centralized place for extension configuration.
  */
 
-import { Extension } from '@tiptap/core';
+import { Extension, type AnyExtension } from '@tiptap/core';
 import Placeholder from '@tiptap/extension-placeholder';
 import History from '@tiptap/extension-history';
 import Dropcursor from '@tiptap/extension-dropcursor';
@@ -27,10 +27,11 @@ import {
 } from './extensions/marks';
 import {
   createSlashCommandsExtension,
-  defaultSlashCommands,
+  createDefaultSlashCommands,
   type SlashCommand,
 } from '../ui/SlashMenu';
 import { createDndPlugin } from './plugins/dnd';
+import { createEditorBehaviorsPlugin } from './plugins/editorBehaviors';
 import { getLocale } from '../i18n';
 
 /**
@@ -48,6 +49,7 @@ export const SUPPORTED_BLOCKS: readonly BlockType[] = [
   'horizontalRule',
   'image',
   'chart',
+  'layout',
 ] as const;
 
 /**
@@ -105,13 +107,15 @@ export interface ExtensionConfig
  *
  * This composes all block, mark, and feature extensions into a single array.
  */
-export function createExtensions(config: ExtensionConfig = {}): Extension[] {
+export function createExtensions(config: ExtensionConfig = {}): AnyExtension[] {
   const {
     placeholder: placeholderProp,
     historyDepth = 100,
     headingLevels,
     linkOpenInNewTab,
     linkOpenOnClick,
+    enableChart,
+    enableLayout,
     enableSlashCommands = true,
     slashCommands,
     imageUpload,
@@ -125,9 +129,14 @@ export function createExtensions(config: ExtensionConfig = {}): Extension[] {
     localeData?.placeholder ??
     'Write,type "/" for commands...';
 
-  const extensions: Extension[] = [
+  const extensions: AnyExtension[] = [
     // Block extensions (document structure + block types)
-    ...createBlockExtensions({ headingLevels, imageUpload }),
+    ...createBlockExtensions({
+      headingLevels,
+      imageUpload,
+      enableChart,
+      enableLayout,
+    }),
 
     // Mark extensions (inline formatting)
     ...createMarkExtensions({ linkOpenInNewTab, linkOpenOnClick }),
@@ -155,16 +164,26 @@ export function createExtensions(config: ExtensionConfig = {}): Extension[] {
         return [createDndPlugin(this.editor)];
       },
     }),
+    Extension.create({
+      name: 'editorBehaviors',
+      addProseMirrorPlugins() {
+        return [createEditorBehaviorsPlugin()];
+      },
+    }),
   ];
 
   // Slash commands (optional)
   if (enableSlashCommands) {
-    const localeData = locale ? getLocale(locale) : getLocale('en');
-    const commands = slashCommands
-      ? [...defaultSlashCommands, ...slashCommands]
-      : defaultSlashCommands;
+    const slashLocale = locale ? getLocale(locale) : getLocale('en');
+    const baseCommands = createDefaultSlashCommands(imageUpload, slashLocale);
+    let commands = slashCommands
+      ? [...baseCommands, ...slashCommands]
+      : baseCommands;
+    if (enableLayout === false) {
+      commands = commands.filter((command) => command.group !== 'layout');
+    }
     extensions.push(
-      createSlashCommandsExtension(commands, imageUpload, localeData)
+      createSlashCommandsExtension(commands, imageUpload, slashLocale)
     );
   }
 
@@ -174,6 +193,6 @@ export function createExtensions(config: ExtensionConfig = {}): Extension[] {
 /**
  * Get the default extensions with standard configuration
  */
-export function getDefaultExtensions(): Extension[] {
+export function getDefaultExtensions(): AnyExtension[] {
   return createExtensions();
 }

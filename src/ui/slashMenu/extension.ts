@@ -20,14 +20,15 @@ import { SlashMenuList } from '../SlashMenu';
  * Create the Slash Commands Extension
  */
 export function createSlashCommandsExtension(
-  commands: SlashCommand[] = defaultSlashCommands,
+  commands?: SlashCommand[],
   imageUploadConfig?: ImageUploadConfig,
   locale?: EditorLocale
 ) {
-  // If imageUploadConfig or locale is provided, recreate commands with the config
-  const finalCommands = imageUploadConfig || locale
-    ? createDefaultSlashCommands(imageUploadConfig, locale)
-    : commands;
+  const finalCommands =
+    commands ??
+    (imageUploadConfig || locale
+      ? createDefaultSlashCommands(imageUploadConfig, locale)
+      : defaultSlashCommands);
 
   // Get group labels from locale or use defaults
   const groupLabels = locale?.slashMenu?.groups || {
@@ -260,4 +261,3 @@ export function createSlashCommandsExtension(
     },
   });
 }
-

@@ -8,7 +8,7 @@
  * - Paragraph, Heading, Lists, Quote, Code Block, Divider, etc.
  */
 
-import { Extension } from '@tiptap/core';
+import type { AnyExtension } from '@tiptap/core';
 import Document from '@tiptap/extension-document';
 import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
@@ -26,11 +26,10 @@ import Blockquote from '@tiptap/extension-blockquote';
 import CodeBlock from '@tiptap/extension-code-block';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import HardBreak from '@tiptap/extension-hard-break';
-import Image from '@tiptap/extension-image';
 import { Chart } from './chart';
 import { Layout, LayoutColumn } from './layout';
-import { Plugin, PluginKey } from '@tiptap/pm/state';
 import type { ImageUploadConfig } from '../../types/editor';
+import { createImageExtension } from './image';
 
 export interface BlockExtensionsConfig {
   /**
@@ -43,6 +42,18 @@ export interface BlockExtensionsConfig {
    * Image upload configuration
    */
   imageUpload?: ImageUploadConfig;
+
+  /**
+   * Enable chart block support
+   * @default true
+   */
+  enableChart?: boolean;
+
+  /**
+   * Enable multi-column layout blocks
+   * @default true
+   */
+  enableLayout?: boolean;
 }
 
 /**
@@ -58,58 +69,17 @@ export interface BlockExtensionsConfig {
  * - CodeBlock: Code snippets
  * - HorizontalRule: Divider
  */
-/**
- * Upload image file and return URL
- * Uses custom handler if provided, otherwise converts to base64
- */
-async function uploadImage(
-  file: File,
-  config?: ImageUploadConfig
-): Promise<string> {
-  const maxSize = config?.maxSize ?? 10 * 1024 * 1024; // 10MB default
-  if (file.size > maxSize) {
-    throw new Error(
-      `Image file is too large. Maximum size is ${maxSize / 1024 / 1024}MB`
-    );
-  }
-
-  // If custom handler is provided, use it
-  if (config?.handler) {
-    try {
-      return await config.handler(file);
-    } catch (error) {
-      console.warn(
-        'Custom image upload failed, falling back to base64:',
-        error
-      );
-      // Fall through to base64 conversion
-    }
-  }
-
-  // Default: convert to base64
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const src = e.target?.result as string;
-      if (src) {
-        resolve(src);
-      } else {
-        reject(new Error('Failed to read image file'));
-      }
-    };
-    reader.onerror = () => {
-      reject(new Error('Failed to read image file'));
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
 export function createBlockExtensions(
   config: BlockExtensionsConfig = {}
-): Extension[] {
-  const { headingLevels = [1, 2, 3], imageUpload } = config;
+): AnyExtension[] {
+  const {
+    headingLevels = [1, 2, 3],
+    imageUpload,
+    enableChart = true,
+    enableLayout = true,
+  } = config;
 
-  return [
+  const extensions: AnyExtension[] = [
     // Document structure (required)
     Document,
     Paragraph.configure({
@@ -203,81 +173,35 @@ export function createBlockExtensions(
     }),
 
     // Image with paste support
-    Image.extend({
-      addProseMirrorPlugins() {
-        return [
-          new Plugin({
-            key: new PluginKey('imagePasteHandler'),
-            props: {
-              handlePaste: (view, event) => {
-                const items = Array.from(event.clipboardData?.items || []);
+    createImageExtension(imageUpload),
+  ];
 
-                for (const item of items) {
-                  if (item.type.indexOf('image') === 0) {
-                    event.preventDefault();
+  if (enableChart) {
+    extensions.push(
+      Chart.configure({
+        HTMLAttributes: {
+          class: 'pubwave-editor__chart',
+        },
+      })
+    );
+  }
 
-                    const file = item.getAsFile();
-                    if (file) {
-                      // Upload image (uses custom handler or base64)
-                      uploadImage(file, imageUpload)
-                        .then((src) => {
-                          const { state, dispatch } = view;
-                          const imageNodeType = state.schema.nodes.image;
+  if (enableLayout) {
+    extensions.push(
+      Layout.configure({
+        HTMLAttributes: {
+          class: 'pubwave-editor__layout',
+        },
+      }),
+      LayoutColumn.configure({
+        HTMLAttributes: {
+          class: 'pubwave-editor__layout-column',
+        },
+      })
+    );
+  }
 
-                          if (imageNodeType) {
-                            const imageNode = imageNodeType.create({
-                              src,
-                            });
-
-                            const transaction =
-                              state.tr.replaceSelectionWith(imageNode);
-                            dispatch(transaction);
-                          }
-                        })
-                        .catch((error) => {
-                          console.error('Failed to upload image:', error);
-                        });
-
-                      return true;
-                    }
-                  }
-                }
-
-                return false;
-              },
-            },
-          }),
-        ];
-      },
-    }).configure({
-      inline: false,
-      allowBase64: true,
-      HTMLAttributes: {
-        class: 'pubwave-editor__image',
-      },
-    }),
-
-    // Chart with Chart.js
-    Chart.configure({
-      HTMLAttributes: {
-        class: 'pubwave-editor__chart',
-      },
-    }),
-
-    // Layout (2-column and 3-column)
-    Layout.configure({
-      HTMLAttributes: {
-        class: 'pubwave-editor__layout',
-      },
-    }),
-
-    // LayoutColumn (individual column within layout)
-    LayoutColumn.configure({
-      HTMLAttributes: {
-        class: 'pubwave-editor__layout-column',
-      },
-    }),
-  ] as Extension[];
+  return extensions;
 }
 
 /**

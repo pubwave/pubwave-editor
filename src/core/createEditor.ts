@@ -33,6 +33,9 @@ export function createEditor(config: EditorConfig = {}): Editor {
     editable = true,
     placeholder,
     autofocus = false,
+    imageUpload,
+    enableChart,
+    enableLayout,
     onUpdate,
     onSelectionUpdate,
     onFocus,
@@ -47,6 +50,9 @@ export function createEditor(config: EditorConfig = {}): Editor {
     headingLevels: [1, 2, 3],
     linkOpenInNewTab: true,
     linkOpenOnClick: true,
+    imageUpload,
+    enableChart,
+    enableLayout,
   });
 
   // Build Tiptap editor options

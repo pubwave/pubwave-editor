@@ -452,6 +452,59 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
       );
     }
 
+    const handleContainerMouseDown = (event: React.MouseEvent<HTMLDivElement>): void => {
+      if (!editor || !editable) return;
+      if (event.button !== 0 || event.defaultPrevented) return;
+
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+
+      // Let ProseMirror handle clicks inside the content area
+      const proseMirror = editor.view.dom as HTMLElement | null;
+      if (proseMirror && proseMirror.contains(target)) return;
+
+      const lastBlock = proseMirror?.lastElementChild as HTMLElement | null;
+      const containerRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      if (
+        event.clientX < containerRect.left ||
+        event.clientX > containerRect.right ||
+        event.clientY < containerRect.top ||
+        event.clientY > containerRect.bottom
+      ) {
+        return;
+      }
+
+      if (lastBlock) {
+        const lastRect = lastBlock.getBoundingClientRect();
+        if (event.clientY <= lastRect.bottom + 1) {
+          return;
+        }
+      }
+
+      const { state } = editor;
+      const paragraphType = state.schema.nodes.paragraph;
+      if (!paragraphType) return;
+
+      const endPos = state.doc.content.size;
+      const lastNode = state.doc.lastChild;
+
+      if (
+        lastNode &&
+        lastNode.type === paragraphType &&
+        lastNode.content.size === 0
+      ) {
+        editor.chain().focus().setTextSelection(Math.max(1, endPos - 1)).run();
+        return;
+      }
+
+      editor
+        .chain()
+        .focus()
+        .insertContentAt(endPos, { type: 'paragraph' })
+        .setTextSelection(endPos + 1)
+        .run();
+    };
+
     return (
       <LocaleProvider value={{ locale }}>
         <div
@@ -460,6 +513,7 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
           role="application"
           aria-label={ariaLabels.editor}
           style={themeStyles}
+          onMouseDown={handleContainerMouseDown}
         >
           <EditorContent editor={editor} />
           {/* Bubble toolbar - appears only on non-empty text selection (US2) */}

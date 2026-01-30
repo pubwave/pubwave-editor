@@ -35,6 +35,13 @@ function getClosestBlock(target: EventTarget | null, proseMirror: HTMLElement, e
   if (!target || !(target instanceof Node)) return null;
 
   try {
+    if (target instanceof HTMLElement) {
+      const table = target.closest('table');
+      if (table && proseMirror.contains(table)) {
+        return table as HTMLElement;
+      }
+    }
+
     // Get position in the document from DOM element
     const pos = editor.view.posAtDOM(target as Node, 0);
     const $pos = editor.state.doc.resolve(pos);
@@ -129,10 +136,17 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     let offset = 14; // Default fallback (half of standard line height approx)
 
     let target = block;
-    // For container blocks (lists, blockquotes), align with the first child (e.g. the first list item)
-    if (['UL', 'OL', 'BLOCKQUOTE'].includes(block.tagName) && block.firstElementChild instanceof HTMLElement) {
-      target = block.firstElementChild as HTMLElement;
+  // For container blocks (lists, blockquotes), align with the first child (e.g. the first list item)
+  if (['UL', 'OL', 'BLOCKQUOTE'].includes(block.tagName) && block.firstElementChild instanceof HTMLElement) {
+    target = block.firstElementChild as HTMLElement;
+  }
+
+  if (block.tagName === 'TABLE') {
+    const header = block.querySelector('thead') || block.querySelector('tr');
+    if (header instanceof HTMLElement) {
+      target = header;
     }
+  }
     
     // Force a reflow for the target element as well
     void target.offsetHeight;
