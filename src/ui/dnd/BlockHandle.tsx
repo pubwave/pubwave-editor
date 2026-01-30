@@ -13,6 +13,7 @@ import type { Editor } from '@tiptap/core';
 import { tokens } from '../theme';
 import { startDrag, findBlockAtPos } from '../../core/plugins/dnd';
 import { isMobileDevice } from '../../core/util';
+import type { Node as PMNode } from '@tiptap/pm/model';
 
 export interface BlockHandleProps {
   /** The Tiptap editor instance */
@@ -46,7 +47,19 @@ function getClosestBlock(target: EventTarget | null, proseMirror: HTMLElement, e
     const pos = editor.view.posAtDOM(target as Node, 0);
     const $pos = editor.state.doc.resolve(pos);
 
-    // 1. Check if we are inside a top-level container (List or Blockquote)
+    // 1. If inside a layout column, treat the whole layout as a single block
+    for (let d = $pos.depth; d > 0; d--) {
+      const node = $pos.node(d);
+      if (node.type.name === 'layout') {
+        const layoutDom = editor.view.nodeDOM($pos.before(d)) as HTMLElement | null;
+        if (layoutDom && proseMirror.contains(layoutDom)) {
+          return layoutDom;
+        }
+        break;
+      }
+    }
+
+    // 2. Check if we are inside a top-level container (List or Blockquote)
     if ($pos.depth >= 1) {
       const topNode = $pos.node(1);
       const containerTypes = ['taskList', 'bulletList', 'orderedList', 'blockquote'];
@@ -58,7 +71,7 @@ function getClosestBlock(target: EventTarget | null, proseMirror: HTMLElement, e
       }
     }
 
-    // 2. Otherwise, walk from innermost depth towards root to find the first block node
+    // 3. Otherwise, walk from innermost depth towards root to find the first block node
     for (let d = $pos.depth; d > 0; d--) {
       const node = $pos.node(d);
       if (node.isBlock) {
@@ -84,6 +97,36 @@ function getClosestBlock(target: EventTarget | null, proseMirror: HTMLElement, e
   return null;
 }
 
+function findTableCellPos(
+  tableNode: PMNode,
+  tablePos: number,
+  rowIndex: number,
+  colIndex: number
+): number | null {
+  if (tableNode.childCount === 0) {
+    return null;
+  }
+
+  let rowPos = tablePos + 1;
+  for (let r = 0; r < tableNode.childCount; r++) {
+    const row = tableNode.child(r);
+    if (r === rowIndex) {
+      let cellPos = rowPos + 1;
+      for (let c = 0; c < row.childCount; c++) {
+        const cell = row.child(c);
+        if (c === colIndex) {
+          return cellPos + 1;
+        }
+        cellPos += cell.nodeSize;
+      }
+      return null;
+    }
+    rowPos += row.nodeSize;
+  }
+
+  return null;
+}
+
 /**
  * BlockHandle Component - Notion-style block controls
  */
@@ -97,6 +140,195 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
   const [position, setPosition] = useState({ top: 0 });
   const [isMobile, setIsMobile] = useState(false);
   const [isWindowTooSmall, setIsWindowTooSmall] = useState(false);
+  const [tableControls, setTableControls] = useState<{
+    showRow: boolean;
+    showCol: boolean;
+    rect: DOMRect | null;
+  }>({ showRow: false, showCol: false, rect: null });
+  const tableTargetRef = useRef<HTMLElement | null>(null);
+  const tableControlsRef = useRef(tableControls);
+  const tableResizeObserverRef = useRef<ResizeObserver | null>(null);
+  const observedTableRef = useRef<HTMLElement | null>(null);
+
+  const setTableControlsState = useCallback(
+    (next: { showRow: boolean; showCol: boolean; rect: DOMRect | null }) => {
+      const prev = tableControlsRef.current;
+      if (
+        prev.showRow === next.showRow &&
+        prev.showCol === next.showCol &&
+        prev.rect?.top === next.rect?.top &&
+        prev.rect?.left === next.rect?.left &&
+        prev.rect?.width === next.rect?.width &&
+        prev.rect?.height === next.rect?.height
+      ) {
+        return;
+      }
+      tableControlsRef.current = next;
+      setTableControls(next);
+    },
+    []
+  );
+
+  const updateTableControls = useCallback(
+    (event: MouseEvent, proseMirror: HTMLElement) => {
+      if (isDraggingRef.current || isMobile || isWindowTooSmall) {
+        setTableControlsState({ showRow: false, showCol: false, rect: null });
+        tableTargetRef.current = null;
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      if (!target) {
+        setTableControlsState({ showRow: false, showCol: false, rect: null });
+        tableTargetRef.current = null;
+        return;
+      }
+
+      const colControl = target.closest('.pubwave-table-add-column');
+      const rowControl = target.closest('.pubwave-table-add-row');
+      if (colControl || rowControl) {
+        const rect =
+          tableTargetRef.current?.getBoundingClientRect() ??
+          tableControlsRef.current.rect;
+        if (!rect) {
+          return;
+        }
+        setTableControlsState({
+          showRow: rowControl ? true : tableControlsRef.current.showRow,
+          showCol: colControl ? true : tableControlsRef.current.showCol,
+          rect,
+        });
+        return;
+      }
+
+      const tableWrapper = target.closest('.tableWrapper');
+      let table = target.closest('table');
+      if (!table && tableWrapper instanceof HTMLElement) {
+        table = tableWrapper.querySelector('table');
+      }
+
+      const EDGE_THRESHOLD = 14;
+      const CONTROL_MARGIN = 56;
+      const EDGE_SLOP = 20;
+
+      const resolveEdgeState = (rect: DOMRect) => {
+        const withinVertical =
+          event.clientY >= rect.top - EDGE_SLOP &&
+          event.clientY <= rect.bottom + EDGE_SLOP;
+        const withinHorizontal =
+          event.clientX >= rect.left - EDGE_SLOP &&
+          event.clientX <= rect.right + EDGE_SLOP;
+        const nearRight =
+          withinVertical &&
+          event.clientX >= rect.right - EDGE_THRESHOLD &&
+          event.clientX <= rect.right + CONTROL_MARGIN;
+        const nearBottom =
+          withinHorizontal &&
+          event.clientY >= rect.bottom - EDGE_THRESHOLD &&
+          event.clientY <= rect.bottom + CONTROL_MARGIN;
+
+        return { nearRight, nearBottom };
+      };
+
+      if (table && proseMirror.contains(table)) {
+        const rect = table.getBoundingClientRect();
+        const { nearRight, nearBottom } = resolveEdgeState(rect);
+
+        if (!nearRight && !nearBottom) {
+          setTableControlsState({ showRow: false, showCol: false, rect: null });
+          tableTargetRef.current = null;
+          return;
+        }
+
+        tableTargetRef.current = table as HTMLElement;
+        setTableControlsState({ showRow: nearBottom, showCol: nearRight, rect });
+        return;
+      }
+
+      if (tableTargetRef.current) {
+        const rect = tableTargetRef.current.getBoundingClientRect();
+        const { nearRight, nearBottom } = resolveEdgeState(rect);
+        if (nearRight || nearBottom) {
+          setTableControlsState({ showRow: nearBottom, showCol: nearRight, rect });
+          return;
+        }
+      }
+
+      setTableControlsState({ showRow: false, showCol: false, rect: null });
+      tableTargetRef.current = null;
+    },
+    [isMobile, isWindowTooSmall, setTableControlsState]
+  );
+
+  const getActiveTableInfo = useCallback(() => {
+    const table = tableTargetRef.current;
+    if (!table) return null;
+    try {
+      const pos = editor.view.posAtDOM(table, 0);
+      const blockInfo = findBlockAtPos(editor.state.doc, pos);
+      if (!blockInfo || blockInfo.node.type.name !== 'table') {
+        return null;
+      }
+      return blockInfo;
+    } catch (err) {
+      return null;
+    }
+  }, [editor]);
+
+  const addTableRowAtEnd = useCallback(() => {
+    const tableInfo = getActiveTableInfo();
+    if (!tableInfo) return;
+    const lastRowIndex = Math.max(0, tableInfo.node.childCount - 1);
+    const lastRow = tableInfo.node.child(lastRowIndex);
+    const lastColIndex = Math.max(0, lastRow.childCount - 1);
+    const cellPos = findTableCellPos(
+      tableInfo.node,
+      tableInfo.pos,
+      lastRowIndex,
+      lastColIndex
+    );
+    if (cellPos == null) return;
+    editor.chain().focus().setTextSelection(cellPos).addRowAfter().run();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (tableTargetRef.current) {
+          const rect = tableTargetRef.current.getBoundingClientRect();
+          setTableControlsState({
+            showRow: tableControlsRef.current.showRow,
+            showCol: tableControlsRef.current.showCol,
+            rect,
+          });
+        }
+      });
+    });
+  }, [editor, getActiveTableInfo]);
+
+  const addTableColumnAtEnd = useCallback(() => {
+    const tableInfo = getActiveTableInfo();
+    if (!tableInfo) return;
+    const firstRow = tableInfo.node.child(0);
+    const lastColIndex = Math.max(0, firstRow.childCount - 1);
+    const cellPos = findTableCellPos(
+      tableInfo.node,
+      tableInfo.pos,
+      0,
+      lastColIndex
+    );
+    if (cellPos == null) return;
+    editor.chain().focus().setTextSelection(cellPos).addColumnAfter().run();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (tableTargetRef.current) {
+          const rect = tableTargetRef.current.getBoundingClientRect();
+          setTableControlsState({
+            showRow: tableControlsRef.current.showRow,
+            showCol: tableControlsRef.current.showCol,
+            rect,
+          });
+        }
+      });
+    });
+  }, [editor, getActiveTableInfo]);
 
   // Detect mobile device and window width on mount and window resize
   useEffect(() => {
@@ -136,8 +368,24 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     let offset = 14; // Default fallback (half of standard line height approx)
 
     let target = block;
+  // For layout blocks, align with the first column's first paragraph if present
+  if (
+    block.classList.contains('pubwave-editor__layout') ||
+    block.getAttribute('data-type') === 'layout'
+  ) {
+    const firstParagraph = block.querySelector(
+      '.pubwave-layout__column-content p'
+    );
+    if (firstParagraph instanceof HTMLElement) {
+      target = firstParagraph;
+    }
+  }
+
   // For container blocks (lists, blockquotes), align with the first child (e.g. the first list item)
-  if (['UL', 'OL', 'BLOCKQUOTE'].includes(block.tagName) && block.firstElementChild instanceof HTMLElement) {
+  if (
+    ['UL', 'OL', 'BLOCKQUOTE'].includes(block.tagName) &&
+    block.firstElementChild instanceof HTMLElement
+  ) {
     target = block.firstElementChild as HTMLElement;
   }
 
@@ -296,6 +544,27 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
       }, 150);
     };
 
+    const onMouseMove = (e: MouseEvent): void => {
+      const target = e.target as HTMLElement | null;
+      if (!target) {
+        updateTableControls(e, proseMirror);
+        return;
+      }
+
+      if (target.closest('.pubwave-table-add-column') || target.closest('.pubwave-table-add-row')) {
+        updateTableControls(e, proseMirror);
+        return;
+      }
+
+      if (!editorContainer.contains(target)) {
+        setTableControlsState({ showRow: false, showCol: false, rect: null });
+        tableTargetRef.current = null;
+        return;
+      }
+
+      updateTableControls(e, proseMirror);
+    };
+
     // Handle mouse leaving the entire editor container
     const onEditorMouseLeave = (): void => {
       if (isDraggingRef.current) return;
@@ -303,10 +572,13 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
       hideTimeoutRef.current = setTimeout(() => {
         hideHandle();
       }, 150);
+      setTableControlsState({ showRow: false, showCol: false, rect: null });
+      tableTargetRef.current = null;
     };
 
     proseMirror.addEventListener('mouseover', onMouseOver);
     proseMirror.addEventListener('mouseout', onMouseOut);
+    document.addEventListener('mousemove', onMouseMove);
     // Also listen to mouseleave on the entire editor container to catch when mouse leaves editor
     editorContainer.addEventListener('mouseleave', onEditorMouseLeave);
 
@@ -324,11 +596,12 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     return () => {
       proseMirror.removeEventListener('mouseover', onMouseOver);
       proseMirror.removeEventListener('mouseout', onMouseOut);
+      document.removeEventListener('mousemove', onMouseMove);
       editorContainer.removeEventListener('mouseleave', onEditorMouseLeave);
       editor.off('transaction', handleTransaction);
       clearHideTimeout();
     };
-  }, [editor, showHandle, hideHandle, clearHideTimeout]);
+  }, [editor, showHandle, hideHandle, clearHideTimeout, updateTableControls, setTableControlsState]);
 
   // Update position when visible state changes
   useEffect(() => {
@@ -344,17 +617,94 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
 
   // Handle scroll - update position
   useEffect(() => {
-    if (!visible) return;
+    if (!visible && !tableControls.showRow && !tableControls.showCol) return;
 
     const onScroll = () => {
       if (currentBlockRef.current) {
         updatePosition();
       }
+      if (tableTargetRef.current && tableControlsRef.current.rect) {
+        const rect = tableTargetRef.current.getBoundingClientRect();
+        setTableControlsState({
+          showRow: tableControlsRef.current.showRow,
+          showCol: tableControlsRef.current.showCol,
+          rect,
+        });
+      }
     };
 
     window.addEventListener('scroll', onScroll, true);
     return () => window.removeEventListener('scroll', onScroll, true);
-  }, [visible, updatePosition]);
+  }, [
+    visible,
+    tableControls.showRow,
+    tableControls.showCol,
+    updatePosition,
+    setTableControlsState,
+  ]);
+
+  useEffect(() => {
+    const table = tableTargetRef.current;
+    const shouldObserve = table && (tableControls.showRow || tableControls.showCol);
+
+    if (!shouldObserve) {
+      if (tableResizeObserverRef.current) {
+        tableResizeObserverRef.current.disconnect();
+        tableResizeObserverRef.current = null;
+      }
+      observedTableRef.current = null;
+      return;
+    }
+
+    if (observedTableRef.current !== table) {
+      if (tableResizeObserverRef.current) {
+        tableResizeObserverRef.current.disconnect();
+      }
+      if (typeof ResizeObserver !== 'undefined') {
+        const observer = new ResizeObserver(() => {
+          if (!tableTargetRef.current) return;
+          const rect = tableTargetRef.current.getBoundingClientRect();
+          setTableControlsState({
+            showRow: tableControlsRef.current.showRow,
+            showCol: tableControlsRef.current.showCol,
+            rect,
+          });
+        });
+        observer.observe(table);
+        tableResizeObserverRef.current = observer;
+      }
+      observedTableRef.current = table;
+    }
+
+    if (table) {
+      const rect = table.getBoundingClientRect();
+      setTableControlsState({
+        showRow: tableControlsRef.current.showRow,
+        showCol: tableControlsRef.current.showCol,
+        rect,
+      });
+    }
+
+    const onResize = () => {
+      if (!tableTargetRef.current) return;
+      const rect = tableTargetRef.current.getBoundingClientRect();
+      setTableControlsState({
+        showRow: tableControlsRef.current.showRow,
+        showCol: tableControlsRef.current.showCol,
+        rect,
+      });
+    };
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+      if (tableResizeObserverRef.current) {
+        tableResizeObserverRef.current.disconnect();
+        tableResizeObserverRef.current = null;
+      }
+      observedTableRef.current = null;
+    };
+  }, [tableControls.showRow, tableControls.showCol, setTableControlsState]);
 
   // Handle add block click - insert paragraph and focus
   const handleAdd = useCallback(() => {
@@ -493,49 +843,171 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
     setVisible(false);
   }, []);
 
+  const shouldRenderTableControls = tableControls.showRow || tableControls.showCol;
   // Don't show on mobile devices or when window is too small
-  if (isMobile || isWindowTooSmall || !visible) return null;
+  if (isMobile || isWindowTooSmall || (!visible && !shouldRenderTableControls)) {
+    return null;
+  }
+  const editorContainer =
+    (tableTargetRef.current?.closest('.pubwave-editor') as HTMLElement | null) ||
+    (containerRef.current?.closest('.pubwave-editor') as HTMLElement | null);
+  const editorRect = editorContainer ? editorContainer.getBoundingClientRect() : null;
+  const tableRect =
+    tableTargetRef.current?.getBoundingClientRect() || tableControls.rect;
 
   return (
-    <div
-      ref={containerRef}
-      className="pubwave-block-handle"
-      data-testid="block-handle"
-      style={{
-        position: 'absolute',
-        left: 'calc(var(--pubwave-container-padding-left, 140px) - 80px)',
-        top: `${position.top}px`,
-        transform: 'translateY(-50%)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '2px',
-        pointerEvents: 'auto',
-        transition: `opacity ${tokens.transition.fast}`,
-        zIndex: tokens.zIndex.dragHandle,
-        opacity: visible && !isDragging ? 1 : 0,
-      }}
-      onMouseEnter={(e) => {
-        // Clear any pending hide when mouse enters handle
-        e.stopPropagation();
-        if (hideTimeoutRef.current) {
-          clearTimeout(hideTimeoutRef.current);
-          hideTimeoutRef.current = null;
-        }
-      }}
-      onMouseLeave={(e) => {
-        e.stopPropagation();
-        const relatedTarget = e.relatedTarget as HTMLElement | null;
-        // Only hide if mouse leaves to outside the editor
-        if (!relatedTarget?.closest('.pubwave-editor')) {
+    <>
+      {tableRect && editorRect && (
+        <>
+          {tableControls.showCol && (
+            <button
+              type="button"
+              className="pubwave-table-add-column"
+              onClick={(e) => {
+                e.stopPropagation();
+                addTableColumnAtEnd();
+              }}
+              style={{
+                position: 'fixed',
+                left: `${tableRect.right + 2}px`,
+                top: `${tableRect.top}px`,
+                width: '16px',
+                height: `${tableRect.height}px`,
+                border: 'none',
+                padding: 0,
+                background: 'transparent',
+                cursor: 'pointer',
+                zIndex: tokens.zIndex.dragHandle,
+              }}
+              aria-label="Add column"
+              title="Add column"
+            >
+              <div
+                style={{
+                  position: 'relative',
+                  width: '12px',
+                  height: '100%',
+                  margin: '0 auto',
+                  borderRadius: '999px',
+                  background: `var(--pubwave-border, ${tokens.colors.border})`,
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: `var(--pubwave-text-muted, ${tokens.colors.textMuted})`,
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    lineHeight: '14px',
+                  }}
+                >
+                  +
+                </div>
+              </div>
+            </button>
+          )}
+          {tableControls.showRow && (
+            <button
+              type="button"
+              className="pubwave-table-add-row"
+              onClick={(e) => {
+                e.stopPropagation();
+                addTableRowAtEnd();
+              }}
+              style={{
+                position: 'fixed',
+                left: `${tableRect.left}px`,
+                top: `${tableRect.bottom + 2}px`,
+                width: `${tableRect.width}px`,
+                height: '16px',
+                border: 'none',
+                padding: 0,
+                background: 'transparent',
+                cursor: 'pointer',
+                zIndex: tokens.zIndex.dragHandle,
+              }}
+              aria-label="Add row"
+              title="Add row"
+            >
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '12px',
+                  margin: '0 auto',
+                  borderRadius: '999px',
+                  background: `var(--pubwave-border, ${tokens.colors.border})`,
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: `var(--pubwave-text-muted, ${tokens.colors.textMuted})`,
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    lineHeight: '14px',
+                  }}
+                >
+                  +
+                </div>
+              </div>
+            </button>
+          )}
+        </>
+      )}
+      <div
+        ref={containerRef}
+        className="pubwave-block-handle"
+        data-testid="block-handle"
+        style={{
+          position: 'absolute',
+          left: 'calc(var(--pubwave-container-padding-left, 140px) - 80px)',
+          top: `${position.top}px`,
+          transform: 'translateY(-50%)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '2px',
+          pointerEvents: 'auto',
+          transition: `opacity ${tokens.transition.fast}`,
+          zIndex: tokens.zIndex.dragHandle,
+          opacity: visible && !isDragging ? 1 : 0,
+        }}
+        onMouseEnter={(e) => {
+          // Clear any pending hide when mouse enters handle
+          e.stopPropagation();
           if (hideTimeoutRef.current) {
             clearTimeout(hideTimeoutRef.current);
+            hideTimeoutRef.current = null;
           }
-          hideTimeoutRef.current = setTimeout(() => {
-            hideHandle();
-          }, 150);
-        }
-      }}
-    >
+        }}
+        onMouseLeave={(e) => {
+          e.stopPropagation();
+          const relatedTarget = e.relatedTarget;
+          const relatedElement =
+            relatedTarget instanceof Element ? relatedTarget : null;
+          // Only hide if mouse leaves to outside the editor
+          if (!relatedElement?.closest('.pubwave-editor')) {
+            if (hideTimeoutRef.current) {
+              clearTimeout(hideTimeoutRef.current);
+            }
+            hideTimeoutRef.current = setTimeout(() => {
+              hideHandle();
+            }, 150);
+          }
+        }}
+      >
       {/* Add button */}
       <button
         type="button"
@@ -584,13 +1056,14 @@ export function BlockHandle({ editor }: BlockHandleProps): React.ReactElement | 
           transition: `background-color ${tokens.transition.fast}, color ${tokens.transition.fast}`,
         }}
         role="button"
-        tabIndex={0}
+        tabIndex={-1}
         title="Drag to move"
         aria-label="Drag to reorder block"
       >
         <GripIcon />
       </div>
     </div>
+    </>
   );
 }
 

@@ -5,7 +5,7 @@ This example demonstrates how to integrate Pubwave Editor in a Next.js applicati
 ## 🚀 Quick Start
 
 ```bash
-# Install dependencies
+## Install dependencies
 npm install
 
 # Start development server

@@ -56,6 +56,10 @@
         "title": "テーブル",
         "description": "テーブルを挿入"
       },
+      "chart": {
+        "title": "チャート",
+        "description": "チャートを挿入"
+      },
       "layoutTwoColumn": {
         "title": "2カラムレイアウト",
         "description": "コンテンツを2つの横並びカラムに分割"

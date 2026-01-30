@@ -56,6 +56,10 @@
         "title": "Tabela",
         "description": "Inserir uma tabela"
       },
+      "chart": {
+        "title": "Gráfico",
+        "description": "Inserir um gráfico"
+      },
       "layoutTwoColumn": {
         "title": "Layout de duas colunas",
         "description": "Dividir o conteúdo em duas colunas lado a lado"
