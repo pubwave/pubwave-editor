@@ -39,6 +39,7 @@ export default defineConfig(({ mode }) => {
               'react/jsx-runtime',
               /^@tiptap\//,
               /^prosemirror-/,
+              /^chart\.js(\/.*)?$/,
             ],
             output: {
               globals: {
