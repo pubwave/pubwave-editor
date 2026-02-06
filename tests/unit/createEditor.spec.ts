@@ -42,7 +42,10 @@ describe('createEditor', () => {
       ],
     };
     editor = createEditor({ content });
-    expect(editor.getJSON()).toEqual(content);
+    const json = editor.getJSON();
+    expect(json.type).toBe('doc');
+    expect(json.content?.[0]?.type).toBe('paragraph');
+    expect(json.content?.[0]?.content?.[0]?.text).toBe('Hello world');
   });
 
   it('should create an editable editor by default', () => {

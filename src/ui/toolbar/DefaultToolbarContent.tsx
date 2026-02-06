@@ -19,6 +19,9 @@ import {
   UnderlineIcon,
   StrikeIcon,
   CodeIcon,
+  AlignLeftIcon,
+  AlignCenterIcon,
+  AlignRightIcon,
 } from './icons';
 
 export interface DefaultToolbarContentProps {
@@ -59,6 +62,21 @@ export function DefaultToolbarContent({
     editor.chain().focus().toggleCode().run();
   }, [editor]);
 
+  const handleAlignLeft = useCallback((): void => {
+    setOpenDropdown(null);
+    editor.chain().focus().setTextAlign('left').run();
+  }, [editor]);
+
+  const handleAlignCenter = useCallback((): void => {
+    setOpenDropdown(null);
+    editor.chain().focus().setTextAlign('center').run();
+  }, [editor]);
+
+  const handleAlignRight = useCallback((): void => {
+    setOpenDropdown(null);
+    editor.chain().focus().setTextAlign('right').run();
+  }, [editor]);
+
   const handleTurnIntoToggle = useCallback((): void => {
     setOpenDropdown((prev) => (prev === 'turnInto' ? null : 'turnInto'));
   }, []);
@@ -76,6 +94,15 @@ export function DefaultToolbarContent({
   const isUnderline = selectionState?.isUnderline ?? false;
   const isStrike = selectionState?.isStrike ?? false;
   const isCode = selectionState?.isCode ?? false;
+  const isAlignLeft =
+    editor.isActive('paragraph', { textAlign: 'left' }) ||
+    editor.isActive('heading', { textAlign: 'left' });
+  const isAlignCenter =
+    editor.isActive('paragraph', { textAlign: 'center' }) ||
+    editor.isActive('heading', { textAlign: 'center' });
+  const isAlignRight =
+    editor.isActive('paragraph', { textAlign: 'right' }) ||
+    editor.isActive('heading', { textAlign: 'right' });
 
   return (
     <>
@@ -131,6 +158,33 @@ export function DefaultToolbarContent({
       >
         <CodeIcon />
       </ToolbarButton>
+      <ToolbarButton
+        active={isAlignLeft}
+        onClick={handleAlignLeft}
+        data-tooltip="Align Left"
+        data-testid="toolbar-align-left"
+        aria-label="Align left"
+      >
+        <AlignLeftIcon />
+      </ToolbarButton>
+      <ToolbarButton
+        active={isAlignCenter}
+        onClick={handleAlignCenter}
+        data-tooltip="Align Center"
+        data-testid="toolbar-align-center"
+        aria-label="Align center"
+      >
+        <AlignCenterIcon />
+      </ToolbarButton>
+      <ToolbarButton
+        active={isAlignRight}
+        onClick={handleAlignRight}
+        data-tooltip="Align Right"
+        data-testid="toolbar-align-right"
+        aria-label="Align right"
+      >
+        <AlignRightIcon />
+      </ToolbarButton>
       <ToolbarDivider />
       <LinkButton 
         editor={editor} 
@@ -148,4 +202,3 @@ export function DefaultToolbarContent({
     </>
   );
 }
-
