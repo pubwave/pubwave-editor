@@ -16,7 +16,7 @@ A Notion-level block editor built with React and Tiptap.
 - ⌨️ **Slash Commands** - Type `/` to quickly insert blocks and formatting
 - 🎨 **Text & Background Colors** - Rich color picker with recently used colors
 - 🔄 **Turn Into** - Convert blocks between different types (paragraph, headings, lists, etc.)
-- 📋 **Rich Formatting** - Bold, italic, underline, strikethrough, code, and links
+- 📋 **Rich Formatting** - Bold, italic, underline, strikethrough, code, links, and text alignment
 - 📝 **Multiple Block Types** - Paragraphs, headings, lists, quotes, code blocks, tables, charts, and more
 - 🖼️ **Image Support** - Upload images via file picker or paste from clipboard, with base64 or custom upload service
 - 📊 **Chart Support** - Interactive charts powered by Chart.js with editable data
@@ -459,6 +459,7 @@ The toolbar appears automatically when you select text, providing quick access t
 - **Underline** - Underline text
 - **Strikethrough** - Strikethrough text
 - **Code** - Inline code formatting
+- **Alignment** - Left align, center align, right align (three direct toolbar icons)
 - **Link** - Add or edit link
 - **Text Color** - Change text color (with recently used colors)
 - **Background Color** - Change background color (with recently used colors)

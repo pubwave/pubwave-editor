@@ -30,6 +30,7 @@ import { Chart } from './chart';
 import { Layout, LayoutColumn } from './layout';
 import type { ImageUploadConfig } from '../../types/editor';
 import { createImageExtension } from './image';
+import { TextAlign } from './textAlign';
 
 export interface BlockExtensionsConfig {
   /**
@@ -96,6 +97,10 @@ export function createBlockExtensions(
       HTMLAttributes: {
         class: 'pubwave-editor__heading',
       },
+    }),
+    TextAlign.configure({
+      types: ['paragraph', 'heading'],
+      alignments: ['left', 'center', 'right'],
     }),
 
     // Lists

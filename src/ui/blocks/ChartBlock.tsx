@@ -124,10 +124,14 @@ export function ChartBlock(props: NodeViewProps) {
       if (scales.x) {
         if (scales.x.ticks) scales.x.ticks.color = textMutedColor;
         if (scales.x.grid) scales.x.grid.color = borderColor;
+        if (scales.x.title) scales.x.title.color = textColor;
+        else scales.x.title = { color: textColor };
       }
       if (scales.y) {
         if (scales.y.ticks) scales.y.ticks.color = textMutedColor;
         if (scales.y.grid) scales.y.grid.color = borderColor;
+        if (scales.y.title) scales.y.title.color = textColor;
+        else scales.y.title = { color: textColor };
       }
     }
 
@@ -187,11 +191,13 @@ export function ChartBlock(props: NodeViewProps) {
               ...(baseScales.x ?? {}),
               ticks: { ...(baseScales.x?.ticks ?? {}), color: textMutedColor },
               grid: { ...(baseScales.x?.grid ?? {}), color: borderColor },
+              title: { ...(baseScales.x?.title ?? {}), color: textColor },
             },
             y: {
               ...(baseScales.y ?? {}),
               ticks: { ...(baseScales.y?.ticks ?? {}), color: textMutedColor },
               grid: { ...(baseScales.y?.grid ?? {}), color: borderColor },
+              title: { ...(baseScales.y?.title ?? {}), color: textColor },
             },
           }
           : undefined;
