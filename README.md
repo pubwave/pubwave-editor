@@ -15,6 +15,7 @@ A Notion-level block editor built with React and Tiptap.
 - 📦 **Lightweight** - Only ships what you need (React + Tiptap peer dependencies)
 - ⌨️ **Slash Commands** - Type `/` to quickly insert blocks and formatting
 - 🎨 **Text & Background Colors** - Rich color picker with recently used colors
+- 🏷️ **Inline Tags** - Inline tag marks with custom colors, variants, and spacing
 - 🔄 **Turn Into** - Convert blocks between different types (paragraph, headings, lists, etc.)
 - 📋 **Rich Formatting** - Bold, italic, underline, strikethrough, code, links, and text alignment
 - 📝 **Multiple Block Types** - Paragraphs, headings, lists, quotes, code blocks, tables, charts, and more
@@ -135,6 +136,7 @@ For complete TypeScript type definitions, see the exported types from `@pubwave/
 
 - `EditorTheme` - Theme configuration
 - `EditorAPI` - Editor API interface
+- `TagProps` - Standalone tag component props
 - `EditorLocale` - Supported locale codes: `'en' | 'zh' | 'zh-CN' | 'ja' | 'ko' | 'fr' | 'de' | 'es' | 'pt'`
 - `ImageUploadConfig` - Image upload configuration
 
@@ -412,6 +414,69 @@ The editor also uses CSS custom properties for styling. Define these in your CSS
   --pubwave-primary: #3b82f6;
   --pubwave-hover: rgba(0, 0, 0, 0.05);
 }
+```
+
+### Inline Tags
+
+Pubwave Editor supports inline `tag` marks in content JSON.
+
+Supported attributes:
+
+- `variant`: `'soft' | 'outline' | 'solid'`
+- `tone`: `'primary' | 'neutral'`
+- `size`: `'sm' | 'md'`
+- `backgroundColor`: custom background color
+- `textColor`: custom text color
+- `borderColor`: custom border color
+- `spacing`: trailing spacing such as `'8px'` or `'0.5rem'`
+
+Example content:
+
+```ts
+const content = {
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
+          text: 'Live Preview',
+          marks: [
+            {
+              type: 'tag',
+              attrs: {
+                variant: 'outline',
+                backgroundColor: 'rgba(20, 10, 31, 0.38)',
+                textColor: '#f5f3ff',
+                borderColor: '#5b21b6',
+                spacing: '0.75rem',
+              },
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+```
+
+You can also use the standalone `Tag` component outside the editor:
+
+```tsx
+import { Tag } from '@pubwave/editor';
+
+<Tag
+  variant="outline"
+  colors={{
+    background: 'rgba(20, 10, 31, 0.38)',
+    text: '#f5f3ff',
+    border: '#5b21b6',
+  }}
+  spacing="0.75rem"
+>
+  Live Preview
+</Tag>;
 ```
 
 ---

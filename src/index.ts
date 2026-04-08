@@ -52,6 +52,8 @@ export {
 export { PubwaveEditor } from './ui/PubwaveEditor';
 export { BubbleToolbar } from './ui/BubbleToolbar';
 export type { BubbleToolbarProps, ToolbarPosition } from './ui/BubbleToolbar';
+export { Tag } from './ui/Tag';
+export type { TagProps } from './ui/Tag';
 export {
   SlashMenuList,
   createSlashCommandsExtension,

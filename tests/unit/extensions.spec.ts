@@ -22,6 +22,7 @@ describe('Extensions', () => {
     expect(SUPPORTED_MARKS).toBeDefined();
     expect(Array.isArray(SUPPORTED_MARKS)).toBe(true);
     expect(SUPPORTED_MARKS.length).toBeGreaterThan(0);
+    expect(SUPPORTED_MARKS).toContain('tag');
   });
 
   it('should create extensions with default config', () => {

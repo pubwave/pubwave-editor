@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { PubwaveEditor } from '../../../src/index';
+import { PubwaveEditor } from '@pubwave/editor';
 import type { EditorTheme, EditorAPI } from '@pubwave/editor';
 import type { JSONContent } from '@tiptap/core';
 import '@pubwave/editor/style.css';

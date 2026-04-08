@@ -25,6 +25,59 @@ const initialContent = {
       content: [
         {
           type: 'text',
+          text: 'AI Workflow',
+          marks: [
+            {
+              type: 'tag',
+              attrs: {
+                backgroundColor: '#07111f',
+                textColor: '#ffffff',
+                borderColor: '#12304d',
+                spacing: '0.75rem',
+              },
+            },
+          ],
+        },
+        {
+          type: 'text',
+          text: 'Theme Aware',
+          marks: [
+            {
+              type: 'tag',
+              attrs: {
+                tone: 'neutral',
+                variant: 'outline',
+                backgroundColor: 'rgba(11, 22, 35, 0.42)',
+                textColor: '#ffffff',
+                borderColor: '#1f4b6e',
+                spacing: '0.75rem',
+              },
+            },
+          ],
+        },
+        {
+          type: 'text',
+          text: 'Live Preview',
+          marks: [
+            {
+              type: 'tag',
+              attrs: {
+                variant: 'outline',
+                backgroundColor: 'rgba(20, 10, 31, 0.38)',
+                textColor: '#f5f3ff',
+                borderColor: '#5b21b6',
+                spacing: '0.25rem',
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
           text: 'Artificial Intelligence is transforming the way we ',
         },
         { type: 'text', marks: [{ type: 'bold' }], text: 'work' },
@@ -1337,6 +1390,7 @@ function App() {
       : initialContent
   );
   const [showPreview, setShowPreview] = useState(false);
+  const currentThemeConfig = themes[currentTheme];
 
   return (
     <div className="app-container" style={{ position: 'relative' }}>
@@ -1545,7 +1599,7 @@ function App() {
             (window as any).pubwaveEditor = api;
           }}
           theme={{
-            ...themes[currentTheme],
+            ...currentThemeConfig,
             locale: currentLocale,
           }}
           width="100%"
@@ -1557,7 +1611,7 @@ function App() {
         <PreviewModal
           content={editorContent}
           theme={{
-            ...themes[currentTheme],
+            ...currentThemeConfig,
             locale: currentLocale,
           }}
           onClose={() => setShowPreview(false)}

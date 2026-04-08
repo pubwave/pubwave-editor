@@ -34,6 +34,7 @@ This is the simplest integration approach where the editor is fully rendered on 
 - ✅ Great development experience
 - ✅ All editor features supported
 - ✅ Theme switcher included
+- ✅ Inline tag examples included
 
 ### 2. Server-Side Rendered Example (`/ssr`)
 

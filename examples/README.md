@@ -61,6 +61,7 @@ All examples demonstrate:
 - ⌨️ Slash command menu
 - 🎨 Text formatting toolbar
 - 🎨 Color picker
+- 🏷️ Inline tags with custom colors and spacing
 - 🖼️ Image upload (base64 and custom service)
 - 🔄 Block type conversion
 - 🖱️ Drag and drop reordering

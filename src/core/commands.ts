@@ -191,6 +191,7 @@ export function getActiveMarks(editor: Editor): string[] {
   if (editor.isActive('bold')) marks.push('bold');
   if (editor.isActive('italic')) marks.push('italic');
   if (editor.isActive('link')) marks.push('link');
+  if (editor.isActive('tag')) marks.push('tag');
   return marks;
 }
 

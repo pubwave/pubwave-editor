@@ -62,6 +62,7 @@ export const SUPPORTED_MARKS: readonly MarkType[] = [
   'strike',
   'code',
   'link',
+  'tag',
 ] as const;
 
 /**

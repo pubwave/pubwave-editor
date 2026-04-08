@@ -34,7 +34,8 @@ export type MarkType =
   | 'underline'
   | 'strike'
   | 'code'
-  | 'link';
+  | 'link'
+  | 'tag';
 
 /**
  * Theme configuration using CSS custom property tokens
@@ -319,6 +320,11 @@ export interface MarkState {
    * Whether a link is active at the current selection
    */
   isLink: boolean;
+
+  /**
+   * Whether a tag is active at the current selection
+   */
+  isTag: boolean;
 
   /**
    * The href of the active link, if any

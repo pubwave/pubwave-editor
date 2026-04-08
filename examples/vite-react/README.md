@@ -28,6 +28,7 @@ This example demonstrates all core features of the editor:
 - 💻 **Code Blocks** - Use `/code` to create code blocks
 - 🖼️ **Image Upload** - Use `/image` to upload images or paste directly
 - 👁️ **Read-only Mode** - See read-only mode in action
+- 🏷️ **Inline Tags** - Content includes custom-colored tag marks with configurable spacing
 
 ## 📝 Basic Usage
 

@@ -213,6 +213,7 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
             isBold: tiptapEditor?.isActive('bold') ?? false,
             isItalic: tiptapEditor?.isActive('italic') ?? false,
             isLink: tiptapEditor?.isActive('link') ?? false,
+            isTag: tiptapEditor?.isActive('tag') ?? false,
             linkHref: tiptapEditor
               ? (tiptapEditor.getAttributes('link') as { href?: string }).href
               : undefined,
@@ -380,6 +381,9 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
       }
       if (colors.primary) {
         themeStyles['--pubwave-primary'] = colors.primary;
+        themeStyles['--pubwave-primary-faded'] = isLightText
+          ? `color-mix(in srgb, ${colors.primary} 28%, transparent)`
+          : `color-mix(in srgb, ${colors.primary} 14%, transparent)`;
       }
       // Only set linkColor if explicitly provided, otherwise CSS will use primary as fallback
       if (colors.linkColor) {

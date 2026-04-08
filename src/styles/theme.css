@@ -31,6 +31,17 @@
   --pubwave-hover-task: rgba(0, 0, 0, 0.05);
   --pubwave-checked-text: #9ca3af;
 
+  /* Compatibility aliases for token-based components */
+  --pubwave-color-background: var(--pubwave-bg);
+  --pubwave-color-surface: var(--pubwave-surface);
+  --pubwave-color-text: var(--pubwave-text);
+  --pubwave-color-text-muted: var(--pubwave-text-muted);
+  --pubwave-color-border: var(--pubwave-border);
+  --pubwave-color-hover: var(--pubwave-hover);
+  --pubwave-color-primary: var(--pubwave-primary);
+  --pubwave-color-primary-faded: var(--pubwave-primary-faded);
+  --pubwave-font-size-small: var(--pubwave-font-size-sm);
+
   /* Spacing */
   --pubwave-spacing-xs: 0.25rem;
   --pubwave-spacing-sm: 0.5rem;
