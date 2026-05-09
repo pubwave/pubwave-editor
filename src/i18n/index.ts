@@ -116,6 +116,28 @@ export interface EditorLocale {
   placeholder: string;
   linkPlaceholder: string;
 
+  // AI Bar (optional - falls back to English defaults when missing)
+  ai?: {
+    askButton: string;
+    promptPlaceholder: string;
+    refinePlaceholder: string;
+    shortcutHint: string;
+    buttons: {
+      send: string;
+      stop: string;
+      apply: string;
+      discard: string;
+      retry: string;
+    };
+    errors: {
+      generic: string;
+    };
+    slashCommand: {
+      title: string;
+      description: string;
+    };
+  };
+
   // Chart editor
   chart?: {
     modal: {

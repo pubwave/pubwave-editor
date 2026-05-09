@@ -167,5 +167,25 @@
       "radar": "레이더 차트",
       "polarArea": "극좌표형 차트"
     }
+  },
+  "ai": {
+    "askButton": "AI에게 묻기",
+    "promptPlaceholder": "AI에게 지시 입력…",
+    "refinePlaceholder": "더 바꿀 점을 AI에게 알려주세요…",
+    "shortcutHint": "↵ 전송 · ⇧↵ 줄바꿈 · Esc 버리기",
+    "buttons": {
+      "send": "전송",
+      "stop": "중지",
+      "apply": "적용",
+      "discard": "버리기",
+      "retry": "다시 시도"
+    },
+    "errors": {
+      "generic": "AI 요청 실패"
+    },
+    "slashCommand": {
+      "title": "AI에게 묻기",
+      "description": "AI로 생성·변환·다듬기"
+    }
   }
 }

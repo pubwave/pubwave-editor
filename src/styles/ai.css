@@ -1,0 +1,241 @@
+/**
+ * AI styles
+ *
+ * Two surfaces:
+ *
+ *   .pubwave-ai-pending        — inline decoration applied to the AI's
+ *                                pending range inside the editor (real
+ *                                Tiptap nodes, just visually marked)
+ *   .pubwave-ai-pending__node  — node decoration on the same range, lets
+ *                                us style block-level borders / padding
+ *
+ *   .pubwave-ai-bar            — compact floating bar with the prompt
+ *                                input + Apply / Discard / Retry controls
+ */
+
+/* ─── Pending decoration in the editor ──────────────────────── */
+
+.pubwave-ai-pending {
+  background-color: var(--pubwave-color-primary-faded);
+  border-radius: 3px;
+  padding: 0 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pubwave-color-primary-faded) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: pubwave-ai-shimmer 2.4s linear infinite;
+}
+
+.pubwave-ai-pending__node {
+  border-left: 3px solid var(--pubwave-color-primary);
+  padding-left: 8px;
+  margin-left: -11px;
+}
+
+@keyframes pubwave-ai-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* ─── Compact floating bar ──────────────────────────────────── */
+
+.pubwave-ai-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background-color: var(
+    --pubwave-color-surface,
+    var(--pubwave-color-background)
+  );
+  color: var(--pubwave-color-text);
+  border: 1px solid var(--pubwave-color-border);
+  border-radius: 14px;
+  box-shadow:
+    0 12px 32px -8px rgba(0, 0, 0, 0.18),
+    0 4px 12px -4px rgba(0, 0, 0, 0.1);
+  font-family: var(--pubwave-font-family, inherit);
+  font-size: 14px;
+  line-height: 1.45;
+  box-sizing: border-box;
+}
+
+.pubwave-ai-bar__input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 8px 8px 8px 12px;
+  border: 1px solid var(--pubwave-color-border);
+  border-radius: 12px;
+  background-color: var(--pubwave-color-background);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pubwave-ai-bar__input-row:focus-within {
+  border-color: var(--pubwave-color-primary);
+  box-shadow: 0 0 0 3px var(--pubwave-color-primary-faded);
+}
+
+.pubwave-ai-bar__icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pubwave-color-primary);
+  font-size: 16px;
+}
+
+.pubwave-ai-bar__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--pubwave-color-text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none;
+  padding: 4px 0;
+  /* rows={1} starts at one line; auto-grows up to max-height via JS */
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.pubwave-ai-bar__input::placeholder {
+  color: var(--pubwave-color-text-muted);
+}
+
+.pubwave-ai-bar__input:disabled {
+  color: var(--pubwave-color-text-muted);
+  cursor: not-allowed;
+}
+
+.pubwave-ai-bar__icon-button {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease,
+    filter 0.15s ease,
+    transform 0.1s ease;
+}
+
+.pubwave-ai-bar__icon-button:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.pubwave-ai-bar__icon-button--send {
+  background-color: var(--pubwave-color-primary);
+  color: var(--pubwave-color-background);
+}
+
+.pubwave-ai-bar__icon-button--send:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.pubwave-ai-bar__icon-button--send:disabled {
+  background-color: var(--pubwave-color-border);
+  color: var(--pubwave-color-text-muted);
+  cursor: not-allowed;
+}
+
+.pubwave-ai-bar__icon-button--stop {
+  background-color: var(--pubwave-color-hover);
+  color: var(--pubwave-color-text);
+  border: 1px solid var(--pubwave-color-border);
+}
+
+.pubwave-ai-bar__icon-button--stop:hover {
+  background-color: var(--pubwave-color-focus);
+}
+
+.pubwave-ai-bar__error {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background-color: var(--pubwave-color-primary-faded);
+  color: var(--pubwave-color-error);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.pubwave-ai-bar__action-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px;
+}
+
+.pubwave-ai-bar__spacer {
+  flex: 1;
+}
+
+.pubwave-ai-bar__primary,
+.pubwave-ai-bar__ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  transition:
+    background-color 0.15s ease,
+    filter 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.pubwave-ai-bar__primary {
+  background-color: var(--pubwave-color-primary);
+  color: var(--pubwave-color-background);
+  border-color: var(--pubwave-color-primary);
+  font-weight: 600;
+}
+
+.pubwave-ai-bar__primary:hover {
+  filter: brightness(0.92);
+}
+
+.pubwave-ai-bar__ghost {
+  color: var(--pubwave-color-text-muted);
+}
+
+.pubwave-ai-bar__ghost:hover:not(:disabled) {
+  color: var(--pubwave-color-text);
+  background-color: var(--pubwave-color-hover);
+}
+
+.pubwave-ai-bar__ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pubwave-ai-bar__hint {
+  font-size: 11px;
+  color: var(--pubwave-color-text-muted);
+  text-align: right;
+  padding: 0 4px;
+}

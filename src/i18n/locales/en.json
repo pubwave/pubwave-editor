@@ -167,5 +167,25 @@
       "radar": "Radar Chart",
       "polarArea": "Polar Area Chart"
     }
+  },
+  "ai": {
+    "askButton": "Ask AI",
+    "promptPlaceholder": "Tell AI what to do…",
+    "refinePlaceholder": "Tell AI what else needs to be changed…",
+    "shortcutHint": "↵ Send · ⇧↵ Newline · Esc Discard",
+    "buttons": {
+      "send": "Send",
+      "stop": "Stop",
+      "apply": "Apply",
+      "discard": "Discard",
+      "retry": "Try again"
+    },
+    "errors": {
+      "generic": "AI request failed"
+    },
+    "slashCommand": {
+      "title": "Ask AI",
+      "description": "Generate, transform, or refine with AI"
+    }
   }
 }

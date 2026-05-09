@@ -126,3 +126,49 @@ export type { ToastProps, ToastItem, ToastContainerProps } from './ui/toast';
 
 // Utilities
 export { isSSR, canUseDOM, isMobileDevice } from './core/util';
+
+// AI integration
+export {
+  defaultAIActions,
+  getAction,
+  runAI,
+  AIError,
+  parseSSE,
+  createOpenAICompatibleAdapter,
+  createAnthropicAdapter,
+  createGeminiAdapter,
+  createOllamaAdapter,
+  defineAIAdapter,
+  createAdapter,
+} from './core/ai';
+export type {
+  AIConfig,
+  AIAdapter,
+  AIAction,
+  AIActionContext,
+  AIApplyMode,
+  AIContextSource,
+  AIMessage,
+  AIRequest,
+  CreateAdapterInput,
+} from './core/ai';
+export {
+  AIBar,
+  AIToolbarButton,
+  AISparkleIcon,
+  AIStopIcon,
+  AIRetryIcon,
+  AI_OPEN_EVENT,
+  fallbackBarStrings,
+  markdownToHTML,
+  aiPreviewPluginKey,
+  getAIPreviewRange,
+  createAIPreviewPlugin,
+} from './ui/ai';
+export type {
+  AIBarProps,
+  AIBarStrings,
+  AIOpenEvent,
+  AIOpenEventDetail,
+  AIPreviewRange,
+} from './ui/ai';

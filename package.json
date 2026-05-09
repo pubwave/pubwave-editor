@@ -1,6 +1,6 @@
 {
   "name": "@pubwave/editor",
-  "version": "0.5.8",
+  "version": "1.0.0",
   "description": "A Notion-level block editor built with React and Tiptap",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -17,7 +17,20 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./style.css": "./dist/index.css"
+    "./server": {
+      "import": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": {
+        "types": "./dist/server.d.cts",
+        "default": "./dist/server.cjs"
+      }
+    },
+    "./style.css": {
+      "types": "./dist/style.css.d.ts",
+      "default": "./dist/index.css"
+    }
   },
   "files": [
     "dist/**/*.js",
@@ -35,7 +48,7 @@
     "dev": "vite",
     "dev:lib": "vite --mode lib",
     "build": "tsc -b && vite build",
-    "build:lib": "vite build --mode lib && (test -f dist/editor.css && mv dist/editor.css dist/index.css || true)",
+    "build:lib": "vite build --mode lib && (test -f dist/editor.css && mv dist/editor.css dist/index.css || true) && printf 'export {};\\n' > dist/style.css.d.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -52,9 +65,9 @@
     "prepublishOnly": "npm run build:lib"
   },
   "peerDependencies": {
+    "chart.js": "^4.0.0 || ^5.0.0",
     "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0",
-    "chart.js": "^4.0.0 || ^5.0.0"
+    "react-dom": "^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
     "chart.js": {
@@ -83,17 +96,18 @@
     "@tiptap/extension-paragraph": "^2.12.0",
     "@tiptap/extension-placeholder": "^2.12.0",
     "@tiptap/extension-strike": "^2.27.1",
-    "@tiptap/extension-task-item": "^2.27.1",
-    "@tiptap/extension-task-list": "^2.27.1",
     "@tiptap/extension-table": "^2.27.1",
     "@tiptap/extension-table-cell": "^2.27.1",
     "@tiptap/extension-table-header": "^2.27.1",
     "@tiptap/extension-table-row": "^2.27.1",
+    "@tiptap/extension-task-item": "^2.27.1",
+    "@tiptap/extension-task-list": "^2.27.1",
     "@tiptap/extension-text": "^2.12.0",
     "@tiptap/extension-underline": "^2.27.1",
     "@tiptap/pm": "^2.12.0",
     "@tiptap/react": "^2.12.0",
     "@tiptap/suggestion": "^2.27.1",
+    "marked": "^18.0.3",
     "tippy.js": "^6.3.7"
   },
   "devDependencies": {
@@ -108,6 +122,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/coverage-v8": "^2.1.8",
     "autoprefixer": "^10.4.23",
+    "chart.js": "^4.4.0",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.37.2",
@@ -122,8 +137,7 @@
     "typescript-eslint": "^8.18.1",
     "vite": "^6.0.5",
     "vite-plugin-dts": "^4.4.0",
-    "vitest": "^2.1.8",
-    "chart.js": "^4.4.0"
+    "vitest": "^2.1.8"
   },
   "repository": {
     "type": "git",

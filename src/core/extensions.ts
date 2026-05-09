@@ -32,7 +32,11 @@ import {
 } from '../ui/SlashMenu';
 import { createDndPlugin } from './plugins/dnd';
 import { createEditorBehaviorsPlugin } from './plugins/editorBehaviors';
+import { createAIPreviewPlugin } from './plugins/aiPreview';
 import { getLocale } from '../i18n';
+import type { AIConfig } from './ai/types';
+import { createAISlashCommand } from '../ui/ai/slashCommand';
+import { AIKeymap } from './extensions/ai';
 
 /**
  * Supported block types
@@ -101,6 +105,15 @@ export interface ExtensionConfig
    * Locale for internationalization
    */
   locale?: EditorLocaleCode;
+
+  /**
+   * AI integration configuration. When provided:
+   *  - The `/ai` slash command is appended (unless `enableInSlashMenu === false`)
+   *  - The ⌘J / Ctrl+J keybinding is registered (unless `enableKeyboardShortcut === false`)
+   * UI affordances (toolbar button, block-handle button, Composer mount) are
+   * added by `PubwaveEditor`, not by this extension factory.
+   */
+  ai?: AIConfig;
 }
 
 /**
@@ -121,6 +134,7 @@ export function createExtensions(config: ExtensionConfig = {}): AnyExtension[] {
     slashCommands,
     imageUpload,
     locale,
+    ai,
   } = config;
 
   // Get placeholder from prop or locale data
@@ -186,8 +200,34 @@ export function createExtensions(config: ExtensionConfig = {}): AnyExtension[] {
     if (enableLayout === false) {
       commands = commands.filter((command) => command.group !== 'layout');
     }
+    if (ai && ai.enableInSlashMenu !== false) {
+      const aiStrings = (slashLocale as { ai?: { slashCommand?: { title?: string; description?: string }; groups?: { ai?: string } } }).ai;
+      commands = [
+        createAISlashCommand({
+          title: aiStrings?.slashCommand?.title ?? 'Ask AI',
+          description: aiStrings?.slashCommand?.description ?? 'Generate, transform, or refine with AI',
+          groupLabel: aiStrings?.groups?.ai ?? 'AI',
+        }),
+        ...commands,
+      ];
+    }
     extensions.push(
       createSlashCommandsExtension(commands, imageUpload, slashLocale)
+    );
+  }
+
+  if (ai && ai.enableKeyboardShortcut !== false) {
+    extensions.push(AIKeymap.configure({ enabled: true }));
+  }
+
+  if (ai) {
+    extensions.push(
+      Extension.create({
+        name: 'aiPreview',
+        addProseMirrorPlugins() {
+          return [createAIPreviewPlugin()];
+        },
+      })
     );
   }
 

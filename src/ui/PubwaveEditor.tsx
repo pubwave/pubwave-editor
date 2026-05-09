@@ -14,12 +14,13 @@
  * that would contradict the minimal, content-first design intent.
  */
 
-import { forwardRef, useImperativeHandle, useCallback, useState, useEffect } from 'react';
+import { forwardRef, useImperativeHandle, useCallback, useState, useEffect, useRef, useMemo } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import type { JSONContent } from '@tiptap/core';
 
 import { createExtensions } from '../core/extensions';
 import type { EditorTheme, EditorAPI, ImageUploadConfig } from '../types/editor';
+import type { AIConfig } from '../core/ai/types';
 import { getReadOnlyClassName } from './readOnlyGuards';
 import { ariaLabels } from './a11y';
 import { BubbleToolbar } from './BubbleToolbar';
@@ -27,6 +28,10 @@ import { BlockHandle } from './dnd/BlockHandle';
 import { DropIndicatorOverlay } from './dnd/DropIndicatorOverlay';
 import { LocaleProvider } from './LocaleContext';
 import { getLocale } from '../i18n';
+import { AIConfigProvider } from './ai/AIConfigContext';
+import { AIBar } from './ai/AIBar';
+import { AI_OPEN_EVENT, type AIOpenEventDetail } from './ai/openEvent';
+import { buildAIStrings } from './ai/buildStrings';
 
 /**
  * Props for the PubwaveEditor component
@@ -91,6 +96,13 @@ export interface PubwaveEditorProps {
   imageUpload?: ImageUploadConfig;
 
   /**
+   * AI integration configuration. When set, exposes the `/ai` slash command,
+   * the bubble-toolbar AI button, the block-handle hover button and the
+   * ⌘J / Ctrl+J shortcut. When omitted, no AI surface appears.
+   */
+  ai?: AIConfig;
+
+  /**
    * Additional CSS class for the container
    */
   className?: string;
@@ -138,6 +150,7 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
       theme,
       autofocus = false,
       imageUpload,
+      ai,
       onChange,
       onSelectionChange,
       onFocus,
@@ -166,6 +179,7 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
         linkOpenOnClick: true,
         imageUpload,
         locale: theme?.locale,
+        ai,
       }),
       content,
       editable,
@@ -267,6 +281,35 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
     useEffect(() => {
       setIsMounted(true);
     }, []);
+
+    // AI Bar state and event wiring
+    interface AIBarInstance {
+      rect: DOMRect | null;
+      documentAnchor: number;
+      key: number;
+    }
+    const [aiBar, setAIBar] = useState<AIBarInstance | null>(null);
+    const aiKeyRef = useRef(0);
+    const aiStrings = useMemo(() => buildAIStrings(locale), [locale]);
+
+    useEffect(() => {
+      if (!editor || !ai) return;
+      const dom = editor.view.dom;
+      const handler = (event: Event): void => {
+        const detail = (event as CustomEvent<AIOpenEventDetail>).detail;
+        if (!detail) return;
+        aiKeyRef.current += 1;
+        setAIBar({
+          rect: detail.rect,
+          documentAnchor: detail.documentAnchor,
+          key: aiKeyRef.current,
+        });
+      };
+      dom.addEventListener(AI_OPEN_EVENT, handler);
+      return () => dom.removeEventListener(AI_OPEN_EVENT, handler);
+    }, [editor, ai]);
+
+    const closeAIBar = useCallback(() => setAIBar(null), []);
 
     // Update data-placeholder attribute when locale changes
     useEffect(() => {
@@ -445,13 +488,15 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
     if (!isMounted || !editor) {
       return (
         <LocaleProvider value={{ locale }}>
-          <div
-            className={containerClassName}
-            data-testid={testId}
-            role="application"
-            aria-label={ariaLabels.editor}
-            style={themeStyles}
-          />
+          <AIConfigProvider value={{ config: ai ?? null }}>
+            <div
+              className={containerClassName}
+              data-testid={testId}
+              role="application"
+              aria-label={ariaLabels.editor}
+              style={themeStyles}
+            />
+          </AIConfigProvider>
         </LocaleProvider>
       );
     }
@@ -511,22 +556,37 @@ export const PubwaveEditor = forwardRef<EditorAPI | null, PubwaveEditorProps>(
 
     return (
       <LocaleProvider value={{ locale }}>
-        <div
-          className={containerClassName}
-          data-testid={testId}
-          role="application"
-          aria-label={ariaLabels.editor}
-          style={themeStyles}
-          onMouseDown={handleContainerMouseDown}
-        >
-          <EditorContent editor={editor} />
-          {/* Bubble toolbar - appears only on non-empty text selection (US2) */}
-          {editable && <BubbleToolbar editor={editor} />}
-          {/* Block handles - + and drag grip appear on block hover (US3) */}
-          {editable && <BlockHandle editor={editor} />}
-          {/* Drop indicator - appears during drag (US4) */}
-          {editable && <DropIndicatorOverlay editor={editor} />}
-        </div>
+        <AIConfigProvider value={{ config: ai ?? null }}>
+          <div
+            className={containerClassName}
+            data-testid={testId}
+            role="application"
+            aria-label={ariaLabels.editor}
+            style={themeStyles}
+            onMouseDown={handleContainerMouseDown}
+          >
+            <EditorContent editor={editor} />
+            {/* Bubble toolbar - appears only on non-empty text selection (US2) */}
+            {editable && <BubbleToolbar editor={editor} />}
+            {/* Block handles - + and drag grip appear on block hover (US3) */}
+            {editable && <BlockHandle editor={editor} />}
+            {/* Drop indicator - appears during drag (US4) */}
+            {editable && <DropIndicatorOverlay editor={editor} />}
+            {/* AI Bar - mounts on /ai, bubble toolbar ✨, or ⌘J */}
+            {editable && ai && aiBar ? (
+              <AIBar
+                key={aiBar.key}
+                editor={editor}
+                config={ai}
+                initialRect={aiBar.rect}
+                documentAnchor={aiBar.documentAnchor}
+                locale={theme?.locale ?? 'en'}
+                strings={aiStrings}
+                onClose={closeAIBar}
+              />
+            ) : null}
+          </div>
+        </AIConfigProvider>
       </LocaleProvider>
     );
   }

@@ -7,6 +7,7 @@
 
 import type { Editor } from '@tiptap/react';
 import type { JSONContent } from '@tiptap/core';
+import type { AIConfig } from '../core/ai/types';
 
 /**
  * Supported block types in the editor
@@ -240,6 +241,17 @@ export interface EditorConfig {
    * @default true
    */
   enableLayout?: boolean;
+
+  /**
+   * AI integration configuration
+   * When provided, enables the AI Composer:
+   *  - `/ai` slash command
+   *  - Bubble-toolbar AI button (on selection)
+   *  - Hover ✨ button on the block handle
+   *  - ⌘J / Ctrl+J keyboard shortcut
+   * No AI surface appears unless this is set.
+   */
+  ai?: AIConfig;
 
   /**
    * Callback fired when the editor content changes

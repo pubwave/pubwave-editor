@@ -27,10 +27,14 @@ export default defineConfig(({ mode }) => {
     build: isLib
       ? {
           lib: {
-            entry: resolve(__dirname, 'src/index.ts'),
+            entry: {
+              index: resolve(__dirname, 'src/index.ts'),
+              server: resolve(__dirname, 'src/server.ts'),
+            },
             name: 'PubwaveEditor',
             formats: ['es', 'cjs'],
-            fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`,
+            fileName: (format, entryName) =>
+              `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
           },
           rollupOptions: {
             external: [

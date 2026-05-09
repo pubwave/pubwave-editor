@@ -92,7 +92,7 @@ export interface SlashCommand {
   description: string;
   icon: React.ReactNode;
   aliases?: string[];
-  group: 'basic' | 'list' | 'media' | 'advanced' | 'layout';
+  group: 'basic' | 'list' | 'media' | 'advanced' | 'layout' | 'ai';
   action: (editor: Editor) => void;
 }
 

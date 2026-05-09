@@ -1,9 +1,33 @@
 import { useState } from 'react';
-import { PubwaveEditor } from '@pubwave/editor';
-import type { EditorTheme, EditorLocale } from '@pubwave/editor';
+import { PubwaveEditor, createAdapter } from '@pubwave/editor';
+import type { EditorTheme, EditorLocale, AIConfig } from '@pubwave/editor';
 import type { JSONContent } from '@tiptap/core';
 import { PreviewModal } from './PreviewModal';
 import '@pubwave/editor/style.css';
+
+/**
+ * AI demo wiring.
+ *
+ * Off by default. To try the AI Composer (`/ai`, ⌘J, ✨ buttons), replace
+ * `undefined` with a real config — for example a local Ollama server:
+ *
+ *   const aiConfig: AIConfig = {
+ *     adapter: createAdapter({
+ *       provider: 'ollama',
+ *       baseURL: 'http://localhost:11434/v1',
+ *     }),
+ *     defaultModel: 'llama3.2',
+ *   };
+ *
+ * Switch `provider` to `'openai' | 'anthropic' | 'gemini'` for other backends.
+ * `'openai'` accepts a custom `baseURL` so it also covers Azure, Groq, Together,
+ * OpenRouter, DeepSeek, Moonshot, Zhipu, Qwen DashScope, vLLM, LM Studio, your
+ * own proxy, etc. Never ship cloud-provider API keys in a browser bundle —
+ * route through your own backend in production.
+ */
+// Reference unused helper so the demo compiles without dropping the import.
+void createAdapter;
+const aiConfig: AIConfig | undefined = undefined;
 
 // Chart images as base64 (SVG converted to data URLs) - AI themed
 const chartDashboard =
@@ -1602,6 +1626,7 @@ function App() {
             ...currentThemeConfig,
             locale: currentLocale,
           }}
+          ai={aiConfig}
           width="100%"
         />
       </div>

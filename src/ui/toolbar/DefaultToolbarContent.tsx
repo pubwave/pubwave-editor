@@ -13,6 +13,8 @@ import { ToolbarButton, ToolbarDivider } from './ToolbarButton';
 import { TurnIntoButton } from './TurnIntoButton';
 import { LinkButton } from './LinkButton';
 import { ColorPickerButton } from './ColorPickerButton';
+import { useAIConfig } from '../ai/AIConfigContext';
+import { AIToolbarButton } from '../ai/AIToolbarButton';
 import {
   BoldIcon,
   ItalicIcon,
@@ -104,10 +106,21 @@ export function DefaultToolbarContent({
     editor.isActive('paragraph', { textAlign: 'right' }) ||
     editor.isActive('heading', { textAlign: 'right' });
 
+  const aiConfig = useAIConfig();
+  const aiLabel =
+    (locale as { ai?: { askButton?: string } }).ai?.askButton ?? 'Ask AI';
+  const showAI = !!aiConfig && aiConfig.enableInToolbar !== false;
+
   return (
     <>
-      <TurnIntoButton 
-        editor={editor} 
+      {showAI ? (
+        <>
+          <AIToolbarButton editor={editor} label={aiLabel} />
+          <ToolbarDivider />
+        </>
+      ) : null}
+      <TurnIntoButton
+        editor={editor}
         isOpen={openDropdown === 'turnInto'}
         onToggle={handleTurnIntoToggle}
         onClose={() => setOpenDropdown(null)}

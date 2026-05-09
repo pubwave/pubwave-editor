@@ -167,5 +167,25 @@
       "radar": "Netzdiagramm",
       "polarArea": "Polärfächen-Diagramm"
     }
+  },
+  "ai": {
+    "askButton": "KI fragen",
+    "promptPlaceholder": "Sag der KI, was sie tun soll…",
+    "refinePlaceholder": "Sag der KI, was noch geändert werden soll…",
+    "shortcutHint": "↵ Senden · ⇧↵ Zeilenumbruch · Esc Verwerfen",
+    "buttons": {
+      "send": "Senden",
+      "stop": "Stopp",
+      "apply": "Übernehmen",
+      "discard": "Verwerfen",
+      "retry": "Erneut"
+    },
+    "errors": {
+      "generic": "KI-Anfrage fehlgeschlagen"
+    },
+    "slashCommand": {
+      "title": "KI fragen",
+      "description": "Mit KI generieren, transformieren oder verfeinern"
+    }
   }
 }

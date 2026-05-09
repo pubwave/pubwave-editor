@@ -167,5 +167,25 @@
       "radar": "Gráfico de radar",
       "polarArea": "Gráfico de área polar"
     }
+  },
+  "ai": {
+    "askButton": "Perguntar à IA",
+    "promptPlaceholder": "Diga à IA o que fazer…",
+    "refinePlaceholder": "Diga à IA o que mais mudar…",
+    "shortcutHint": "↵ Enviar · ⇧↵ Nova linha · Esc Descartar",
+    "buttons": {
+      "send": "Enviar",
+      "stop": "Parar",
+      "apply": "Aplicar",
+      "discard": "Descartar",
+      "retry": "Tentar novamente"
+    },
+    "errors": {
+      "generic": "Falha na solicitação à IA"
+    },
+    "slashCommand": {
+      "title": "Perguntar à IA",
+      "description": "Gerar, transformar ou refinar com IA"
+    }
   }
 }

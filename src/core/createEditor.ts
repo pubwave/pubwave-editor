@@ -36,6 +36,7 @@ export function createEditor(config: EditorConfig = {}): Editor {
     imageUpload,
     enableChart,
     enableLayout,
+    ai,
     onUpdate,
     onSelectionUpdate,
     onFocus,
@@ -53,6 +54,7 @@ export function createEditor(config: EditorConfig = {}): Editor {
     imageUpload,
     enableChart,
     enableLayout,
+    ai,
   });
 
   // Build Tiptap editor options

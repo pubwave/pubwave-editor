@@ -22,6 +22,7 @@ A Notion-level block editor built with React and Tiptap.
 - 🖼️ **Image Support** - Upload images via file picker or paste from clipboard, with base64 or custom upload service
 - 📊 **Chart Support** - Interactive charts powered by Chart.js with editable data
 - 🌐 **Internationalization** - Multi-language support with English as default
+- 🤖 **AI Composer** - Built-in `/ai` slash command, bubble toolbar ✨ button, and `⌘J` shortcut. BYO model — OpenAI / Anthropic / Gemini / Ollama / OpenRouter / DeepSeek / Moonshot / Zhipu / 千问 / any OpenAI-compatible endpoint
 
 ---
 
@@ -848,6 +849,261 @@ When in editable mode:
 2. Click the edit button to open the chart editor modal
 3. Modify chart type, title, labels, datasets, and appearance options
 4. Save changes to update the chart
+
+---
+
+## 🤖 AI
+
+Pubwave ships built-in AI integration: the **AIBar** — a compact floating bar — drives the flow, while the model's output streams **directly into the editor as real Tiptap nodes** (heading, list, table, code block, …) marked as "pending" until you Apply or Discard.
+
+You bring the model — any OpenAI-compatible endpoint, Anthropic, Gemini, or Ollama works out of the box; you can also drop in any custom adapter.
+
+### Entry points (all open the same bar)
+
+| Trigger | When |
+|---|---|
+| Type `/ai` | Anywhere in the editor |
+| Click the ✨ button in the bubble toolbar | Text is selected |
+| Press `⌘J` / `Ctrl+J` | Always |
+
+### What it does
+
+- **Streams into the editor**, not into a popover. AI's output appears in place — heading becomes a real heading, list becomes a real list, table becomes a real table — with a faded "pending" highlight while it's still in review.
+- **Two implicit modes** based on what's selected when you open the bar:
+  - **Selection present** → *transform* mode: the pending output replaces the selection
+  - **No selection** → *generate* mode: the pending output flows in **at the cursor** (no extra blank line above)
+- **Compact floating bar** carries only the controls — prompt input + Send/Stop and Apply / Discard / Try again. No context dropdowns or preset menus.
+- **Conversational refinement**: after a reply, type "shorter" or "make it more formal" and Send — the previous output is dropped and the new one streams into the same spot, with the prior turns kept as conversation history.
+- **Output language follows `theme.locale`** — Chinese editor → AI replies in Chinese, etc.
+- **Markdown understood**: the model is asked to use standard Markdown for structured content (headings, lists, tables, code, quotes, links, marks). Pubwave parses it via Tiptap's HTML pipeline, so what lands in the doc is real schema-typed nodes.
+- **Lossless Discard**: in transform mode the original selection is snapshotted as a ProseMirror `Slice` before the pending output replaces it. Discard restores the exact original — text, marks, links, custom attributes — as if AI had never touched it.
+
+> ⚠️ **Phase 1 limitation**: custom blocks specific to Pubwave (`chart`, `layout`, colored `tag`) cannot be expressed in Markdown and so cannot be produced by AI in this release. The model will fall back to a Markdown table or paragraph. A later release will add tool calling for those.
+
+### Keyboard shortcuts inside the bar
+
+| Key | Action |
+|---|---|
+| `Enter` | Send the prompt to AI |
+| `Shift + Enter` | Insert a newline in the input (multi-line prompts) |
+| `Esc` | Close the bar; in transform mode this also restores the original selection |
+
+The textarea starts as a single line and auto-grows as you type, capped at ~160px tall with internal scrolling beyond that.
+
+### Apply / Discard / Try again
+
+| Action | Generate mode (no selection) | Transform mode (with selection) |
+|---|---|---|
+| **Apply** (or click ✓) | Strips the pending decoration, content stays where streamed | Same — AI output stays in place of the original selection |
+| **Discard** (or `Esc`) | Deletes the AI-streamed content | Deletes the AI output **and restores the original selection lossless** |
+| **Try again** | Re-runs the same prompt; streams a fresh take into the same spot | Same — original selection stays preserved as snapshot until you Apply or Discard |
+
+While streaming, the **Stop** button on the input row aborts the request — already-arrived content stays as pending so you can Apply, Discard, or refine it.
+
+### Quick start
+
+```tsx
+import { PubwaveEditor, createAdapter } from '@pubwave/editor';
+import type { AIConfig } from '@pubwave/editor';
+import '@pubwave/editor/style.css';
+
+const aiConfig: AIConfig = {
+  adapter: createAdapter({
+    provider: 'openai',
+    baseURL: '/api/ai/openai',  // your server proxy (see below)
+  }),
+  defaultModel: 'gpt-4o-mini',
+};
+
+<PubwaveEditor ai={aiConfig} />
+```
+
+To turn AI off, just don't pass `ai` (or pass `undefined`). No surface appears.
+
+### Provider switch — `createAdapter`
+
+```ts
+createAdapter({ provider: 'openai',    baseURL, apiKey, model })
+createAdapter({ provider: 'anthropic', apiKey, model, anthropicVersion })
+createAdapter({ provider: 'gemini',    apiKey, model })
+createAdapter({ provider: 'ollama',    baseURL, model })
+```
+
+The `'openai'` provider covers OpenAI itself **plus any OpenAI-compatible endpoint** — Azure, Groq, Together, OpenRouter, DeepSeek, Moonshot, Zhipu GLM, Qwen DashScope (compat-mode), Volcengine Doubao, vLLM, LM Studio, your own proxy. Just override `baseURL`.
+
+For something the union doesn't cover, use `defineAIAdapter({ id, stream })` and supply your own streaming function.
+
+### Two deployment modes
+
+#### A. Direct (browser → provider). Demo / local Ollama only.
+
+```ts
+adapter: createAdapter({
+  provider: 'openai',
+  apiKey: 'sk-...',  // ⚠️ ends up in JS bundle, anyone can DevTools it
+}),
+```
+
+Fine for local Ollama (no key needed):
+```ts
+adapter: createAdapter({
+  provider: 'openai',
+  baseURL: 'http://localhost:11434/v1',
+}),
+defaultModel: 'llama3.2',
+```
+
+#### B. Server proxy (recommended for cloud providers in production).
+
+The library ships a framework-agnostic proxy handler at `@pubwave/editor/server`. Use it from any Web-standard runtime (Next.js / Hono / Cloudflare Workers / Bun / Deno):
+
+**Next.js** — one 3-line file covers all providers:
+
+```ts
+// app/api/ai/[...path]/route.ts
+import { createAIProxyHandler } from '@pubwave/editor/server';
+export const POST = createAIProxyHandler();
+export const runtime = 'edge';
+```
+
+**Hono / Bun / Deno / Cloudflare Workers**:
+
+```ts
+import { createAIProxyHandler } from '@pubwave/editor/server';
+const handler = createAIProxyHandler();
+
+// Hono
+app.post('/api/ai/*', (c) => handler(c.req.raw));
+
+// Cloudflare Worker
+export default {
+  fetch: (req, env) => createAIProxyHandler({
+    openai:    { apiKey: env.OPENAI_API_KEY },
+    anthropic: { apiKey: env.ANTHROPIC_API_KEY },
+    gemini:    { apiKey: env.GOOGLE_API_KEY },
+  })(req),
+};
+```
+
+Path routing (default prefix `/api/ai`):
+
+| Client `baseURL` | Forwards to | Reads env |
+|---|---|---|
+| `/api/ai/openai` | `${OPENAI_BASE_URL}` (default: `https://api.openai.com/v1`) | `OPENAI_API_KEY`, `OPENAI_BASE_URL` |
+| `/api/ai/anthropic` | `${ANTHROPIC_BASE_URL}` (default: Anthropic) | `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL`, `ANTHROPIC_VERSION` |
+| `/api/ai/gemini` | `${GOOGLE_BASE_URL}` (default: Gemini) | `GOOGLE_API_KEY`, `GOOGLE_BASE_URL` |
+
+Streaming (SSE) is piped through end-to-end without buffering.
+
+### Configuring providers via env
+
+Two env vars are needed for any **non-OpenAI** provider that uses the OpenAI protocol (OpenRouter, DeepSeek, Moonshot, Zhipu, 千问, Groq, etc.) — both `OPENAI_API_KEY` AND `OPENAI_BASE_URL`:
+
+```bash
+# .env (or .env.local, or system env on your platform)
+
+# --- OpenRouter (covers OpenAI / Claude / Gemini / Llama / DeepSeek with one key) ---
+OPENAI_API_KEY=sk-or-v1-...
+OPENAI_BASE_URL=https://openrouter.ai/api/v1
+
+# --- OR DeepSeek ---
+# OPENAI_API_KEY=sk-...
+# OPENAI_BASE_URL=https://api.deepseek.com/v1
+
+# --- OR Zhipu GLM ---
+# OPENAI_API_KEY=...
+# OPENAI_BASE_URL=https://open.bigmodel.cn/api/paas/v4
+
+# --- OR Qwen DashScope (must use compat-mode path) ---
+# OPENAI_API_KEY=sk-...
+# OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+
+# --- Anthropic Claude (native) — only the key is required ---
+# ANTHROPIC_API_KEY=sk-ant-...
+
+# --- Google Gemini (native) — only the key is required ---
+# GOOGLE_API_KEY=AIza...
+```
+
+For a fully-annotated reference of every provider's URL + model ids, see [`examples/nextjs/.env.example`](./examples/nextjs/.env.example).
+
+> **Common pitfall**: setting only `OPENAI_API_KEY` (no URL) with a non-OpenAI key. The proxy will dutifully send your OpenRouter / DeepSeek / Zhipu key to OpenAI's default endpoint, which returns `401 invalid_api_key`. Always set both.
+
+### Selecting the active provider in the client
+
+Switch `baseURL` on the client adapter to choose which proxy path (and therefore which env vars) take effect:
+
+```ts
+createAdapter({ provider: 'openai',    baseURL: '/api/ai/openai' })     // → OPENAI_*
+createAdapter({ provider: 'anthropic', baseURL: '/api/ai/anthropic' })  // → ANTHROPIC_*
+createAdapter({ provider: 'gemini',    baseURL: '/api/ai/gemini' })     // → GOOGLE_*
+```
+
+### Vite / SPA users
+
+Vite has no server runtime. Three options:
+
+1. **Local Ollama** — direct from browser, no key needed.
+2. **`VITE_OPENAI_API_KEY` in browser** — demo only, key visible to anyone.
+3. **Separate backend** — Cloudflare Worker / Hono / Express running `createAIProxyHandler`. Vite app points at its URL.
+
+See [Examples](./examples) for runnable code.
+
+### Disabling specific surfaces
+
+```ts
+ai={{
+  adapter,
+  defaultModel: '...',
+  enableInSlashMenu: false,    // hide /ai
+  enableInToolbar: false,      // hide ✨ in bubble toolbar
+  enableKeyboardShortcut: false, // disable ⌘J
+}}
+```
+
+### Customizing strings (i18n)
+
+The bar's labels (placeholder, button text, shortcut hint) are pulled from the active `theme.locale` and fall back to English when missing. To override per-instance, you can build your own bar and pass `strings` directly using the exported `<AIBar>` component, or — for most cases — just edit `ai.*` keys in your locale JSON. The relevant fields:
+
+```jsonc
+{
+  "ai": {
+    "askButton": "Ask AI",
+    "promptPlaceholder": "Tell AI what to do…",
+    "refinePlaceholder": "Tell AI what else needs to be changed…",
+    "shortcutHint": "↵ Send · ⇧↵ Newline · Esc Discard",
+    "buttons": {
+      "send": "Send", "stop": "Stop",
+      "apply": "Apply", "discard": "Discard", "retry": "Try again"
+    },
+    "errors": { "generic": "AI request failed" },
+    "slashCommand": {
+      "title": "Ask AI",
+      "description": "Generate, transform, or refine with AI"
+    }
+  }
+}
+```
+
+### Advanced: building your own UI
+
+If the bundled bar doesn't fit, the lib also exports the lower-level pieces so you can wire your own:
+
+| Export | What it is |
+|---|---|
+| `AIBar` | The default bar component |
+| `runAI` | Async-iterable streaming helper around an `AIAdapter` |
+| `createAIPreviewPlugin` / `aiPreviewPluginKey` / `getAIPreviewRange` | ProseMirror plugin that tracks the pending range and renders the faded decoration |
+| `markdownToHTML` | The `marked` wrapper used internally (handles GFM tables + task lists) |
+| `fallbackBarStrings` | Default English strings you can spread into your `strings` prop |
+| `createAIProxyHandler` (from `@pubwave/editor/server`) | Server-side proxy for the OpenAI / Anthropic / Gemini protocols |
+
+### Security checklist
+
+- ❌ **Never** put a cloud API key (OpenAI / Anthropic / Gemini / OpenRouter / etc.) in client-side code that ships to public users. Even `VITE_*` / `NEXT_PUBLIC_*` prefixes mean "this WILL be visible in the bundle."
+- ✅ Use the server proxy (`createAIProxyHandler`) and let env vars stay on the server.
+- ✅ For paid providers, add rate-limiting / auth / quotas on your proxy. The bundled handler is intentionally minimal — wrap it.
+- ✅ Local Ollama and other no-auth local servers are fine to call directly from the browser.
 
 ---
 

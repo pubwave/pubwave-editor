@@ -167,5 +167,25 @@
       "radar": "雷达图",
       "polarArea": "极地图"
     }
+  },
+  "ai": {
+    "askButton": "询问 AI",
+    "promptPlaceholder": "告诉 AI 你想做什么…",
+    "refinePlaceholder": "告诉 AI 还要改什么…",
+    "shortcutHint": "↵ 发送 · ⇧↵ 换行 · Esc 舍弃",
+    "buttons": {
+      "send": "发送",
+      "stop": "停止",
+      "apply": "应用",
+      "discard": "舍弃",
+      "retry": "重试"
+    },
+    "errors": {
+      "generic": "AI 请求失败"
+    },
+    "slashCommand": {
+      "title": "询问 AI",
+      "description": "使用 AI 生成、改写或润色内容"
+    }
   }
 }

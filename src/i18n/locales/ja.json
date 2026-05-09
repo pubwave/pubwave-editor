@@ -167,5 +167,25 @@
       "radar": "レーダーチャート",
       "polarArea": "極座標グラフ"
     }
+  },
+  "ai": {
+    "askButton": "AIに頼む",
+    "promptPlaceholder": "AIに指示を入力…",
+    "refinePlaceholder": "AIにさらに変えたい点を伝えてください…",
+    "shortcutHint": "↵ 送信 · ⇧↵ 改行 · Esc 破棄",
+    "buttons": {
+      "send": "送信",
+      "stop": "停止",
+      "apply": "適用",
+      "discard": "破棄",
+      "retry": "再試行"
+    },
+    "errors": {
+      "generic": "AI リクエスト失敗"
+    },
+    "slashCommand": {
+      "title": "AIに頼む",
+      "description": "AIで生成・変換・推敲する"
+    }
   }
 }

@@ -136,6 +136,7 @@ export const SlashMenuList = React.forwardRef<
 
   // Use groupLabels from props or fallback to defaults
   const groupLabels = groupLabelsProp || {
+    ai: 'AI',
     basic: 'Style',
     list: 'Lists',
     media: 'Media',
@@ -153,7 +154,7 @@ export const SlashMenuList = React.forwardRef<
       <div style={{ padding: 'var(--pubwave-spacing-1, 4px) 0' }}>
         {(() => {
           let globalIndex = 0;
-          const groupOrder = ['basic', 'list', 'media', 'advanced', 'layout'];
+          const groupOrder = ['ai', 'basic', 'list', 'media', 'advanced', 'layout'];
 
           return groupOrder.map((group) => {
             const groupItems = groupedItems[group];

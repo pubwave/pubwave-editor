@@ -1,11 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import { PubwaveEditor } from '@pubwave/editor';
-import type { EditorTheme, EditorLocale } from '@pubwave/editor';
+import { PubwaveEditor, createAdapter } from '@pubwave/editor';
+import type { EditorTheme, EditorLocale, AIConfig } from '@pubwave/editor';
 import type { JSONContent } from '@tiptap/core';
 import { PreviewModal } from './PreviewModal';
 import '@pubwave/editor/style.css';
+
+/**
+ * AI demo wiring.
+ *
+ * Routes through the catch-all proxy at `/api/ai/[...path]/route.ts`, which
+ * keeps the cloud-provider key on the server (set OPENAI_API_KEY and
+ * optionally OPENAI_BASE_URL in `.env`). Production-safe pattern — never
+ * put cloud keys in a browser bundle.
+ *
+ * To disable AI in this example, set `aiConfig` to `undefined`.
+ */
+const aiConfig: AIConfig | undefined = {
+  adapter: createAdapter({
+    provider: 'openai',
+    baseURL: '/api/ai/openai',
+  }),
+  defaultModel: 'openai/gpt-4o-mini',
+};
 
 // Chart images as base64 (SVG converted to data URLs) - AI themed
 const chartDashboard =
@@ -1521,6 +1539,7 @@ export default function EditorClientComponent({
             ...currentThemeConfig,
             locale: currentLocale,
           }}
+          ai={aiConfig}
           width="100%"
         />
       </div>
